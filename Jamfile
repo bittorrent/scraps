@@ -1,0 +1,135 @@
+DEPENDENCIES_PREFIX = [ SHELL "python3 -m ci_tacklebox.ci.properties prefix" : strip-eol ] ;
+DEPENDENCIES_PREFIX = "$(DEPENDENCIES_PREFIX)/ci-tacklebox" ;
+NEEDS_PREFIX = [ SHELL "python3 -m ci_tacklebox.ci.properties needs_path" : strip-eol ] ;
+
+rule clang-defaults ( properties * ) {
+    if <toolset>darwin in $(properties) || <toolset>clang in $(properties) {
+        local result ;
+        result += <cflags>-fdiagnostics-show-note-include-stack ;
+        result += <cflags>-fmacro-backtrace-limit=0 ;
+        result += <cflags>-fmessage-length=0 ;
+        result += <cflags>-fmodules ;
+        result += <cflags>-fstrict-aliasing ;
+        result += <cflags>-Wbool-conversion ;
+        result += <cflags>-Wconditional-uninitialized ;
+        result += <cflags>-Wconstant-conversion ;
+        result += <cflags>-Wdeprecated-declarations ;
+        result += <cflags>-Wno-deprecated-declarations ;
+        result += <cflags>-Wduplicate-method-match ;
+        result += <cflags>-Wempty-body ;
+        result += <cflags>-Wenum-conversion ;
+        result += <cflags>-Werror=deprecated-objc-isa-usage ;
+        result += <cflags>-Werror=objc-root-class ;
+        result += <cflags>-Werror=return-type ;
+        result += <cflags>-Wint-conversion ;
+        result += <cflags>-Winvalid-offsetof ;
+        result += <cflags>-Wno-arc-repeated-use-of-weak ;
+        result += <cflags>-Wno-c++11-extensions ;
+        result += <cflags>-Wno-c++1y-extensions ;
+        result += <cflags>-Wno-conversion ;
+        result += <cflags>-Wno-deprecated-implementations ;
+        result += <cflags>-Wno-exit-time-destructors ;
+        result += <cflags>-Wno-four-char-constants ;
+        result += <cflags>-Wno-implicit-atomic-properties ;
+        result += <cflags>-Wno-missing-braces ;
+        result += <cflags>-Wno-missing-field-initializers ;
+        result += <cflags>-Wno-missing-prototypes ;
+        result += <cflags>-Wno-newline-eof ;
+        result += <cflags>-Wno-non-virtual-dtor ;
+        result += <cflags>-Wno-overloaded-virtual ;
+        result += <cflags>-Wno-receiver-is-weak ;
+        result += <cflags>-Wno-selector ;
+        result += <cflags>-Wno-shadow ;
+        result += <cflags>-Wno-sign-conversion ;
+        result += <cflags>-Wno-strict-selector-match ;
+        result += <cflags>-Wno-unknown-pragmas ;
+        result += <cflags>-Wno-unused-label ;
+        result += <cflags>-Wno-unused-local-typedef ;
+        result += <cflags>-Wno-unused-parameter ;
+        result += <cflags>-Wparentheses ;
+        result += <cflags>-Wprotocol ;
+        #result += <cflags>-Wshorten-64-to-32 ;
+        result += <cflags>-Wswitch ;
+        result += <cflags>-Wundeclared-selector ;
+        result += <cflags>-Wunused-function ;
+        result += <cflags>-Wunused-value ;
+        result += <cflags>-Wunused-variable ;
+        return $(result) ;
+    }
+}
+
+alias project_defaults : : : :
+    <conditional>@clang-defaults
+
+    <toolset>gcc:<cflags>-Wno-error=format
+    <toolset>gcc:<cflags>-Wno-error=unused-variable
+    <toolset>gcc:<cflags>-Wno-unused-variable
+    <toolset>gcc:<cflags>-Wno-format
+    <toolset>gcc:<cflags>-Wno-unused-local-typedefs
+    <toolset>gcc:<cflags>-Wno-sign-compare
+
+    <variant>release,<target-os>linux:<warnings-as-errors>on
+    <variant>release,<target-os>darwin:<warnings-as-errors>on
+    <variant>release,<target-os>iphoneos:<warnings-as-errors>on
+    <variant>release,<target-os>appletvos:<warnings-as-errors>on
+    <variant>release,<target-os>android:<warnings-as-errors>off
+
+    <define>STATICLIB
+    <cflags>-U__STRICT_ANSI__
+;
+
+
+alias objc : : : :
+    <target-os>darwin:<cxxflags>"-x objective-c++"
+    <target-os>iphone:<cxxflags>"-x objective-c++"
+    <target-os>appletv:<cxxflags>"-x objective-c++"
+    <target-os>darwin:<cflags>-fobjc-arc
+    <target-os>iphone:<cflags>-fobjc-arc
+    <target-os>appletv:<cflags>-fobjc-arc
+;
+
+
+alias foundation_headers :
+    $(DEPENDENCIES_PREFIX)/boost//boost
+    $(DEPENDENCIES_PREFIX)/libsodium//libsodium
+    $(NEEDS_PREFIX)//openssl
+    $(NEEDS_PREFIX)//curl
+    $(NEEDS_PREFIX)//gsl
+    project_defaults
+:
+    <include>./include
+: :
+    <include>./include
+;
+
+
+cpp-pch pch :
+    foundation_headers
+    src/pch.h
+:
+    <conditional>@use-pch
+;
+
+alias mnmlstc : $(NEEDS_PREFIX)//mnmlstc ;
+
+lib foundation :
+    pch
+    objc
+    [ glob-tree *.cpp : tests include ]
+    include/cppformat/format.cc
+    include/json11/json11.cpp
+    foundation_headers
+    $(DEPENDENCIES_PREFIX)/boost//boost_system
+    $(DEPENDENCIES_PREFIX)/boost//boost_filesystem
+    $(DEPENDENCIES_PREFIX)/boost//boost_program_options
+    mnmlstc
+:
+    <link>static
+: :
+    <target-os>darwin:<framework>Foundation
+    <target-os>darwin:<framework>CoreServices
+    <target-os>darwin:<framework>CoreFoundation
+    <target-os>darwin:<framework>Security
+    <target-os>linux:<linkflags>"-lpthread -ldl"
+    <linkflags>"-lcurl -lz -lssl -lcrypto"
+;
