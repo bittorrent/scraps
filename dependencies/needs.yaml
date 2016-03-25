@@ -1,0 +1,69 @@
+libraries:
+    openssl:
+        repository: git@github.com:openssl/openssl.git
+        commit: OpenSSL_1_0_1p
+        project:
+            build-steps:
+                {% if platform == 'osx' %}
+                - sh ./Configure darwin64-x86_64-cc --prefix={build_directory}
+                - make install
+                {% elif platform == 'ios' %}
+                - sh ./Configure iphoneos-cross --prefix={build_directory}
+                - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/iPhoneOS.platform/Developer CROSS_SDK=iPhoneOS.sdk'
+                {% elif platform == 'iossimulator' %}
+                - sh ./Configure iphoneos-cross --prefix={build_directory} -D__STRICT_ANSI__=1 no-asm
+                - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/iPhoneSimulator.platform/Developer CROSS_SDK=iPhoneSimulator.sdk'
+                {% elif platform == 'tvos' %}
+                - sh ./Configure iphoneos-cross --prefix={build_directory} -DHAVE_FORK=0
+                - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/AppleTVOS.platform/Developer CROSS_SDK=AppleTVOS.sdk'
+                {% elif platform == 'tvossimulator' %}
+                - sh ./Configure iphoneos-cross --prefix={build_directory} -D__STRICT_ANSI__=1 -DHAVE_FORK=0 no-asm
+                - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/AppleTVSimulator.platform/Developer CROSS_SDK=AppleTVSimulator.sdk'
+                {% elif platform == 'android' %}
+                - sh ./Configure android --prefix={build_directory}
+                - make install
+                {% elif platform == host_platform %}
+                - sh ./config --prefix={build_directory}
+                - make install
+                {% endif %}
+    curl:
+        download: http://curl.haxx.se/download/curl-7.44.0.tar.gz
+        checksum: 4dc36d2f3310585cc1f9211b5f5c71327c86fb61
+        dependencies: openssl
+        project:
+            linkage: static
+            configure-args:
+                - --disable-ldap
+                - --without-libidn
+                - --without-librtmp
+                - --disable-ntlm-wb
+                - --with-ssl={build_directory}/../../../../openssl/build/{platform}/{architecture}
+    gsl:
+        repository: git@github.com:Microsoft/GSL.git
+        commit: 0be53d99ef9b6ac0c7d6d995cb94c0dce14fe1f8
+        project:
+            header-directory: include
+    mnmlstc:
+        repository: git@github.com:bittorrent/mnmlstc-core.git
+        commit: 477ad177db1bed75c5f251b1a1976787cc769c00
+        project:
+            header-directory: include
+
+universal-binaries:
+    macosx:
+        osx:
+            - x86_64
+    iphoneos:
+        ios:
+            - armv7
+            - arm64
+    iphonesimulator:
+        iossimulator:
+            - i386
+            - x86_64
+    appletvos:
+        tvos:
+            - arm64
+    appletvsimulator:
+        tvossimulator:
+            - x86_64
