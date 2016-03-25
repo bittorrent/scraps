@@ -4,11 +4,11 @@
 /.build
 /.configure
 /analyzer-results
+/dist
+/dependencies/ci-tacklebox
+/dependencies/needs
 /doxygen-warnings.log
 /test-reports
-/third-party/*/share
-/third-party/*/src
-/dist
 /tests/dist
 
 ###
@@ -18,8 +18,6 @@
 ###########
 # Android #
 ###########
-/third-party/android*
-
 # Built application files
 *.apk
 *.ap_
@@ -65,9 +63,10 @@ proguard/
 ################
 # CI Tacklebox #
 ################
-/config.tackle
-/include/onair/*-config.h
+*.tackle
+/include/scraps/*-config.h
 *.checksum
+/project-config.jam
 
 ############
 # IntelliJ #
@@ -78,6 +77,11 @@ proguard/
 .idea/tasks.xml
 .idea/datasources.xml
 .idea/dataSources.ids
+
+#########
+# Needy #
+#########
+.needy_lock
 
 ##########
 # Python #
