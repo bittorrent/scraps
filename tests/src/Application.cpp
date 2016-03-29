@@ -10,7 +10,7 @@ class TestApplication : public Application {
 public:
     bool processed = false;
 
-    TestApplication() {
+    TestApplication() : Application{Version{1,0}} {
         setOutStream(&_ostream);
         _previousLogger = CurrentLogger();
         SetLogger(nullptr);

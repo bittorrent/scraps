@@ -21,7 +21,7 @@ struct Version {
     uint16_t revision = 0;
     uint32_t build    = 0;
 
-    constexpr Version(uint8_t major, uint8_t minor, uint16_t revision, uint32_t build)
+    constexpr Version(uint8_t major, uint8_t minor, uint16_t revision = 0, uint32_t build = 0)
         : major(major), minor(minor), revision(revision), build(build) {}
 
     explicit Version(uint64_t versionInt);
@@ -37,17 +37,6 @@ struct Version {
     bool operator>(const Version& other) const { return toInteger() > other.toInteger(); }
     bool operator<=(const Version& other) const { return toInteger() <= other.toInteger(); }
     bool operator>=(const Version& other) const { return toInteger() >= other.toInteger(); }
-};
-
-static const constexpr Version kVersion = {
-#if defined(SCRAPS_VERSION)
-    SCRAPS_VERSION_MAJOR,
-    SCRAPS_VERSION_MINOR,
-    SCRAPS_VERSION_REVISION,
-    SCRAPS_VERSION_BUILD
-#else
-    0, 0, 0, 0
-#endif
 };
 
 } // namespace scraps

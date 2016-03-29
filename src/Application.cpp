@@ -16,8 +16,8 @@ namespace scraps {
 
 Application* Application::g_instance = nullptr;
 
-Application::Application() :
-    _appVersion{kVersion}
+Application::Application(Version appVersion) :
+    _appVersion{std::move(appVersion)}
 {
     SCRAPS_ASSERT(g_instance == nullptr);
     g_instance = this;

@@ -16,7 +16,7 @@ class Logger;
  * Provide a structured way to initialize and shutdown an application.
  *
  * int main(int argc, const char* argv[]) {
- *     Application app;
+ *     Application app{Version{1, 0}};
  *     if (app.processArguments(argc, argv)) {
  *         return app.run();
  *     }
@@ -28,7 +28,7 @@ class Logger;
  */
 class Application {
 public:
-    Application();
+    Application(Version appVersion);
 
     Application(const Application&) = delete;
     Application& operator=(const Application&) = delete;
