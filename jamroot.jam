@@ -1,2 +1,2 @@
 build-project lib ;
-# build-project tests ;
+build-project tests ;

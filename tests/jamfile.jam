@@ -1,0 +1,33 @@
+alias scraps-tests-common :
+    [ glob-tree-ex src : *.cpp : android.cpp ]
+    ../lib//scraps
+    ../dependencies/ci-tacklebox/gtest//gtest/<link>static
+;
+
+lib scraps-gtests : scraps-tests-common :
+    <conditional>@unit-test-library
+    <link>static
+;
+
+exe scraps-tests :
+    scraps-tests-common/<link>static
+    ../dependencies/ci-tacklebox/gtest//gtest_main/<link>static
+:
+    <conditional>@unit-test-executable
+;
+
+#lib scraps-tests-android :
+#    src/android.cpp
+#    scraps-tests-common/<link>static
+#    ../dependencies/jni//jni
+#:
+#    <include>../../apk-wrapper/include
+#    <link>shared
+#    <build>no
+#    <target-os>android:<build>yes
+#;
+
+#install dist/android : scraps-tests-android/<target-os>android :
+#    <build>no
+#    <target-os>android:<build>yes
+#;
