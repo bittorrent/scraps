@@ -1,6 +1,5 @@
-DEPENDENCIES_PREFIX = [ SHELL "python3 -m ci_tacklebox.ci.properties prefix" : strip-eol ] ;
-DEPENDENCIES_PREFIX = "$(DEPENDENCIES_PREFIX)/ci-tacklebox" ;
-NEEDS_PREFIX = [ SHELL "python3 -m ci_tacklebox.ci.properties needs_path" : strip-eol ] ;
+DEPENDENCIES_PATH = [ SHELL "python3 -m ci_tacklebox.ci.properties dependencies_path" : strip-eol ] ;
+NEEDS_PATH = [ SHELL "python3 -m ci_tacklebox.ci.properties needs_path" : strip-eol ] ;
 
 rule clang-defaults ( properties * ) {
     if <toolset>darwin in $(properties) || <toolset>clang in $(properties) {
@@ -89,39 +88,40 @@ alias objc : : : :
 ;
 
 
-alias foundation_headers :
-    $(DEPENDENCIES_PREFIX)/boost//boost
-    $(DEPENDENCIES_PREFIX)/libsodium//libsodium
-    $(NEEDS_PREFIX)//openssl
-    $(NEEDS_PREFIX)//curl
-    $(NEEDS_PREFIX)//gsl
+alias scraps_headers :
+    $(DEPENDENCIES_PATH)/boost//boost
+    $(DEPENDENCIES_PATH)/libsodium//libsodium
+    $(NEEDS_PATH)//openssl
+    $(NEEDS_PATH)//curl
+    $(NEEDS_PATH)//gsl
     project_defaults
 :
-    <include>./include
+    <include>../include
 : :
-    <include>./include
+    <include>../include
 ;
 
 
 cpp-pch pch :
-    foundation_headers
-    src/pch.h
+    scraps_headers
+    ../src/pch.h
 :
     <conditional>@use-pch
 ;
 
-alias mnmlstc : $(NEEDS_PREFIX)//mnmlstc ;
+alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
 
-lib foundation :
+lib scraps :
     pch
     objc
-    [ glob-tree *.cpp : tests include ]
-    include/cppformat/format.cc
-    include/json11/json11.cpp
-    foundation_headers
-    $(DEPENDENCIES_PREFIX)/boost//boost_system
-    $(DEPENDENCIES_PREFIX)/boost//boost_filesystem
-    $(DEPENDENCIES_PREFIX)/boost//boost_program_options
+    [ glob-tree-ex ../src : *.cpp ]
+    ../include/cppformat/format.cc
+    ../include/json11/json11.cpp
+    scraps_headers
+    $(DEPENDENCIES_PATH)/boost//boost
+    $(DEPENDENCIES_PATH)/boost//boost_system
+    $(DEPENDENCIES_PATH)/boost//boost_filesystem
+    $(DEPENDENCIES_PATH)/boost//boost_program_options
     mnmlstc
 :
     <link>static
