@@ -83,11 +83,7 @@ TEST(TaskThread, futuresFunctionality) {
     EXPECT_EQ(f.valid(), true);
     EXPECT_EQ(f.get(), 17);
 
-    #if !SCRAPS_MOBILE
-        const auto threshold = 8ms;
-    #else
-        const auto threshold = 20ms;
-    #endif
+    const auto threshold = 20ms;
 
     EXPECT_LT(std::chrono::steady_clock::now(), now + threshold);
 }
