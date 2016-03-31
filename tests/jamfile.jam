@@ -1,3 +1,5 @@
+JSHACKLE_PATH = [ SHELL "python3 -m ci_tacklebox.dependencies.path jshackle" : strip-eol ] ;
+
 alias scraps-tests-common :
     [ glob-tree-ex src : *.cpp : android.cpp ]
     ../lib//scraps
@@ -16,18 +18,17 @@ exe scraps-tests :
     <conditional>@unit-test-executable
 ;
 
-#lib scraps-tests-android :
-#    src/android.cpp
-#    scraps-tests-common/<link>static
-#    ../dependencies/jni//jni
-#:
-#    <include>../../apk-wrapper/include
-#    <link>shared
-#    <build>no
-#    <target-os>android:<build>yes
-#;
+lib scraps-tests-android :
+    src/android.cpp
+    scraps-tests-common/<link>static
+    $(JSHACKLE_PATH)//jshackle
+:
+    <link>shared
+    <build>no
+    <target-os>android:<build>yes
+;
 
-#install dist/android : scraps-tests-android/<target-os>android :
-#    <build>no
-#    <target-os>android:<build>yes
-#;
+install dist/android : scraps-tests-android/<target-os>android :
+    <build>no
+    <target-os>android:<build>yes
+;

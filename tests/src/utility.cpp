@@ -38,15 +38,14 @@ TEST(utility, Base64Encode) {
     }
 }
 
-TEST(utility, URLEncode) {
-    ASSERT_EQ("gro%C3%9Fp%C3%B6sna", URLEncode("großpösna"));
-    ASSERT_EQ("-_.+", URLEncode("-_. "));
-};
-
-TEST(utility, URLDecode) {
-    ASSERT_EQ("großpösna", URLDecode("gro%C3%9Fp%C3%B6sna"));
-    ASSERT_EQ("-_. ", URLDecode("-_.+"));
-};
+TEST(utility, Clamp) {
+    EXPECT_EQ(Clamp(5l, 0, 10), 5l);
+    EXPECT_EQ(Clamp(5l, 6, 10), 6l);
+    EXPECT_EQ(Clamp(5l, 0, 5), 5l);
+    EXPECT_EQ(Clamp(0.25, 0, 5), 0.25);
+    EXPECT_EQ(Clamp(1, 0.0, 5.0), 1.0);
+    EXPECT_EQ(Clamp(-0.5, -1.0, 5.0), -0.5);
+}
 
 TEST(utility, JSONEscape) { ASSERT_EQ("asd\\\\ \\\"asd\\u0009", JSONEscape("asd\\ \"asd\t")); };
 
@@ -82,6 +81,38 @@ TEST(utility, UniformDistribution) {
     }
 }
 
+TEST(utility, URLEncode) {
+    ASSERT_EQ("gro%C3%9Fp%C3%B6sna", URLEncode("großpösna"));
+    ASSERT_EQ("-_.+", URLEncode("-_. "));
+};
+
+TEST(utility, URLDecode) {
+    ASSERT_EQ("großpösna", URLDecode("gro%C3%9Fp%C3%B6sna"));
+    ASSERT_EQ("-_. ", URLDecode("-_.+"));
+};
+
+TEST(utility, HexToDec) {
+    static_assert(HexToDec('0') == 0, "test failed");
+    static_assert(HexToDec('a') == 10, "test failed");
+    static_assert(HexToDec('f') == 15, "test failed");
+    static_assert(HexToDec('A') == 10, "test failed");
+    static_assert(HexToDec('F') == 15, "test failed");
+
+    static_assert(HexToDec('g') == -1, "test failed");
+    static_assert(HexToDec('-') == -1, "test failed");
+    static_assert(HexToDec(' ') == -1, "test failed");
+}
+
+TEST(utility, DecToHex) {
+    static_assert(DecToHex(0) == '0', "test failed");
+    static_assert(DecToHex(10) == 'a', "test failed");
+    static_assert(DecToHex(15) == 'f', "test failed");
+
+    static_assert(DecToHex(-1) == -1, "test failed");
+    static_assert(DecToHex(17) == -1, "test failed");
+    static_assert(DecToHex(20) == -1, "test failed");
+}
+
 TEST(utility, NRandomElements) {
     std::vector<int> set{1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<int> counts(9, 0);
@@ -110,43 +141,6 @@ TEST(utility, NRandomElements) {
 
     auto minmax = std::minmax_element(counts.begin(), counts.end());
     EXPECT_GT(*minmax.first, *minmax.second * 0.8);
-}
-
-TEST(utility, HexToDec) {
-    static_assert(HexToDec('0') == 0, "test failed");
-    static_assert(HexToDec('a') == 10, "test failed");
-    static_assert(HexToDec('f') == 15, "test failed");
-    static_assert(HexToDec('A') == 10, "test failed");
-    static_assert(HexToDec('F') == 15, "test failed");
-
-    static_assert(HexToDec('g') == -1, "test failed");
-    static_assert(HexToDec('-') == -1, "test failed");
-    static_assert(HexToDec(' ') == -1, "test failed");
-}
-
-TEST(utility, DecToHex) {
-    static_assert(DecToHex(0) == '0', "test failed");
-    static_assert(DecToHex(10) == 'a', "test failed");
-    static_assert(DecToHex(15) == 'f', "test failed");
-
-    static_assert(DecToHex(-1) == -1, "test failed");
-    static_assert(DecToHex(17) == -1, "test failed");
-    static_assert(DecToHex(20) == -1, "test failed");
-}
-
-TEST(utility, ToHex) {
-    std::array<Byte, 8> bytes = {
-        {Byte{0x01}, Byte{0x23}, Byte{0x45}, Byte{0x67}, Byte{0x89}, Byte{0xAB}, Byte{0xCD}, Byte{0xEF}}};
-
-    EXPECT_EQ(ToHex(bytes), "0123456789abcdef");
-
-    uint8_t dims[3][3] = {{0x01, 0x23, 0x45}, {0x67, 0x89, 0xAB}, {0xCD, 0xEF, 0x01}};
-
-    EXPECT_EQ(ToHex(gsl::as_span(dims)), "0123456789abcdef01");
-
-    uint8_t(*dynDims)[3] = dims;
-
-    EXPECT_EQ(ToHex(gsl::as_span(dynDims, 3)), "0123456789abcdef01");
 }
 
 TEST(utility, ToBytes) {
@@ -193,6 +187,21 @@ TEST(utility, ToBytes) {
         EXPECT_TRUE(ToBytes(str, actual));
         EXPECT_EQ(expected, actual);
     }
+}
+
+TEST(utility, ToHex) {
+    std::array<Byte, 8> bytes = {
+        {Byte{0x01}, Byte{0x23}, Byte{0x45}, Byte{0x67}, Byte{0x89}, Byte{0xAB}, Byte{0xCD}, Byte{0xEF}}};
+
+    EXPECT_EQ(ToHex(bytes), "0123456789abcdef");
+
+    uint8_t dims[3][3] = {{0x01, 0x23, 0x45}, {0x67, 0x89, 0xAB}, {0xCD, 0xEF, 0x01}};
+
+    EXPECT_EQ(ToHex(gsl::as_span(dims)), "0123456789abcdef01");
+
+    uint8_t(*dynDims)[3] = dims;
+
+    EXPECT_EQ(ToHex(gsl::as_span(dynDims, 3)), "0123456789abcdef01");
 }
 
 #if SCRAPS_OS_X

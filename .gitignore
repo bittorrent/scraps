@@ -1,8 +1,6 @@
 ########
 # Ours #
 ########
-/.build
-/.configure
 /analyzer-results
 /dist
 /dependencies/ci-tacklebox
@@ -63,6 +61,8 @@ proguard/
 ################
 # CI Tacklebox #
 ################
+/.build
+/.configure
 *.tackle
 /include/scraps/*-config.h
 *.checksum

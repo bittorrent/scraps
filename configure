@@ -17,17 +17,15 @@ except:
 
 from ci_tacklebox.ci import configure
 configure.main(
-    dependencies=[
-        'boost-build',
-        'boost',
-        'libsodium',
-        'needy',
-        # 'cppformat',
-        # 'json11'
-        # 'needs/openssl',
-        # 'needs/curl',
-        # 'needs/gsl',
-        # 'needs/mnmlstc',
-    ],
+    dependencies={
+        'boost-build': {},
+        'boost': {'libraries': ['system', 'program_options', 'filesystem']},
+        'libsodium': {},
+        'gtest': {},
+        'needy': {},
+        'jshackle': {
+            'url': 'ssh://git@github.com:bittorrent/jshackle.git',
+        }
+    },
     prerequisites=['clang', 'cmake']
 )

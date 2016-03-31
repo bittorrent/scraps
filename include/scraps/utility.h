@@ -146,9 +146,31 @@ std::string Base64Encode(const char* data, size_t length);
 std::string Basename(const std::string& path);
 
 /**
+ * Clamp a value between min and max, inclusive.
+ */
+template <typename T, typename MinT, typename MaxT>
+constexpr auto Clamp(const T& value, const MinT& min, const MaxT& max) {
+  return std::max<std::common_type_t<T, MinT, MaxT>>(min, std::min<std::common_type_t<T, MinT, MaxT>>(value, max));
+}
+
+
+/**
 * Returns the directory name of a given path.
 */
 std::string Dirname(const std::string& path);
+
+/**
+* Allow user to enter a shadowed password from stdin.
+*/
+std::string GetPasswordFromStdin();
+
+template <typename CharT>
+constexpr int8_t HexToDec(CharT c) {
+    if (c >= '0' && c <= '9') { return c - '0'; }
+    if (c >= 'a' && c <= 'f') { return c - 'a' + 10; }
+    if (c >= 'A' && c <= 'F') { return c - 'A' + 10; }
+    return -1;
+}
 
 /**
 * Parse out an address and port from the given host string. If a port is not found, the
@@ -157,14 +179,14 @@ std::string Dirname(const std::string& path);
 std::tuple<std::string, uint16_t> ParseAddressAndPort(const std::string& host, uint16_t defaultPort);
 
 /**
+* @return the amount of physical memory that the system has, or 0 on error
+*/
+size_t PhysicalMemory();
+
+/**
 * Convert from microseconds to a timeval.
 */
 timeval ToTimeval(const std::chrono::microseconds& value);
-
-/**
-* Allow user to enter a shadowed password from stdin.
-*/
-std::string GetPasswordFromStdin();
 
 constexpr signed char DecToHex(int c) {
     if (c >= 0 && c < 16) {
@@ -175,41 +197,6 @@ constexpr signed char DecToHex(int c) {
 
 constexpr signed char DecToHex(const Byte& c) {
     return DecToHex(c.value());
-}
-
-/**
- * Returns a hex string representation of the input span. The output does not
- * include an "0x" prefix.
- *
- * example: ToHex(std::array<uint8_t, 1>{0xAB}) == "AB";
- */
-template <typename T, std::ptrdiff_t... BytesDimension>
-std::string ToHex(const gsl::span<T, BytesDimension...> range) {
-    std::string ret;
-
-    static_assert(sizeof(T) == 1, "Input span type too large");
-
-    ret.reserve(range.size() * 2 + 2);
-
-    for (auto& b : range) {
-        ret += DecToHex(b >> 4);
-        ret += DecToHex(b & 0x0F);
-    }
-
-    return ret;
-}
-
-template <typename T, size_t N>
-std::string ToHex(const std::array<T, N>& in) {
-    return ToHex(gsl::span<const T, N>{in});
-}
-
-template <typename CharT>
-constexpr int8_t HexToDec(CharT c) {
-    if (c >= '0' && c <= '9') { return c - '0'; }
-    if (c >= 'a' && c <= 'f') { return c - 'a' + 10; }
-    if (c >= 'A' && c <= 'F') { return c - 'A' + 10; }
-    return -1;
 }
 
 /**
@@ -243,8 +230,30 @@ constexpr bool ToBytes(const std::basic_string<CharT>& in, std::array<T, N>& out
 }
 
 /**
-* @return the amount of physical memory that the system has, or 0 on error
-*/
-size_t PhysicalMemory();
+ * Returns a hex string representation of the input span. The output does not
+ * include an "0x" prefix.
+ *
+ * example: ToHex(std::array<uint8_t, 1>{0xAB}) == "AB";
+ */
+template <typename T, std::ptrdiff_t... BytesDimension>
+std::string ToHex(const gsl::span<T, BytesDimension...> range) {
+    std::string ret;
+
+    static_assert(sizeof(T) == 1, "Input span type too large");
+
+    ret.reserve(range.size() * 2 + 2);
+
+    for (auto& b : range) {
+        ret += DecToHex(b >> 4);
+        ret += DecToHex(b & 0x0F);
+    }
+
+    return ret;
+}
+
+template <typename T, size_t N>
+std::string ToHex(const std::array<T, N>& in) {
+    return ToHex(gsl::span<const T, N>{in});
+}
 
 } // namespace scraps
