@@ -61,12 +61,14 @@ proguard/
 ################
 # CI Tacklebox #
 ################
+*.checksum
+*.tackle
 /.build
 /.configure
-*.tackle
 /include/scraps/*-config.h
-*.checksum
+/lib/*.xcconfig
 /project-config.jam
+/tests/*-tests.xcconfig
 
 ############
 # IntelliJ #

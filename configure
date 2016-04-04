@@ -22,9 +22,10 @@ configure.main(
         'boost': {'libraries': ['system', 'program_options', 'filesystem']},
         'libsodium': {},
         'gtest': {},
+        'gtest-xcode': {},
         'needy': {},
         'jshackle': {
-            'url': 'ssh://git@github.com:bittorrent/jshackle.git',
+            'url': 'git@github.com:bittorrent/jshackle.git',
         }
     },
     prerequisites=['clang', 'cmake']

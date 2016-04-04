@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+
+from ci_tacklebox.ci.tester import main
+
+main(platform='iphonesimulator')

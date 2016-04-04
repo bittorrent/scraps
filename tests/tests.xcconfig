@@ -1,0 +1,9 @@
+#include "./scraps-tests.xcconfig"
+#include "../lib/scraps.xcconfig"
+#include "../dependencies/ci-tacklebox/gtest-xcode/gtest-xcode.xcconfig"
+#include "../dependencies/ci-tacklebox/boost/boost.xcconfig"
+#include "../dependencies/needs/needs.xcconfig"
+
+DEPENDENCY_LDFLAGS =  $(GTEST_LDFLAGS) $(BOOST_LDFLAGS) $(CURL_LDFLAGS) $(OPENSSL_LDFLAGS) "-lz"
+
+OTHER_LDFLAGS = $(inherited) $(SCRAPS_TESTS_LDFLAGS) $(SCRAPS_LDFLAGS) $(DEPENDENCY_LDFLAGS)
