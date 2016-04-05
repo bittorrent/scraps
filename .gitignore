@@ -61,6 +61,7 @@ proguard/
 ################
 # CI Tacklebox #
 ################
+/.arcconfig
 *.checksum
 *.tackle
 /.build
