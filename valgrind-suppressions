@@ -1,0 +1,172 @@
+##### Scraps #####
+
+{
+   memcheck-darwin-scraps-HTTPRequest-initiate
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:curl_easy_init
+   fun:_ZN5scraps11HTTPRequest8initiateERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEPKvmRKNS1_6vectorIS7_NS5_IS7_EEEE
+}
+
+{
+   memcheck-darwin-scraps-TCPService-connect
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:getaddrinfo
+   fun:_ZZN5scraps10TCPService7connectERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEtENK3$_3clEv
+}
+
+{
+   memcheck-darwin-scraps-TCPService-connect
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:getaddrinfo
+   fun:_ZZN5scraps10TCPService7connectERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEtENK3$_3clEv
+}
+
+{
+   memcheck-darwin-scraps-Application-processArguments
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:+[NSBundle mainBundle]
+   fun:_ZN5scraps11Application16processArgumentsEiPPKc
+}
+
+{
+   memcheck-darwin-scraps-Application-processArguments
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:+[NSBundle mainBundle]
+   fun:_ZN5scraps11Application16processArgumentsEiPPKc
+}
+
+{
+   memcheck-darwin-scraps-Application-processArguments
+   Memcheck:Leak
+   match-leak-kinds: possible
+   ...
+   fun:+[NSBundle mainBundle]
+   fun:_ZN5scraps11Application16processArgumentsEiPPKc
+}
+
+{
+   memcheck-darwin-scraps-Application-processArguments
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   ...
+   fun:+[NSBundle mainBundle]
+   fun:_ZN5scraps11Application16processArgumentsEiPPKc
+}
+
+{
+   memcheck-darwin-scraps-Application-processArguments
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:_ZL16attachCategoriesP10objc_classP26locstamped_category_list_tb
+   fun:_ZN5scraps11Application16processArgumentsEiPPKc
+}
+
+{
+   memcheck-darwin-scraps-Application-processArguments
+   Memcheck:Leak
+   match-leak-kinds: possible
+   ...
+   fun:_ZL16attachCategoriesP10objc_classP26locstamped_category_list_tb
+   fun:_ZN5scraps11Application16processArgumentsEiPPKc
+}
+
+{
+   memcheck-darwin-scraps-Application-processArguments
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:-[NSBundle infoDictionary]
+   fun:_ZN5scraps11Application16processArgumentsEiPPKc
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:-[NSString(NSPathUtilities) _stringByStandardizingPathUsingCache:]
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:-[NSString(NSPathUtilities) _stringByStandardizingPathUsingCache:]
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:+[NSString stringWithFormat:]
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   ...
+   fun:+[NSString stringWithFormat:]
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: possible
+   ...
+   fun:-[NSString(NSPathUtilities) _stringByStandardizingPathUsingCache:]
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   ...
+   fun:-[NSString(NSPathUtilities) _stringByStandardizingPathUsingCache:]
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:NSHomeDirectoryForUser
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:NSHomeDirectoryForUser
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
+
+{
+   memcheck-darwin-scraps-FileLogger-DefaultLogPath
+   Memcheck:Leak
+   match-leak-kinds: indirect
+   ...
+   fun:NSHomeDirectoryForUser
+   fun:_ZN5scraps10FileLogger14DefaultLogPathERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEE
+}
