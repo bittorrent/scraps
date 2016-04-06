@@ -8,6 +8,7 @@
 /doxygen-warnings.log
 /test-reports
 /tests/dist
+/scraps.xcodeproj/project.xcworkspace
 
 ###
 # Note: Keep organized by product, A-Z
