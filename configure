@@ -17,6 +17,7 @@ except:
 
 from ci_tacklebox.ci import configure
 configure.main(
+    version='0.1.0',
     dependencies={
         'boost-build': {},
         'boost': {'libraries': ['system', 'program_options', 'filesystem']},
