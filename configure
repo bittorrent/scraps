@@ -25,6 +25,7 @@ configure.main(
         'gtest': {},
         'gtest-xcode': {},
         'needy': {},
+        'ocunit2junit': {},
         'jshackle': {
             'url': 'git@github.com:bittorrent/jshackle.git',
         }
