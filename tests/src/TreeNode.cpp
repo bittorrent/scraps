@@ -166,21 +166,21 @@ TEST(TreeNode, isDescendantOf) {
 }
 
 
-TEST(TreeNode, isAnscestorOf) {
+TEST(TreeNode, isAncestorOf) {
     TestNode root;
     TestNode c1, c2;
 
     root.addChildToBack(&c1);
     c1.addChildToBack(&c2);
 
-    EXPECT_FALSE(c2.isAnscestorOf(&root));
-    EXPECT_FALSE(c2.isAnscestorOf(&c1));
+    EXPECT_FALSE(c2.isAncestorOf(&root));
+    EXPECT_FALSE(c2.isAncestorOf(&c1));
 
-    EXPECT_FALSE(c1.isAnscestorOf(&root));
-    EXPECT_TRUE(c1.isAnscestorOf(&c2));
+    EXPECT_FALSE(c1.isAncestorOf(&root));
+    EXPECT_TRUE(c1.isAncestorOf(&c2));
 
-    EXPECT_TRUE(root.isAnscestorOf(&c1));
-    EXPECT_TRUE(root.isAnscestorOf(&c2));
+    EXPECT_TRUE(root.isAncestorOf(&c1));
+    EXPECT_TRUE(root.isAncestorOf(&c2));
 }
 
 TEST(TreeNode, commonNode) {

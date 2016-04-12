@@ -65,7 +65,7 @@ public:
     /**
      * Determine if a node is a descendant or ancestor of this node.
      */
-    bool isAnscestorOf(const T* other) const;
+    bool isAncestorOf(const T* other) const;
     bool isDescendantOf(const T* other) const;
 
     enum class Relation {
@@ -188,7 +188,7 @@ template <typename T>
 const T* TreeNode<T>::commonNode(gsl::not_null<const T*> other) const {
     const T* current = static_cast<const T*>(this);
     while (current) {
-        if (current == other || current->isAnscestorOf(other)) {
+        if (current == other || current->isAncestorOf(other)) {
             return current;
         }
         current = current->parent();
@@ -212,7 +212,7 @@ bool TreeNode<T>::isDescendantOf(const T* other) const {
 }
 
 template <typename T>
-bool TreeNode<T>::isAnscestorOf(const T* other) const {
+bool TreeNode<T>::isAncestorOf(const T* other) const {
     return other && other->isDescendantOf(static_cast<const T*>(this));
 }
 
@@ -227,7 +227,7 @@ bool TreeNode<T>::hasRelation(TreeNode::Relation relation, const T* other) const
         case Relation::kDescendant:
             return isDescendantOf(other);
         case Relation::kAncestor:
-            return isAnscestorOf(other);
+            return isAncestorOf(other);
         case Relation::kSibling:
             return other != static_cast<const T*>(this) && parent() && parent() == other->parent();
         case Relation::kSelf:
