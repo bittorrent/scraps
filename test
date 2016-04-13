@@ -2,4 +2,4 @@
 
 from ci_tacklebox.ci.tester import main
 
-main(platform='iphonesimulator')
+main()
