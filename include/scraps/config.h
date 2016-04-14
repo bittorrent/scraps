@@ -25,7 +25,6 @@
 #define BOOST_ASIO_HAS_STD_SHARED_PTR 1
 #define BOOST_ASIO_HAS_STD_ARRAY 1
 
-
 namespace scraps {
 using namespace std::literals;
 } // namespace scraps

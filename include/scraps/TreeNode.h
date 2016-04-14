@@ -2,12 +2,9 @@
 
 #include "scraps/config.h"
 
-#include "scraps/Reverse.h"
-
-#include <gsl.h>
-
 #include <list>
 #include <queue>
+#include <cassert>
 
 namespace scraps {
 
@@ -22,13 +19,13 @@ public:
     /**
      * Add children.
      */
-    void addChildToBack(gsl::not_null<T*> child);
-    void addChildToFront(gsl::not_null<T*> child);
+    void addChildToBack(T* child);
+    void addChildToFront(T* child);
 
     /**
-     * Remove children. Returns the number of children removed.
+     * Remove children. Returns whether a child was removed.
      */
-    size_t removeChild(gsl::not_null<T*> child);
+    bool removeChild(T* child);
 
     /**
      * Rearrange the order of this node relative to its siblings. If this node
@@ -40,17 +37,17 @@ public:
     /**
      * Get a list of all children.
      */
-    inline auto& children() const { return _children; }
-    inline auto& children()       { return _children; }
+    const std::list<T*>& children() const { return _children; }
+    std::list<T*>& children()             { return _children; }
 
     /**
      * Get the parent.
      */
-    inline T* parent() const { return _parent; }
-    inline T* parent()       { return _parent; }
+    const T* parent() const { return _parent; }
+    T* parent()             { return _parent; }
 
     /**
-     * Get the root of the tree. Will return `this` if the there is no parent;
+     * Get the root of the tree. Will return `this` if the there is no parent.
      */
     const T* root() const;
     T* root();
@@ -60,7 +57,7 @@ public:
      * (including if one is a descendant or ancestor of the other) or null
      * otherwise.
      */
-    const T* commonNode(gsl::not_null<const T*> other) const;
+    const T* commonNode(const T* other) const;
 
     /**
      * Determine if a node is a descendant or ancestor of this node.
@@ -102,96 +99,92 @@ public:
     auto traverseRelation(Relation relation, F&& function, R init, bool* shouldContinue = nullptr);
 
 private:
-    std::list<T*>  _children;
     T* _parent = nullptr;
+    std::list<T*> _children;
 
     template <typename F, typename R>
-    auto _traverseRelation(Relation relation, F&& function, R&& result, gsl::not_null<bool*> shouldContinue);
+    auto _traverseRelation(Relation relation, F&& function, R&& result, bool* shouldContinue);
+
+    auto _self() const { return static_cast<const T*>(this); }
+    auto _self()       { return static_cast<T*>(this); }
 };
 
 template <typename T>
-void TreeNode<T>::addChildToBack(gsl::not_null<T*> child) {
-    SCRAPS_ASSERT(child != static_cast<T*>(this));
-    SCRAPS_ASSERT(child->parent() == nullptr);
+void TreeNode<T>::addChildToBack(T* child) {
+    assert(child != nullptr);
+    assert(child != _self());
+    assert(child->TreeNode::parent() == nullptr);
 
     _children.push_back(child);
-    child->_parent = static_cast<T*>(this);
+    child->_parent = _self();
 }
 
 template <typename T>
-void TreeNode<T>::addChildToFront(gsl::not_null<T*> child) {
-    SCRAPS_ASSERT(child != static_cast<T*>(this));
-    SCRAPS_ASSERT(child->parent() == nullptr);
+void TreeNode<T>::addChildToFront(T* child) {
+    assert(child != nullptr);
+    assert(child != _self());
+    assert(child->TreeNode::parent() == nullptr);
 
     _children.push_front(child);
-    child->_parent = static_cast<T*>(this);
+    child->_parent = _self();
 }
 
 template <typename T>
-size_t TreeNode<T>::removeChild(gsl::not_null<T*> child) {
+bool TreeNode<T>::removeChild(T* child) {
+    assert(child != nullptr);
     auto it = std::find(_children.begin(), _children.end(), child);
     if (it == _children.end()) {
-        return 0;
+        return false;
     }
     _children.erase(it);
     child->_parent = nullptr;
-    return 1;
+    return true;
 }
 
 template <typename T>
 void TreeNode<T>::sendToBack() {
+    assert(parent() != nullptr);
     auto& siblings = parent()->TreeNode::children();
-    for (auto it = siblings.begin(); it != siblings.end(); ++it) {
-        if (*it == this) {
-            siblings.erase(it);
-            siblings.push_back(static_cast<T*>(this));
-            return;
-        }
-    }
+
+    auto it = std::find(siblings.begin(), siblings.end(), _self());
+    assert(it != siblings.end());
+
+    siblings.erase(it);
+    siblings.push_back(_self());
 }
 
 template <typename T>
 void TreeNode<T>::bringToFront() {
+    assert(parent() != nullptr);
     auto& siblings = parent()->TreeNode::children();
-    for (auto it = siblings.begin(); it != siblings.end(); ++it) {
-        if (*it == this) {
-            siblings.erase(it);
-            siblings.push_front(static_cast<T*>(this));
-            return;
-        }
-    }
+
+    auto it = std::find(siblings.begin(), siblings.end(), _self());
+    assert(it != siblings.end());
+
+    siblings.erase(it);
+    siblings.push_front(_self());
 }
 
 template <typename T>
 const T* TreeNode<T>::root() const {
-    const T* current = static_cast<const T*>(this);
-    const T* currentParent = parent();
-    while (currentParent) {
-        current = currentParent;
-        currentParent = current->parent();
-    }
+    auto current = _self();
+    while (current->TreeNode::parent()) { current = current->TreeNode::parent(); }
     return current;
 }
 
 template <typename T>
 T* TreeNode<T>::root() {
-    T* current = static_cast<T*>(this);
-    T* currentParent = parent();
-    while (currentParent) {
-        current = currentParent;
-        currentParent = current->parent();
-    }
+    auto current = _self();
+    while (current->TreeNode::parent()) { current = current->TreeNode::parent(); }
     return current;
 }
 
 template <typename T>
-const T* TreeNode<T>::commonNode(gsl::not_null<const T*> other) const {
-    const T* current = static_cast<const T*>(this);
-    while (current) {
-        if (current == other || current->isAncestorOf(other)) {
+const T* TreeNode<T>::commonNode(const T* other) const {
+    for (auto current = _self(); current; current = current->TreeNode::parent()) {
+        if (current == other || current->TreeNode::isAncestorOf(other)) {
             return current;
         }
-        current = current->parent();
     }
     return nullptr;
 }
@@ -201,19 +194,17 @@ bool TreeNode<T>::isDescendantOf(const T* other) const {
     if (!other) {
         return false;
     }
-    const T* current = parent();
-    while (current) {
+    for (auto current = parent(); current; current = current->TreeNode::parent()) {
         if (current == other) {
             return true;
         }
-        current = current->parent();
     }
     return false;
 }
 
 template <typename T>
 bool TreeNode<T>::isAncestorOf(const T* other) const {
-    return other && other->isDescendantOf(static_cast<const T*>(this));
+    return other && other->TreeNode::isDescendantOf(_self());
 }
 
 template <typename T>
@@ -222,24 +213,20 @@ bool TreeNode<T>::hasRelation(TreeNode::Relation relation, const T* other) const
         return false;
     }
     switch (relation) {
-        case Relation::kCommonRoot:
-            return root() && root() == other->root();
-        case Relation::kDescendant:
-            return isDescendantOf(other);
-        case Relation::kAncestor:
-            return isAncestorOf(other);
-        case Relation::kSibling:
-            return other != static_cast<const T*>(this) && parent() && parent() == other->parent();
-        case Relation::kSelf:
-            return other == static_cast<const T*>(this);
+        case Relation::kCommonRoot: return root() && root() == other->TreeNode::root();
+        case Relation::kDescendant: return isDescendantOf(other);
+        case Relation::kAncestor:   return isAncestorOf(other);
+        case Relation::kSibling:    return other != _self() && parent() && parent() == other->TreeNode::parent();
+        case Relation::kSelf:       return other == _self();
+        default:                    assert(false); return false;
     }
 }
 
 template <typename T>
 template <typename F, typename R>
 auto TreeNode<T>::traverseRelation(Relation relation, F&& function, R init, bool* shouldContinue) {
-    if (!shouldContinue) {
-        bool b = true;
+    if (shouldContinue == nullptr) {
+        auto b = true;
         return _traverseRelation(relation, std::forward<F>(function), std::move(init), &b);
     }
     if (*shouldContinue) {
@@ -250,7 +237,7 @@ auto TreeNode<T>::traverseRelation(Relation relation, F&& function, R init, bool
 
 template <typename T>
 template <typename F, typename R>
-auto TreeNode<T>::_traverseRelation(Relation relation, F&& function, R&& result, gsl::not_null<bool*> shouldContinue) {
+auto TreeNode<T>::_traverseRelation(Relation relation, F&& function, R&& result, bool* shouldContinue) {
     if (!*shouldContinue) {
         return 0;
     }
@@ -259,52 +246,50 @@ auto TreeNode<T>::_traverseRelation(Relation relation, F&& function, R&& result,
 
     switch (relation) {
         case Relation::kSelf: {
-            ret += function(static_cast<T*>(this), shouldContinue);
+            ret += function(_self(), shouldContinue);
             break;
         }
         case Relation::kSibling: {
             if (!parent()) {
                 break;
             }
-            for (auto& child : parent()->TreeNode::children()) {
-                if (child == static_cast<T*>(this)) { continue; }
-                ret += function(child, shouldContinue);
-                if (!shouldContinue) {
+            for (auto& sibling : parent()->TreeNode::children()) {
+                if (sibling == _self()) { continue; }
+                ret += function(sibling, shouldContinue);
+                if (shouldContinue == nullptr) {
                     break;
                 }
             }
             break;
         }
         case Relation::kDescendant: {
-            std::deque<T*> q{static_cast<T*>(this)};
+            std::deque<T*> q{_self()};
             while (shouldContinue && !q.empty()) {
                 auto parent = q.front();
                 q.pop_front();
-                for (auto& child : parent->children()) {
-                    ret += function(child, shouldContinue);
-                    if (!shouldContinue) {
+                for (auto& descendant : parent->TreeNode::children()) {
+                    ret += function(descendant, shouldContinue);
+                    if (shouldContinue == nullptr) {
                         break;
                     }
-                    q.push_back(child);
+                    q.push_back(descendant);
                 }
             }
             break;
         }
         case Relation::kAncestor: {
-            auto* child = parent();
-            while (child) {
-                ret += function(child, shouldContinue);
-                if (!shouldContinue) {
+            for (auto ancestor = parent(); ancestor; ancestor = ancestor->TreeNode::parent()) {
+                ret += function(ancestor, shouldContinue);
+                if (shouldContinue == nullptr) {
                     break;
                 }
-                child = child->parent();
             }
             break;
         }
         case Relation::kCommonRoot: {
             if (root()) {
                 root()->TreeNode::_traverseRelation(Relation::kSelf, function, ret, shouldContinue);
-                if (!shouldContinue) {
+                if (shouldContinue == nullptr) {
                     break;
                 }
                 root()->TreeNode::_traverseRelation(Relation::kDescendant, function, ret, shouldContinue);

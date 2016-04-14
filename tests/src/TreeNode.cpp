@@ -65,7 +65,7 @@ TEST(TreeNode, removeChild) {
     root.addChildToBack(&c3);
     ASSERT_EQ(root.children(), (std::list<TestNode*>{&c1, &c2, &c3}));
 
-    EXPECT_EQ(root.removeChild(&c1), 1);
+    EXPECT_EQ(root.removeChild(&c1), true);
     EXPECT_EQ(root.children(), (std::list<TestNode*>{&c2, &c3}));
 
     EXPECT_EQ(c1.parent(), nullptr);
@@ -78,7 +78,7 @@ TEST(TreeNode, removeChildOnlyRemovesValidChildren) {
     root1.addChildToBack(&c1);
     root2.addChildToBack(&c2);
 
-    EXPECT_EQ(root1.removeChild(&c2), 0);
+    EXPECT_EQ(root1.removeChild(&c2), false);
 
     EXPECT_EQ(root1.children(), (std::list<TestNode*>{&c1}));
     EXPECT_EQ(root2.children(), (std::list<TestNode*>{&c2}));
