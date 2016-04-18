@@ -2,8 +2,10 @@
 
 #include "scraps/config.h"
 
+SCRAPS_IGNORE_WARNINGS_PUSH
 #include <boost/asio/ip/udp.hpp>
 #include <boost/functional/hash.hpp>
+SCRAPS_IGNORE_WARNINGS_POP
 
 namespace scraps {
 

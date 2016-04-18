@@ -5,9 +5,11 @@
 #include "scraps/Temp.h"
 #include "scraps/type-traits.h"
 
+SCRAPS_IGNORE_WARNINGS_PUSH
 #include <boost/functional/hash.hpp>
 
 #include <gsl.h>
+SCRAPS_IGNORE_WARNINGS_POP
 
 #include <array>
 

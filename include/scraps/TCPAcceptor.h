@@ -10,11 +10,13 @@
 
 #include <unistd.h>
 
+SCRAPS_IGNORE_WARNINGS_PUSH
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/placeholders.hpp>
 
 #include <boost/bind.hpp>
+SCRAPS_IGNORE_WARNINGS_POP
 
 #include <condition_variable>
 

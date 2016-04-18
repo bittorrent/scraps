@@ -2,8 +2,10 @@
 
 #include "scraps/config.h"
 
+SCRAPS_IGNORE_WARNINGS_PUSH
 #include <boost/optional.hpp>
 #include <boost/program_options.hpp>
+SCRAPS_IGNORE_WARNINGS_POP
 
 #include <unordered_map>
 

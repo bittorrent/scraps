@@ -5,7 +5,9 @@
 #include <vector>
 #include <string>
 
+SCRAPS_IGNORE_WARNINGS_PUSH
 #include <boost/range.hpp>
+SCRAPS_IGNORE_WARNINGS_POP
 
 namespace scraps {
 

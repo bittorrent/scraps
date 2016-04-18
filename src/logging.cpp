@@ -2,7 +2,9 @@
 
 #include "scraps/loggers.h"
 
+SCRAPS_IGNORE_WARNINGS_PUSH
 #include <boost/filesystem.hpp>
+SCRAPS_IGNORE_WARNINGS_POP
 
 #if SCRAPS_APPLE
 #import <Foundation/Foundation.h>
