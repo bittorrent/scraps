@@ -21,7 +21,7 @@ public:
     TaskThread& operator=(TaskThread&&) = delete;
     ~TaskThread();
 
-    virtual void clear() override;
+    void cancelAndJoin();
 
 private:
     virtual void _async(std::unique_ptr<Task> task) override;

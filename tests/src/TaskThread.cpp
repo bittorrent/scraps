@@ -88,22 +88,24 @@ TEST(TaskThread, futuresFunctionality) {
     EXPECT_LT(std::chrono::steady_clock::now(), now + threshold);
 }
 
-TEST(TaskThread, cancelClearFunctionality) {
-    bool executed = false;
+TEST(TaskThread, cancelAndJoin) {
+    TaskThread scheduler;
 
-    {
-        TaskThread scheduler;
-        scheduler.asyncAfter(5ms, [&] { executed = true; });
-    }
+    std::atomic<size_t> invocations{0};
+    std::function<void()> repeat;
+    repeat = [&] {
+        ++invocations;
+        std::this_thread::sleep_for(100ms);
+        scheduler.async(repeat);
+    };
+    scheduler.async(repeat);
+    scheduler.async(repeat);
+    while (invocations < 1);
+    scheduler.cancelAndJoin();
+    scheduler.async(repeat);
 
-    EXPECT_EQ(executed, false);
-
-    {
-        TaskThread scheduler;
-        scheduler.asyncAfter(5ms, [&] { executed = true; });
-        scheduler.clear();
-        EXPECT_EQ(executed, false);
-    }
+    std::this_thread::sleep_for(300ms);
+    EXPECT_EQ(invocations, 1);
 }
 
 TEST(TaskThread, scopeFunctionality) {

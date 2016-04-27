@@ -19,7 +19,7 @@ public:
     TaskQueue& operator=(TaskQueue&&) = delete;
     ~TaskQueue() = default;
 
-    virtual void clear() override;
+    void clear();
 
     /**
     * Call run() often to run all tasks which have been scheduled to be executed before now

@@ -7,6 +7,10 @@ TaskThread::TaskThread(const std::string& threadName)
 {}
 
 TaskThread::~TaskThread() {
+    cancelAndJoin();
+}
+
+void TaskThread::cancelAndJoin() {
     {
         std::lock_guard<std::mutex> lock{_mutex};
         _exit = true;
@@ -18,17 +22,13 @@ TaskThread::~TaskThread() {
     }
 }
 
-void TaskThread::clear() {
-    std::lock_guard<std::mutex> lock{_mutex};
-    _tasks.clear();
-}
-
 void TaskThread::_async(std::unique_ptr<Task> task) {
     auto t = task->time;
     auto firstElement = false;
 
     {
         std::lock_guard<std::mutex> lock{_mutex};
+        if (_exit) { return; }
         _tasks.push_back(std::move(task));
         std::push_heap(_tasks.begin(), _tasks.end(), TaskComparer{});
         firstElement = _tasks.front()->time == t;

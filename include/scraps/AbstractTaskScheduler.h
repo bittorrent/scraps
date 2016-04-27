@@ -46,8 +46,6 @@ public:
     std::future<typename std::result_of<typename std::decay<F>::type(typename std::decay<Args>::type...)>::type>
     asyncAt(const TaskScope& scope, const std::chrono::steady_clock::time_point& t, F&& f, Args&&... args);
 
-    virtual void clear() = 0;
-
 protected:
     struct Task;
     template<class> struct TaskImpl;
