@@ -20,6 +20,7 @@ void TaskThread::cancelAndJoin() {
     if (_thread.joinable()) {
         _thread.join();
     }
+    _tasks.clear();
 }
 
 void TaskThread::_async(std::unique_ptr<Task> task) {
