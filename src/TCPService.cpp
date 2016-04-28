@@ -15,7 +15,7 @@ namespace scraps {
 
 TCPService::Connection::~Connection() {
     close();
-    if (!isClosed()) {
+    if (fd >= 0) {
         ::close(fd);
     }
 }
@@ -24,16 +24,14 @@ bool TCPService::Connection::close() {
     if (isClosing()) {
         return true;
     } else if (isConnecting()) {
-        SCRAPS_LOGF_INFO("connection isConnecting (fd = %u)", fd);
         state = kClosing;
     } else if (fd < 0) {
-        SCRAPS_LOGF_INFO("fd < 0 (fd = %u)", fd);
+        SCRAPS_LOG_INFO("fd < 0 (fd = {})", fd);
         return false;
     } else {
         state = kClosing;
-        SCRAPS_LOGF_INFO("shutting down connection (fd = %u)", fd);
+        SCRAPS_LOG_INFO("shutting down connection (fd = {})", fd);
         ::shutdown(fd, SHUT_WR);
-        state = kClosed;
     }
 
     return true;
@@ -193,7 +191,7 @@ void TCPService::send(TCPService::ConnectionId connectionId, const void* data, s
 }
 
 void TCPService::close(TCPService::ConnectionId connectionId) {
-    SCRAPS_LOGF_INFO("closing tcp connection (id = %u)", connectionId);
+    SCRAPS_LOG_INFO("closing tcp connection (id = {})", connectionId);
 
     _runLoop.async([this, connectionId] {
         auto connection = _connections.findById(connectionId);

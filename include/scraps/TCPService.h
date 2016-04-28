@@ -118,7 +118,7 @@ private:
     struct Connection {
         const ConnectionId id;
         const int fd;
-        enum State { kConnecting, kConnected, kClosing, kClosed };
+        enum State { kConnecting, kConnected, kClosing };
 
         State state;
 
@@ -137,7 +137,6 @@ private:
         bool isConnecting() const { return state == kConnecting; }
         bool isConnected() const { return state == kConnected; }
         bool isClosing() const { return state == kClosing; }
-        bool isClosed() const { return state == kClosed; }
 
         bool close();
     };
