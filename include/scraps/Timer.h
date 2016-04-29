@@ -47,10 +47,11 @@ public:
 private:
     typename clock::time_point _start;
     duration _elapsed = duration::zero();
-    bool _stopped     = true;
+    bool _stopped = true;
 };
 
 using SystemTimer  = Timer<std::chrono::system_clock>;
 using SteadyTimer  = Timer<std::chrono::steady_clock>;
 using HighResTimer = Timer<std::chrono::high_resolution_clock>;
+
 } // namespace scraps

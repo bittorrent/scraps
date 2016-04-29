@@ -26,8 +26,8 @@ public:
     */
     template <typename T>
     EntryReference get(T&& hashable) const {
-        std::lock_guard<std::mutex> l(_mutex);
         auto hash = std::hash<typename std::remove_reference<T>::type>()(std::forward<T>(hashable));
+        std::lock_guard<std::mutex> l(_mutex);
 
         auto it = _entries.find(hash);
         return it == _entries.end() ? nullptr : it->second.entry;
@@ -41,9 +41,9 @@ public:
     */
     template <typename T>
     EntryReference add(std::shared_ptr<Entry> entry, T&& hashable, Policy policy = kRemoveUnreferenced) {
-        std::lock_guard<std::mutex> l(_mutex);
         auto hash = std::hash<typename std::remove_reference<T>::type>()(std::forward<T>(hashable));
 
+        std::lock_guard<std::mutex> l(_mutex);
         auto it = _entries.find(hash);
         if (it != _entries.end()) {
             if (policy > it->second.policy) {
@@ -54,11 +54,8 @@ public:
 
         _removeExpired();
 
-        EntryInfo info;
-        info.entry = entry;
-        info.policy = policy;
-        _entries[hash] = info;
-        return info.entry;
+        _entries[hash] = {entry, policy};
+        return entry;
     }
 
     /**
@@ -84,8 +81,8 @@ public:
     */
     template <typename T>
     void remove(T&& hashable) {
-        std::lock_guard<std::mutex> l(_mutex);
         auto hash = std::hash<typename std::remove_reference<T>::type>()(std::forward<T>(hashable));
+        std::lock_guard<std::mutex> l(_mutex);
         _entries.erase(hash);
     }
 
