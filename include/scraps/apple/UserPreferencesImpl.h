@@ -32,17 +32,17 @@ public:
     /**
      * Return a string value for the given key. If not found, the default value is returned.
      */
-    std::string getString(const std::string& key, const std::string& defaultValue = "") const;
+    std::string getString(const std::string& key) const;
 
     /**
      * Return an int value for the given key. If not found, then a zero value is returned.
      */
-    int64_t getInt(const std::string& key) const;
+    long long getInt(const std::string& key) const;
 
     /**
      * Return a double value for the given key. If not found, then a zero value is returned.
      */
-    double getDouble(const std::string& key) const;
+    long double getDouble(const std::string& key) const;
 
     /**
      * Return a bool value for the given key. If not found, then false is returned.
@@ -57,12 +57,12 @@ public:
     /**
      * Set an int value for the given key.
      */
-    void setInt(const std::string& key, int64_t value);
+    void setInt(const std::string& key, long long value);
 
     /**
      * Set a double value for the given key.
      */
-    void setDouble(const std::string& key, double value);
+    void setDouble(const std::string& key, long double value);
 
     /**
      * Set a bool value for the given key.

@@ -25,10 +25,10 @@ bool UserPreferencesImpl::has(const std::string& key) const {
     return nsValue != nil;
 }
 
-std::string UserPreferencesImpl::getString(const std::string& key, const std::string& defaultValue) const {
+std::string UserPreferencesImpl::getString(const std::string& key) const {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     NSString* nsValue = [_userDefaults objectForKey:nsKey];
-    return nsValue ? [nsValue UTF8String] : defaultValue;
+    return nsValue ? [nsValue UTF8String] : "";
 }
 
 void UserPreferencesImpl::setString(const std::string& key, const std::string& value) {
@@ -37,22 +37,22 @@ void UserPreferencesImpl::setString(const std::string& key, const std::string& v
     [_userDefaults setObject:nsValue forKey:nsKey];
 }
 
-int64_t UserPreferencesImpl::getInt(const std::string& key) const {
+long long UserPreferencesImpl::getInt(const std::string& key) const {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     return [_userDefaults integerForKey:nsKey];
 }
 
-void UserPreferencesImpl::setInt(const std::string& key, int64_t value) {
+void UserPreferencesImpl::setInt(const std::string& key, long long value) {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     [_userDefaults setInteger:value forKey:nsKey];
 }
 
-double UserPreferencesImpl::getDouble(const std::string& key) const {
+long double UserPreferencesImpl::getDouble(const std::string& key) const {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     return [_userDefaults doubleForKey:nsKey];
 }
 
-void UserPreferencesImpl::setDouble(const std::string& key, double value) {
+void UserPreferencesImpl::setDouble(const std::string& key, long double value) {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     [_userDefaults setDouble:value forKey:nsKey];
 }

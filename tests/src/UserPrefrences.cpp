@@ -1,8 +1,8 @@
-#if SCRAPS_MAC_OS_X
-
 #include "gtest/gtest.h"
 
 #include "scraps/UserPreferences.h"
+
+#if SCRAPS_APPLE
 
 using namespace scraps;
 
@@ -13,10 +13,10 @@ TEST(UserPreferences, strings) {
     const std::string modified = "modified";
 
     userPreferences.set(key, original);
-    ASSERT_EQ(original, userPreferences.getString(key));
+    ASSERT_EQ(original, userPreferences.get<std::string>(key));
 
     userPreferences.set(key, modified);
-    ASSERT_EQ(modified, userPreferences.getString(key));
+    ASSERT_EQ(modified, userPreferences.get<std::string>(key));
 }
 
 TEST(UserPreferences, ints) {
@@ -26,10 +26,10 @@ TEST(UserPreferences, ints) {
     const auto modified = 6;
 
     userPreferences.set(key, original);
-    ASSERT_EQ(original, userPreferences.getInt(key));
+    ASSERT_EQ(original, userPreferences.get<decltype(original)>(key));
 
     userPreferences.set(key, modified);
-    ASSERT_EQ(modified, userPreferences.getInt(key));
+    ASSERT_EQ(modified, userPreferences.get<decltype(original)>(key));
 }
 
 TEST(UserPreferences, floats) {
@@ -39,10 +39,10 @@ TEST(UserPreferences, floats) {
     const auto modified = 6.0;
 
     userPreferences.set(key, original);
-    ASSERT_EQ(original, userPreferences.getDouble(key));
+    ASSERT_EQ(original, userPreferences.get<decltype(original)>(key));
 
     userPreferences.set(key, modified);
-    ASSERT_EQ(modified, userPreferences.getDouble(key));
+    ASSERT_EQ(modified, userPreferences.get<decltype(original)>(key));
 }
 
 TEST(UserPreferences, bools) {
@@ -52,10 +52,10 @@ TEST(UserPreferences, bools) {
     const auto modified = false;
 
     userPreferences.set(key, original);
-    ASSERT_EQ(original, userPreferences.getBool(key));
+    ASSERT_EQ(original, userPreferences.get<decltype(original)>(key));
 
     userPreferences.set(key, modified);
-    ASSERT_EQ(modified, userPreferences.getBool(key));
+    ASSERT_EQ(modified, userPreferences.get<decltype(original)>(key));
 }
 
 #endif
