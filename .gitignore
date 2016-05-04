@@ -9,6 +9,7 @@
 /test-reports
 /tests/dist
 /scraps.xcodeproj/project.xcworkspace
+/scraps.xcconfig
 
 ###
 # Note: Keep organized by product, A-Z
