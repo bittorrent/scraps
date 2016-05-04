@@ -6,8 +6,8 @@
 
 #if SCRAPS_APPLE
 #include "scraps/apple/UserPreferencesImpl.h"
-#elif SCRAPS_ANDROID
-// TODO: implement for android
+#elif SCRAPS_ANDROID || SCRAPS_LINUX
+// TODO: implement for android, linux
 #include "scraps/standins/DummyUserPreferencesImpl.h"
 #else
 #error Not implemented for this platform.
@@ -15,7 +15,7 @@
 
 namespace scraps {
 
-#if SCRAPS_ANDROID
+#if SCRAPS_ANDROID || SCRAPS_LINUX
 using UserPreferencesImpl = standins::DummyUserPreferencesImpl;
 #endif
 
