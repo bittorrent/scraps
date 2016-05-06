@@ -11,9 +11,11 @@ void HTTPRequest::initiate(const std::string& url, const void* body, size_t body
     _curl = curl_easy_init();
     _curlMultiHandle = curl_multi_init();
 
-    auto cleanup = gsl::finally([&]{
-        curl_multi_cleanup(_curlMultiHandle);
+    auto handleCleanup = gsl::finally([&]{
         curl_easy_cleanup(_curl);
+        curl_multi_cleanup(_curlMultiHandle);
+        _curlMultiHandle = nullptr;
+        _curl = nullptr;
     });
 
     curl_easy_setopt(_curl, CURLOPT_URL, url.c_str());
@@ -63,7 +65,13 @@ void HTTPRequest::initiate(const std::string& url, const void* body, size_t body
 
     curl_multi_add_handle(_curlMultiHandle, _curl);
 
-    _worker = std::thread([&, threadCleanup = std::move(cleanup)]{
+    // Curl handle cleanups MUST occur after curl_multi_remove_handle
+    // Pass them around in nested lambdas to guarantee destruction order.
+    auto removeHandleCleanup = gsl::finally([&, _ = std::move(handleCleanup)]{
+        curl_multi_remove_handle(_curlMultiHandle, _curl);
+    });
+
+    _worker = std::thread([&, _ = std::move(removeHandleCleanup)]{
         SetThreadName("HTTPRequest");
         std::unique_lock<std::mutex> lock{_mutex};
 
