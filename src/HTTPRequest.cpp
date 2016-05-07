@@ -7,16 +7,23 @@
 
 namespace scraps {
 
+HTTPRequest::~HTTPRequest() {
+    abort();
+
+    if (_curl) {
+        curl_multi_remove_handle(_curlMultiHandle, _curl);
+        curl_multi_cleanup(_curlMultiHandle);
+        curl_easy_cleanup(_curl);
+    }
+
+    if (_curlHeaderList) {
+        curl_slist_free_all(_curlHeaderList);
+    }
+}
+
 void HTTPRequest::initiate(const std::string& url, const void* body, size_t bodyLength, const std::vector<std::string>& headers) {
     _curl = curl_easy_init();
     _curlMultiHandle = curl_multi_init();
-
-    auto handleCleanup = gsl::finally([&]{
-        curl_easy_cleanup(_curl);
-        curl_multi_cleanup(_curlMultiHandle);
-        _curlMultiHandle = nullptr;
-        _curl = nullptr;
-    });
 
     curl_easy_setopt(_curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 10);
@@ -65,13 +72,7 @@ void HTTPRequest::initiate(const std::string& url, const void* body, size_t body
 
     curl_multi_add_handle(_curlMultiHandle, _curl);
 
-    // Curl handle cleanups MUST occur after curl_multi_remove_handle
-    // Pass them around in nested lambdas to guarantee destruction order.
-    auto removeHandleCleanup = gsl::finally([&, _ = std::move(handleCleanup)]{
-        curl_multi_remove_handle(_curlMultiHandle, _curl);
-    });
-
-    _worker = std::thread([&, _ = std::move(removeHandleCleanup)]{
+    _worker = std::thread([&] {
         SetThreadName("HTTPRequest");
         std::unique_lock<std::mutex> lock{_mutex};
 
@@ -115,15 +116,7 @@ void HTTPRequest::initiate(const std::string& url, const void* body, size_t body
                 _isComplete = true;
             }
         }
-
-        if (_curlHeaderList ) {
-            curl_slist_free_all(_curlHeaderList);
-        }
     });
-}
-
-HTTPRequest::~HTTPRequest() {
-    abort();
 }
 
 void HTTPRequest::wait() {
