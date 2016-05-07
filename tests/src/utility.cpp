@@ -81,6 +81,15 @@ TEST(utility, UniformDistribution) {
     }
 }
 
+TEST(utility, RandomBytes) {
+    std::random_device rd;
+    std::mt19937 rng{rd()};
+    const auto value = RandomBytes(32, rng);
+
+    EXPECT_EQ(32, value.size());
+    std::cout << Base64Encode(gsl::as_span(value)) << std::endl;
+}
+
 TEST(utility, URLEncode) {
     ASSERT_EQ("gro%C3%9Fp%C3%B6sna", URLEncode("großpösna"));
     ASSERT_EQ("-_.+", URLEncode("-_. "));

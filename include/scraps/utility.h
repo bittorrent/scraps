@@ -2,7 +2,9 @@
 
 #include "scraps/config.h"
 
+#include "scraps/base64.h"
 #include "scraps/Byte.h"
+#include "scraps/hex.h"
 #include "scraps/Temp.h"
 
 #include <gsl.h>
@@ -27,7 +29,7 @@ inline namespace literals {
     }
 }
 
-}
+} // anonymous namespace
 
 constexpr double kPi = 3.1415926535897932385;
 
@@ -86,6 +88,19 @@ std::vector<InputIt> NRandomElements(InputIt inFirst, InputIt inLast, size_t n, 
     return result;
 }
 
+/**
+ * Generate a sequence of random bytes.
+ */
+template <class Generator>
+std::vector<uint8_t> RandomBytes(size_t n, Generator& g) {
+    std::vector<uint8_t> result(n);
+    for (size_t i = 0; i < n; ++i) {
+        result[i] = static_cast<uint8_t>(UniformDistribution(g, 0, 255));
+    }
+
+    return result;
+}
+
 template<class Rep, class Period>
 constexpr typename std::enable_if<std::chrono::duration<Rep, Period>::min() < std::chrono::duration<Rep, Period>::zero(), std::chrono::duration<Rep, Period>>::type
 abs(std::chrono::duration<Rep, Period> d) {
@@ -121,26 +136,6 @@ inline std::string URLDecode(const std::string& str) { return URLDecode(str.c_st
 std::string JSONEscape(const char* str);
 
 /**
-* Returns a string decoded from base64
-*
-* @param a pointer to the data to be decoded
-* @param the length of the data to be decoded
-* @return the decoded data stored in a std::string
-*
-*/
-std::string Base64Decode(const char* data, size_t length);
-
-/**
-* Returns a string encoded as base64
-*
-* @param a pointer to the data to be encoded
-* @param the length of the data to be encoded
-* @return the encoded data stored in a std::string
-*
-*/
-std::string Base64Encode(const char* data, size_t length);
-
-/**
 * Returns the basename of a given path.
 */
 std::string Basename(const std::string& path);
@@ -164,14 +159,6 @@ std::string Dirname(const std::string& path);
 */
 std::string GetPasswordFromStdin();
 
-template <typename CharT>
-constexpr int8_t HexToDec(CharT c) {
-    if (c >= '0' && c <= '9') { return c - '0'; }
-    if (c >= 'a' && c <= 'f') { return c - 'a' + 10; }
-    if (c >= 'A' && c <= 'F') { return c - 'A' + 10; }
-    return -1;
-}
-
 /**
 * Parse out an address and port from the given host string. If a port is not found, the
 * defaultPort is returned.
@@ -187,73 +174,5 @@ size_t PhysicalMemory();
 * Convert from microseconds to a timeval.
 */
 timeval ToTimeval(const std::chrono::microseconds& value);
-
-constexpr signed char DecToHex(int c) {
-    if (c >= 0 && c < 16) {
-        return "0123456789abcdef"[c];
-    }
-    return -1;
-}
-
-constexpr signed char DecToHex(const Byte& c) {
-    return DecToHex(c.value());
-}
-
-/**
- * Fills a byte range from a range of hex characters. Returns true if the input
- * range is successfully converted to the output range. A prefix of "0x" or "0X"
- * is optional.
- */
-template <typename HexCharT, std::ptrdiff_t HexExtent, typename ByteType, std::ptrdiff_t... BytesDimension>
-constexpr bool ToBytes(const gsl::basic_string_span<const HexCharT, HexExtent> hex, const gsl::span<ByteType, BytesDimension...> bytes) {
-    auto prefixSize = 0;
-    if (hex.size() > 2 && hex[0] == '0' && (hex[1] == 'x' || hex[1] == 'X')) {
-        prefixSize += 2;
-    }
-    if (hex.size() - prefixSize != bytes.size() * 2) {
-        return false;
-    }
-    for (std::size_t i = 0; i < bytes.size(); ++i) {
-        auto hi = HexToDec(hex[i * 2 + prefixSize]);
-        auto lo = HexToDec(hex[i * 2 + 1 + prefixSize]);
-        if (hi < 0 || lo < 0) {
-            return false;
-        }
-        bytes[i] = ByteType{static_cast<uint8_t>((hi << 4) | lo)};
-    }
-    return true;
-}
-
-template <typename CharT, typename T, size_t N>
-constexpr bool ToBytes(const std::basic_string<CharT>& in, std::array<T, N>& out) {
-    return ToBytes(gsl::basic_string_span<const CharT>{in}, gsl::span<T, N>{out});
-}
-
-/**
- * Returns a hex string representation of the input span. The output does not
- * include an "0x" prefix.
- *
- * example: ToHex(std::array<uint8_t, 1>{0xAB}) == "AB";
- */
-template <typename T, std::ptrdiff_t... BytesDimension>
-std::string ToHex(const gsl::span<T, BytesDimension...> range) {
-    std::string ret;
-
-    static_assert(sizeof(T) == 1, "Input span type too large");
-
-    ret.reserve(range.size() * 2 + 2);
-
-    for (auto& b : range) {
-        ret += DecToHex(b >> 4);
-        ret += DecToHex(b & 0x0F);
-    }
-
-    return ret;
-}
-
-template <typename T, size_t N>
-std::string ToHex(const std::array<T, N>& in) {
-    return ToHex(gsl::span<const T, N>{in});
-}
 
 } // namespace scraps
