@@ -75,7 +75,7 @@ public:
     /**
      * True if monotonic time has a value
      */
-    bool initialized() const noexcept { return static_cast<bool>(_monotonicTime); }
+    bool initialized() const noexcept { return _monotonicTime != stdts::nullopt; }
 
     /**
      * When set, adjusts the schedule outputs by `offset` amount.
