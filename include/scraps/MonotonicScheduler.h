@@ -10,8 +10,8 @@
 namespace scraps {
 
 /**
- * Converts timepoints in a streaming input set to an offset-corrected monotonic
- * local timepoint. Can be used to normalize remote time points that may change
+ * Converts time points in a streaming input set to an offset-corrected monotonic
+ * local time point. Can be used to normalize remote time points that may change
  * monotonicity occasionally.
  *
  * Example (1 input per second):
@@ -22,7 +22,7 @@ namespace scraps {
  *
  * As the output offset is calculated on first run, inputs should be scheduled
  * in realtime. If an input would ever exceed the threshold provided to
- * the constructor or is out of order with respect to previous timepoints, then
+ * the constructor or is out of order with respect to previous time points, then
  * the internal offset is reset.
  *
  * Example (1 input per second and a forward-in-time reset):
@@ -38,7 +38,7 @@ namespace scraps {
  *                    reset point
  *
  * If the offset is ever reset, the provided callback will be triggered and
- * provided with a unique monotonic timepoint to come before the timepoint that
+ * provided with a unique monotonic time point to come before the time point that
  * caused the reset.
  */
 class MonotonicScheduler {
@@ -50,7 +50,7 @@ public:
         , _threshold{threshold}
     {}
 
-    std::chrono::steady_clock::time_point schedule(std::chrono::steady_clock::time_point remoteTimepoint) noexcept;
+    std::chrono::steady_clock::time_point schedule(std::chrono::steady_clock::time_point remoteTimePoint) noexcept;
 
     /**
      * Reset internal state and keey settings.
@@ -63,9 +63,9 @@ public:
     void initialize(std::chrono::steady_clock::time_point tp = std::chrono::steady_clock::now()) noexcept;
 
     /**
-     * Return the a monotonic timepoint.
+     * Return the a monotonic time point.
      */
-    std::chrono::steady_clock::time_point getTimepoint(std::chrono::steady_clock::duration delta = 1us) noexcept;
+    std::chrono::steady_clock::time_point getTimePoint(std::chrono::steady_clock::duration delta = 1us) noexcept;
 
     /**
      * Return the current time offset.
@@ -75,21 +75,21 @@ public:
     /**
      * True if monotonic time has a value
      */
-    bool initialized() const noexcept { return _monotonicTime != stdts::nullopt; }
+    bool initialized() const noexcept { return _lastLocalTimePoint != stdts::nullopt; }
 
     /**
-     * When set, adjusts the schedule outputs by `offset` amount.
-     */
-    void adjustLocalTime(std::chrono::steady_clock::duration offset) { _localOffsetAdjust = offset; }
+    * Forces the scheduler to use the same remote epoch as other.
+    */
+    void synchronizeWith(const MonotonicScheduler& other) noexcept;
 
 private:
     bool _firstSchedule = true;
     CallbackType _callback;
-    std::chrono::steady_clock::duration _threshold           = {};
-    std::chrono::steady_clock::duration _lastDelta           = {};
-    std::chrono::steady_clock::duration _remoteToLocalOffset = {};
-    std::chrono::steady_clock::duration _localOffsetAdjust   = {};
-    stdts::optional<std::chrono::steady_clock::time_point> _monotonicTime;
+    stdts::optional<std::chrono::steady_clock::time_point> _lastRemoteTimePoint;
+    std::chrono::steady_clock::duration   _threshold           = {};
+    std::chrono::steady_clock::duration   _lastDelta           = {};
+    std::chrono::steady_clock::duration   _remoteToLocalOffset = {};
+    stdts::optional<std::chrono::steady_clock::time_point> _lastLocalTimePoint;
 
     void _resetOffset(std::chrono::steady_clock::duration offset) noexcept;
     void _initializeTime() noexcept;

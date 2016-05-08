@@ -13,7 +13,7 @@ TEST(MonotonicScheduler, constantInterval) {
         MonotonicScheduler scheduler(500ms);
         std::chrono::steady_clock::time_point prev{};
         std::chrono::steady_clock::time_point tp;
-        const auto start = scheduler.getTimepoint();
+        const auto start = scheduler.getTimePoint();
 
         for (auto i = 0ms; i < interval * 10; i += interval) {
             tp = scheduler.schedule(start + i + remoteOffset);
@@ -43,7 +43,7 @@ TEST(MonotonicScheduler, exceedThresholdForward) {
     MonotonicScheduler scheduler(200ms);
     std::chrono::steady_clock::time_point prev{};
     std::chrono::steady_clock::time_point tp;
-    const auto start = scheduler.getTimepoint();
+    const auto start = scheduler.getTimePoint();
 
     for (auto i = 0; i < times.size(); ++i) {
         tp = scheduler.schedule(start + times[i]);
@@ -68,7 +68,7 @@ TEST(MonotonicScheduler, exceedThresholdBackward) {
     MonotonicScheduler scheduler(200ms);
     std::chrono::steady_clock::time_point prev{};
     std::chrono::steady_clock::time_point tp;
-    const auto start = scheduler.getTimepoint();
+    const auto start = scheduler.getTimePoint();
 
     for (auto i = 0; i < times.size(); ++i) {
         tp = scheduler.schedule(start + times[i]);
@@ -93,7 +93,7 @@ TEST(MonotonicScheduler, variableButWithinThreshold) {
     MonotonicScheduler scheduler(200ms);
     std::chrono::steady_clock::time_point prev{};
     std::chrono::steady_clock::time_point tp;
-    const auto start = scheduler.getTimepoint();
+    const auto start = scheduler.getTimePoint();
 
     for (auto i = 0; i < times.size(); ++i) {
         tp = scheduler.schedule(start + times[i]);
@@ -101,4 +101,17 @@ TEST(MonotonicScheduler, variableButWithinThreshold) {
         EXPECT_LT(prev, tp);
         prev = tp;
     }
+}
+
+TEST(MonotonicScheduler, synchronization) {
+    bool didReset = false;
+    MonotonicScheduler a(200ms, [&](std::chrono::steady_clock::time_point x) { didReset = true; });
+    MonotonicScheduler b(200ms, [&](std::chrono::steady_clock::time_point x) { didReset = true; });
+
+    auto first = a.schedule(std::chrono::steady_clock::time_point(500ms));
+    std::this_thread::sleep_for(200ms);
+    b.synchronizeWith(a);
+    auto second = b.schedule(std::chrono::steady_clock::time_point(1010ms));
+    EXPECT_FALSE(didReset);
+    EXPECT_NEAR(std::chrono::duration_cast<std::chrono::microseconds>(second - first).count(), 510000, 2);
 }
