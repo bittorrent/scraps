@@ -75,7 +75,7 @@ public:
     /**
      * True if monotonic time has a value
      */
-    bool initialized() const noexcept { return _lastLocalTimePoint != stdts::nullopt; }
+    bool initialized() const noexcept { return static_cast<bool>(_lastLocalTimePoint); }
 
     /**
     * Forces the scheduler to use the same remote epoch as other.
