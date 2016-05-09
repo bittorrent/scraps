@@ -221,3 +221,18 @@ TEST(utility, PhysicalMemory) {
 }
 
 #endif
+
+TEST(utility, NonatomicIteration) {
+    std::vector<int> numbers = {1, 2, 3, 4};
+    NonatomicIteration(numbers, [&](int x) {
+        if (x == 2) {
+            numbers.erase(numbers.begin() + 2);
+        }
+        EXPECT_NE(x, 3);
+        if (x == 4) {
+            numbers.push_back(5);
+        }
+    });
+    EXPECT_EQ(numbers.size(), 4);
+    EXPECT_EQ(numbers, std::vector<int>({1, 2, 4, 5}));
+}

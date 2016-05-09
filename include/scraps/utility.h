@@ -175,4 +175,19 @@ size_t PhysicalMemory();
 */
 timeval ToTimeval(const std::chrono::microseconds& value);
 
+/**
+* Iterates over a container, allowing for safe modification of the container at any point.
+*/
+template <typename T, typename F>
+void NonatomicIteration(T&& iterable, F&& function) {
+    auto copy = iterable;
+    for (auto& element : copy) {
+        auto it = std::find(iterable.begin(), iterable.end(), element);
+        if (it == iterable.end()) {
+            continue;
+        }
+        function(element);
+    }
+}
+
 } // namespace scraps
