@@ -89,7 +89,7 @@ public:
     /**
     * Returns the number of entries currently in the cache.
     */
-    size_t size() {
+    size_t size() const {
         std::lock_guard<std::mutex> l(_mutex);
         return _entries.size();
     }
