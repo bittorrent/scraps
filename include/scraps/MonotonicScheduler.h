@@ -23,9 +23,10 @@ namespace scraps {
  * As the output offset is calculated on first run, inputs should be scheduled
  * in realtime. If an input would ever exceed the threshold provided to
  * the constructor or is out of order with respect to previous time points, then
- * the internal offset is reset.
+ * the internal offset is reset and the timepoint incremented by the steady_clock
+ * epsilon + an optional delta.
  *
- * Example (1 input per second and a forward-in-time reset):
+ * Example (1 input per second with a forward-in-time reset):
  *   input:  1, 2, 10, 11, 12, 13
  *   output: 1, 2,  3,  4,  5,  6,
  *                ^
@@ -43,8 +44,15 @@ namespace scraps {
  */
 class MonotonicScheduler {
 public:
+    static constexpr std::chrono::steady_clock::duration kDefaultResetOffset = 100ms;
+
     using CallbackType = std::function<void(std::chrono::steady_clock::time_point)>;
 
+    /**
+     * @param threshold The scheduler is reset if input is outside of the bounds now -> now + threshold.
+     * @param callback If the scheduler is reset more than once (1 freebie), callback is invoked.
+     * @param postResetOffset If the output is reset, the first new output will occur at now + postResetOffset.
+     */
     MonotonicScheduler(std::chrono::steady_clock::duration threshold, CallbackType callback = [](auto){})
         : _callback{std::move(callback)}
         , _threshold{threshold}
@@ -53,27 +61,27 @@ public:
     std::chrono::steady_clock::time_point schedule(std::chrono::steady_clock::time_point remoteTimePoint) noexcept;
 
     /**
-     * Reset internal state and keey settings.
+     * Reset internal state and keep settings.
      */
     void reset() noexcept;
 
     /**
-     * Reset and add an initial time point.
+     * Reset to an initial time point.
      */
     void initialize(std::chrono::steady_clock::time_point tp = std::chrono::steady_clock::now()) noexcept;
 
     /**
-     * Return the a monotonic time point.
+     * Return the a monotonic time point and increments the internal counter.
      */
     std::chrono::steady_clock::time_point getTimePoint(std::chrono::steady_clock::duration delta = 1us) noexcept;
 
     /**
-     * Return the current time offset.
+     * Return current remote to local offset.
      */
     std::chrono::steady_clock::duration offset() const noexcept { return _remoteToLocalOffset; }
 
     /**
-     * True if monotonic time has a value
+     * True if monotonic time has a value.
      */
     bool initialized() const noexcept { return static_cast<bool>(_lastLocalTimePoint); }
 
@@ -86,12 +94,10 @@ private:
     bool _firstSchedule = true;
     CallbackType _callback;
     stdts::optional<std::chrono::steady_clock::time_point> _lastRemoteTimePoint;
-    std::chrono::steady_clock::duration   _threshold           = {};
-    std::chrono::steady_clock::duration   _lastDelta           = {};
-    std::chrono::steady_clock::duration   _remoteToLocalOffset = {};
+    std::chrono::steady_clock::duration                    _threshold           = {};
+    std::chrono::steady_clock::duration                    _remoteToLocalOffset = {};
     stdts::optional<std::chrono::steady_clock::time_point> _lastLocalTimePoint;
 
-    void _resetOffset(std::chrono::steady_clock::duration offset) noexcept;
     void _initializeTime() noexcept;
 };
 

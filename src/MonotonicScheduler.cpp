@@ -2,20 +2,23 @@
 
 namespace scraps {
 
+constexpr std::chrono::steady_clock::duration MonotonicScheduler::kDefaultResetOffset;
+
 std::chrono::steady_clock::time_point MonotonicScheduler::schedule(std::chrono::steady_clock::time_point remoteTimePoint) noexcept {
+    auto now = std::chrono::steady_clock::now();
     auto localTimePoint = remoteTimePoint + _remoteToLocalOffset;
 
     _initializeTime();
 
-    if (_firstSchedule ||
-        (_lastRemoteTimePoint && (remoteTimePoint - *_lastRemoteTimePoint > _threshold || *_lastRemoteTimePoint - remoteTimePoint > _threshold))
-    ) {
-        _resetOffset(*_lastLocalTimePoint - localTimePoint + _lastDelta);
+    if (_firstSchedule || localTimePoint < now || localTimePoint > now + _threshold) {
+        _remoteToLocalOffset = now - remoteTimePoint;
+        if (!_firstSchedule && (localTimePoint < now - _threshold || localTimePoint > now + _threshold)) {
+            *_lastLocalTimePoint += 1us;
+            _callback(*_lastLocalTimePoint);
+        }
         localTimePoint = remoteTimePoint + _remoteToLocalOffset;
     }
 
-    _lastDelta = remoteTimePoint - _lastRemoteTimePoint.value_or(remoteTimePoint);
-    _lastRemoteTimePoint = remoteTimePoint;
     _lastLocalTimePoint = std::max(*_lastLocalTimePoint + 1us, localTimePoint);
     _firstSchedule = false;
 
@@ -24,7 +27,7 @@ std::chrono::steady_clock::time_point MonotonicScheduler::schedule(std::chrono::
 
 void MonotonicScheduler::reset() noexcept {
     _firstSchedule       = true;
-    _lastLocalTimePoint       = {};
+    _lastLocalTimePoint  = {};
     _remoteToLocalOffset = {};
 }
 
@@ -42,14 +45,6 @@ std::chrono::steady_clock::time_point MonotonicScheduler::getTimePoint(std::chro
 void MonotonicScheduler::synchronizeWith(const MonotonicScheduler& other) noexcept {
     _firstSchedule = other._firstSchedule;
     _remoteToLocalOffset = other._remoteToLocalOffset;
-}
-
-void MonotonicScheduler::_resetOffset(std::chrono::steady_clock::duration offset) noexcept {
-    _remoteToLocalOffset = offset;
-    if (!_firstSchedule) {
-        *_lastLocalTimePoint += 1us;
-        _callback(*_lastLocalTimePoint);
-    }
 }
 
 void MonotonicScheduler::_initializeTime() noexcept {
