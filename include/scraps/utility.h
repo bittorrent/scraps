@@ -190,4 +190,9 @@ void NonatomicIteration(T&& iterable, F&& function) {
     }
 }
 
+template<typename Rep, typename Period>
+auto ToMilliseconds(std::chrono::duration<Rep, Period> d) {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
+}
+
 } // namespace scraps
