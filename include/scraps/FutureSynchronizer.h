@@ -9,6 +9,10 @@
 
 namespace scraps {
 
+/**
+ * Convenience class to invoke `get()` on futures and passes the result to
+ * provided callbacks. Callbacks are always invoked on a different thread.
+ */
 class FutureSynchronizer {
 public:
     template<typename T, typename Callback>
