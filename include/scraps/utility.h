@@ -195,4 +195,8 @@ auto ToMilliseconds(std::chrono::duration<Rep, Period> d) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
 }
 
+gsl::string_span<> TrimLeft(gsl::string_span<> str);
+gsl::string_span<> TrimRight(gsl::string_span<> str);
+gsl::string_span<> Trim(gsl::string_span<> str);
+
 } // namespace scraps

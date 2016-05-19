@@ -223,4 +223,21 @@ size_t PhysicalMemory() {
     return (pages > 0 && pageSize > 0) ? pages * pageSize : 0;
 }
 
+gsl::string_span<> TrimLeft(gsl::string_span<> str) {
+    size_t i = 0;
+    while(i < str.size() && isspace(str[i])) { ++i; };
+    return {str.data() + i, static_cast<std::ptrdiff_t>(str.size() - i)};
+}
+
+gsl::string_span<> TrimRight(gsl::string_span<> str) {
+    size_t i = str.size();
+    while(i > 0 && isspace(str[i - 1])) { --i; };
+    return {str.data(), static_cast<std::ptrdiff_t>(i)};
+}
+
+gsl::string_span<> Trim(gsl::string_span<> str) {
+    return TrimLeft(TrimRight(str));
+}
+
+
 } // namespace scraps

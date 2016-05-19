@@ -236,3 +236,15 @@ TEST(utility, NonatomicIteration) {
     EXPECT_EQ(numbers.size(), 4);
     EXPECT_EQ(numbers, std::vector<int>({1, 2, 4, 5}));
 }
+
+TEST(utility, Trim) {
+    std::string s1(" \t\r\n  ");
+    std::string s2("  \r\nc");
+    std::string s3("c \t");
+    std::string s4("  \rc ");
+
+    EXPECT_EQ(gsl::to_string(Trim(s1)), std::string{""});
+    EXPECT_EQ(gsl::to_string(Trim(s2)), std::string{"c"});
+    EXPECT_EQ(gsl::to_string(Trim(s3)), std::string{"c"});
+    EXPECT_EQ(gsl::to_string(Trim(s4)), std::string{"c"});
+}
