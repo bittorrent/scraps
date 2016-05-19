@@ -93,8 +93,14 @@ bool UDPSocket::send(const UDPEndpoint& destination, const void* data, size_t le
     int sent = ::sendto(_socket, data, length, 0, reinterpret_cast<sockaddr*>(&addr), addrLength);
 
     if (sent < 0) {
-        SCRAPS_LOGF_ERROR("udp socket send error (errno = %d)", static_cast<int>(errno));
+        SCRAPS_LOG_ERROR("udp socket send error (errno = {})", static_cast<int>(errno));
     }
+
+    if (sent != length) {
+        SCRAPS_LOG_WARNING("udp socket sent != length ({} != {})", sent, length);
+    }
+
+    _totalSentBytes += sent;
 
     return sent == length;
 }
@@ -115,10 +121,12 @@ void UDPSocket::receive() {
 
         if (bytes <= 0) {
             if (bytes < 0) {
-                SCRAPS_LOGF_ERROR("udp socket error (errno = %d)", static_cast<int>(errno));
+                SCRAPS_LOG_ERROR("udp socket error (errno = {})", static_cast<int>(errno));
             }
             return;
         }
+
+        _totalReceivedBytes += bytes;
 
         UDPEndpoint sender;
 
@@ -153,6 +161,8 @@ void UDPSocket::close() {
 
     _socket = -1;
     _receiver.reset();
+    _totalReceivedBytes = 0;
+    _totalSentBytes = 0;
 }
 
 bool UDPSocket::_bind(const char* interface, uint16_t port) {
@@ -167,7 +177,7 @@ bool UDPSocket::_bind(const char* interface, uint16_t port) {
     }
 
     if (getaddrinfo(interface, Formatf("%hu", port).c_str(), &hints, &result)) {
-        SCRAPS_LOGF_ERROR("error interpreting socket interface");
+        SCRAPS_LOG_ERROR("error interpreting socket interface");
         return false;
     }
 
@@ -176,7 +186,7 @@ bool UDPSocket::_bind(const char* interface, uint16_t port) {
     });
 
     if (::bind(_socket, result->ai_addr, result->ai_addrlen)) {
-        SCRAPS_LOGF_ERROR("error binding udp socket (errno = %d)", static_cast<int>(errno));
+        SCRAPS_LOG_ERROR("error binding udp socket (errno = {})", static_cast<int>(errno));
         return false;
     }
 

@@ -8,6 +8,7 @@
 #include <array>
 #include <mutex>
 #include <thread>
+#include <atomic>
 
 namespace scraps {
 
@@ -34,7 +35,7 @@ public:
     * Returns the native socket.
     */
     int native() const { return _socket; }
-        
+
     /**
     * Sets the receiver for the socket. The receiver should outlive the socket and
     * should not be changed once set.
@@ -60,7 +61,7 @@ public:
     * Sends data on the socket.
     */
     virtual bool send(const UDPEndpoint& destination, const void* data, size_t length) override;
-    
+
     /**
     * Attempts to receive data on the socket and dispatch it to its receiver.
     */
@@ -71,12 +72,21 @@ public:
     */
     void close();
 
+    /**
+     * Get total number of bytes sent and received.
+     */
+    uint64_t totalSentBytes() { return _totalSentBytes; }
+    uint64_t totalReceivedBytes() { return _totalReceivedBytes; }
+
 private:
     std::mutex _mutex;
     int _socket = -1;
     Protocol _protocol;
     std::weak_ptr<UDPReceiver> _receiver;
     std::array<unsigned char, 4096> _buffer;
+
+    std::atomic_uint_fast64_t _totalSentBytes{0};
+    std::atomic_uint_fast64_t _totalReceivedBytes{0};
 
     bool _bind(const char* interface, uint16_t port);
 };
