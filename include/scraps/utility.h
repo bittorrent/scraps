@@ -195,8 +195,23 @@ auto ToMilliseconds(std::chrono::duration<Rep, Period> d) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
 }
 
-gsl::string_span<> TrimLeft(gsl::string_span<> str);
-gsl::string_span<> TrimRight(gsl::string_span<> str);
-gsl::string_span<> Trim(gsl::string_span<> str);
+template <typename T, std::ptrdiff_t N>
+gsl::basic_string_span<T> TrimLeft(gsl::basic_string_span<T, N> str) {
+    size_t i = 0;
+    while(i < str.size() && isspace(str[i])) { ++i; };
+    return {str.data() + i, static_cast<std::ptrdiff_t>(str.size() - i)};
+}
+
+template <typename T, std::ptrdiff_t N>
+gsl::basic_string_span<T> TrimRight(gsl::basic_string_span<T, N> str) {
+    size_t i = str.size();
+    while(i > 0 && isspace(str[i - 1])) { --i; };
+    return {str.data(), static_cast<std::ptrdiff_t>(i)};
+}
+
+template <typename T, std::ptrdiff_t N>
+auto Trim(gsl::basic_string_span<T, N> str) {
+    return TrimLeft(TrimRight(str));
+}
 
 } // namespace scraps

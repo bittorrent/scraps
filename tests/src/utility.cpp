@@ -87,7 +87,6 @@ TEST(utility, RandomBytes) {
     const auto value = RandomBytes(32, rng);
 
     EXPECT_EQ(32, value.size());
-    std::cout << Base64Encode(gsl::as_span(value)) << std::endl;
 }
 
 TEST(utility, URLEncode) {
@@ -243,8 +242,8 @@ TEST(utility, Trim) {
     std::string s3("c \t");
     std::string s4("  \rc ");
 
-    EXPECT_EQ(gsl::to_string(Trim(s1)), std::string{""});
-    EXPECT_EQ(gsl::to_string(Trim(s2)), std::string{"c"});
-    EXPECT_EQ(gsl::to_string(Trim(s3)), std::string{"c"});
-    EXPECT_EQ(gsl::to_string(Trim(s4)), std::string{"c"});
+    EXPECT_EQ(gsl::to_string(Trim(gsl::string_span<>(s1))), std::string{""});
+    EXPECT_EQ(gsl::to_string(Trim(gsl::string_span<>(s2))), std::string{"c"});
+    EXPECT_EQ(gsl::to_string(Trim(gsl::string_span<>(s3))), std::string{"c"});
+    EXPECT_EQ(gsl::to_string(Trim(gsl::string_span<>(s4))), std::string{"c"});
 }
