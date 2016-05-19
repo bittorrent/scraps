@@ -188,6 +188,27 @@ TEST(MonotonicScheduler, variableButWithinThreshold) {
     });
 }
 
+TEST(MonotonicScheduler, scheduleForwardDoesntReset) {
+    MonotonicSchedulerTests(200ms, {
+        // sleep, sched tp, out tp, reset
+        {    0ms,      0ms,    0ms, false },
+        {  100ms,    100ms,  100ms, false },
+        {  200ms,    200ms,  200ms, false }, // burst of schedule points in regular intervals in the future shouldn't cause a reset
+        {  210ms,    300ms,  300ms, false },
+        {  220ms,    400ms,  400ms, false },
+        {  230ms,    500ms,  500ms, false },
+        {  240ms,    600ms,  600ms, false },
+        {  250ms,    700ms,  700ms, false },
+        {  260ms,    800ms,  800ms, false },
+        {  270ms,    900ms,  900ms, false },
+        {  280ms,   1000ms, 1000ms, false },
+        {  300ms,   1100ms, 1100ms, false },
+        {  310ms,   1200ms, 1200ms, false },
+        {  320ms,   1300ms, 1300ms, false },
+        {  330ms,   1400ms, 1400ms, false },
+    });
+}
+
 TEST(MonotonicScheduler, synchronization) {
     bool didReset = false;
     MonotonicScheduler a(300ms, [&](auto) { didReset = true; });

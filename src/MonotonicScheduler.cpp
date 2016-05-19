@@ -10,13 +10,13 @@ std::chrono::steady_clock::time_point MonotonicScheduler::schedule(std::chrono::
 
     _initializeTime();
 
-    if (_firstSchedule || localTimePoint < now || localTimePoint > now + _threshold) {
+    if (_firstSchedule || localTimePoint < now || localTimePoint > *_lastLocalTimePoint + _threshold) {
         SCRAPS_LOG_WARNING("scheduler reset: previous offset {}, estimated local {}, now {}", _remoteToLocalOffset.count(), localTimePoint.time_since_epoch().count(), now.time_since_epoch().count());
-        _remoteToLocalOffset = now - remoteTimePoint;
         if (!_firstSchedule && (localTimePoint < now - _threshold || localTimePoint > now + _threshold)) {
             *_lastLocalTimePoint += 1us;
             _callback(*_lastLocalTimePoint);
         }
+        _remoteToLocalOffset = now - remoteTimePoint;
         localTimePoint = remoteTimePoint + _remoteToLocalOffset;
     }
 
