@@ -186,17 +186,6 @@ std::tuple<std::string, uint16_t> ParseAddressAndPort(const std::string& host,
     return std::make_tuple(address, port);
 }
 
-timeval ToTimeval(const std::chrono::microseconds& value) {
-    struct timeval result;
-    auto seconds = std::chrono::duration_cast<std::chrono::seconds>(value);
-    std::chrono::microseconds microseconds = value;
-    microseconds -= seconds;
-    result.tv_sec = seconds.count();
-    result.tv_usec = microseconds.count();
-
-    return result;
-}
-
 std::string GetPasswordFromStdin() {
 #ifdef WIN32
     HANDLE stdin = GetStdHandle(STD_INPUT_HANDLE);

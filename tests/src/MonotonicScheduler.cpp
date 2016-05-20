@@ -1,5 +1,5 @@
 #include "scraps/MonotonicScheduler.h"
-#include "scraps/utility.h"
+#include "scraps/chrono.h"
 
 #include <gtest/gtest.h>
 

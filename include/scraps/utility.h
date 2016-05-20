@@ -101,12 +101,6 @@ std::vector<uint8_t> RandomBytes(size_t n, Generator& g) {
     return result;
 }
 
-template<class Rep, class Period>
-constexpr typename std::enable_if<std::chrono::duration<Rep, Period>::min() < std::chrono::duration<Rep, Period>::zero(), std::chrono::duration<Rep, Period>>::type
-abs(std::chrono::duration<Rep, Period> d) {
-    return d >= d.zero() ? d : -d;
-}
-
 /**
 * Returns a string in which all non-alphanumeric characters except dashes, underscores,
 * spaces, and periods are replaced with a percent sign followed by their hexadecimal
@@ -171,11 +165,6 @@ std::tuple<std::string, uint16_t> ParseAddressAndPort(const std::string& host, u
 size_t PhysicalMemory();
 
 /**
-* Convert from microseconds to a timeval.
-*/
-timeval ToTimeval(const std::chrono::microseconds& value);
-
-/**
 * Iterates over a container, allowing for safe modification of the container at any point.
 */
 template <typename T, typename F>
@@ -188,11 +177,6 @@ void NonatomicIteration(T&& iterable, F&& function) {
         }
         function(element);
     }
-}
-
-template<typename Rep, typename Period>
-auto ToMilliseconds(std::chrono::duration<Rep, Period> d) {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
 }
 
 template <typename T, std::ptrdiff_t N>

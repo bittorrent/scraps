@@ -1,6 +1,6 @@
 #include "scraps/network.h"
 
-#include "scraps/utility.h"
+#include "scraps/chrono.h"
 
 #include <fcntl.h>
 #include <unistd.h>

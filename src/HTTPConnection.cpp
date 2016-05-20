@@ -1,5 +1,6 @@
 #include "scraps/HTTPConnection.h"
 
+#include "scraps/chrono.h"
 #include "scraps/logging.h"
 #include "scraps/network.h"
 #include "scraps/utility.h"
