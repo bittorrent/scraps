@@ -105,8 +105,24 @@ public:
     * Stops the server.
     */
     void stop() {
-        std::unique_lock<std::mutex> lock(_startStopMutex);
+        std::lock_guard<std::mutex> lock(_startStopMutex);
         _stop();
+    }
+
+    template <typename Callback>
+    void iterateConnections(Callback&& callback) {
+        std::vector<std::weak_ptr<ConnectionClass>> connections;
+        {
+            std::lock_guard<std::mutex> lock(_mutex);
+            for (auto& kv : _connections) {
+                connections.emplace_back(kv.second->connectionClass);
+            }
+        }
+        for (auto& connection : connections) {
+            if (auto shared = connection.lock()) {
+                callback(*shared);
+            }
+        }
     }
 
 private:
