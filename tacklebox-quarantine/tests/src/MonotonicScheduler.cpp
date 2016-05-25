@@ -33,7 +33,7 @@ void MonotonicSchedulerTests(std::chrono::steady_clock::duration threshold, std:
         prevSleepTp = sleepTarget;
         SpinSleep(sleepDuration);
         auto tp = a.schedule(start + std::get<1>(t) + 10ms); // +10ms to try to kill race conditions
-        EXPECT_NEAR(ToMilliseconds(tp - start), ToMilliseconds(std::get<2>(t)), 20);
+        EXPECT_NEAR(MillisecondCount(tp - start), MillisecondCount(std::get<2>(t)), 20);
         EXPECT_EQ(didReset, std::get<3>(t));
         didReset = false;
     }
@@ -45,8 +45,8 @@ TEST(MonotonicScheduler, basicUsage) {
     const auto start = std::chrono::steady_clock::now();
     auto tp = scheduler.schedule(start + 500ms);
 
-    EXPECT_NEAR(ToMilliseconds(tp - start), 0, 20);
-    EXPECT_NEAR(ToMilliseconds(scheduler.offset()), -500, 20);
+    EXPECT_NEAR(MillisecondCount(tp - start), 0, 20);
+    EXPECT_NEAR(MillisecondCount(scheduler.offset()), -500, 20);
 }
 
 TEST(MonotonicScheduler, slowStart) {
@@ -218,8 +218,8 @@ TEST(MonotonicScheduler, synchronization) {
     EXPECT_FALSE(didReset);
 
     auto first = a.schedule(start + 500ms);
-    EXPECT_NEAR(ToMilliseconds(first - start), 0, 20);
-    EXPECT_NEAR(ToMilliseconds(a.offset()), -500, 20); // first = 100. 500 - 400 = 100
+    EXPECT_NEAR(MillisecondCount(first - start), 0, 20);
+    EXPECT_NEAR(MillisecondCount(a.offset()), -500, 20); // first = 100. 500 - 400 = 100
     EXPECT_FALSE(didReset);
 
     SpinSleep(200ms);
@@ -228,6 +228,6 @@ TEST(MonotonicScheduler, synchronization) {
     EXPECT_EQ(a.offset(), b.offset());
 
     auto second = b.schedule(start + 810ms);
-    EXPECT_NEAR(ToMilliseconds(second - first), 310, 20);
+    EXPECT_NEAR(MillisecondCount(second - first), 310, 20);
     EXPECT_FALSE(didReset);
 }

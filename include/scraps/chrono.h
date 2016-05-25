@@ -8,8 +8,8 @@
 namespace scraps {
 
 template<class Rep, class Period>
-constexpr typename std::enable_if<std::chrono::duration<Rep, Period>::min() < std::chrono::duration<Rep, Period>::zero(), std::chrono::duration<Rep, Period>>::type
-abs(std::chrono::duration<Rep, Period> d) {
+std::chrono::duration<Rep, Period> abs(std::chrono::duration<Rep, Period> d) {
+    static_assert(std::chrono::duration<Rep, Period>::min() < std::chrono::duration<Rep, Period>::zero(), "Input type cannot express negative duration");
     return d >= d.zero() ? d : -d;
 }
 
@@ -21,7 +21,7 @@ std::chrono::steady_clock::duration TimedSleep(const std::chrono::duration<Rep, 
 }
 
 template<typename Rep, typename Period>
-auto ToMilliseconds(std::chrono::duration<Rep, Period> d) {
+auto MillisecondCount(std::chrono::duration<Rep, Period> d) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
 }
 
