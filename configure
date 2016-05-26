@@ -22,7 +22,6 @@ configure.main(
         'boost-build': {},
         'boost': {'libraries': ['system', 'program_options', 'filesystem']},
         'clang-analyzer': {},
-        'libsodium': {},
         'gtest': {},
         'gtest-xcode': {},
         'needy': {},

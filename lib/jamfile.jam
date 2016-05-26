@@ -84,9 +84,9 @@ alias objc : : : :
 
 alias scraps_headers :
     $(DEPENDENCIES_PATH)/boost//boost
-    $(DEPENDENCIES_PATH)/libsodium//libsodium
     $(NEEDS_PATH)//openssl
     $(NEEDS_PATH)//curl
+    $(NEEDS_PATH)//libsodium
     $(NEEDS_PATH)//gsl
     project_defaults
 :
@@ -125,5 +125,5 @@ lib scraps :
     <target-os>darwin:<framework>CoreFoundation
     <target-os>darwin:<framework>Security
     <target-os>linux:<linkflags>"-lpthread -ldl"
-    <linkflags>"-lcurl -lz -lssl -lcrypto"
+    <linkflags>"-lcurl -lz -lssl -lcrypto -lsodium"
 ;

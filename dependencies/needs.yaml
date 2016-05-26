@@ -1,4 +1,15 @@
 libraries:
+    libsodium:
+        download: https://github.com/jedisct1/libsodium/releases/download/1.0.10/libsodium-1.0.10.tar.gz
+        checksum: f34f78330cf1a4f69acce5f3fc2ada2d4098c7f4
+        project:
+            configure-args:
+                - --enable-minimal
+                - --disable-soname-versions
+            {% if platform == 'android' and architecture == 'armv7' %}
+            environment:
+                CFLAGS: {current} -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm
+            {% endif %}
     openssl:
         repository: git@github.com:openssl/openssl.git
         commit: OpenSSL_1_0_1p
