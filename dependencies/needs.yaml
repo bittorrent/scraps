@@ -8,7 +8,7 @@ libraries:
                 - --disable-soname-versions
             {% if platform == 'android' and architecture == 'armv7' %}
             environment:
-                CFLAGS: {current} -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm
+                CFLAGS: "{current} -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm"
             {% endif %}
     openssl:
         repository: git@github.com:openssl/openssl.git
