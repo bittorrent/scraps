@@ -6,6 +6,7 @@ libraries:
             configure-args:
                 - --enable-minimal
                 - --disable-soname-versions
+                - --disable-shared
             {% if platform == 'android' and architecture == 'armv7' %}
             environment:
                 CFLAGS: "{current} -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm"
