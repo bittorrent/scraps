@@ -88,6 +88,7 @@ alias scraps_headers :
     $(NEEDS_PATH)//curl
     $(NEEDS_PATH)//libsodium
     $(NEEDS_PATH)//gsl
+    $(NEEDS_PATH)//boost
     project_defaults
 :
     <include>../include
@@ -112,10 +113,6 @@ lib scraps :
     ../include/cppformat/format.cc
     ../include/json11/json11.cpp
     scraps_headers
-    $(DEPENDENCIES_PATH)/boost//boost
-    $(DEPENDENCIES_PATH)/boost//boost_system
-    $(DEPENDENCIES_PATH)/boost//boost_filesystem
-    $(DEPENDENCIES_PATH)/boost//boost_program_options
     mnmlstc
 :
     <link>static
@@ -125,5 +122,5 @@ lib scraps :
     <target-os>darwin:<framework>CoreFoundation
     <target-os>darwin:<framework>Security
     <target-os>linux:<linkflags>"-lpthread -ldl"
-    <linkflags>"-lcurl -lz -lssl -lcrypto -lsodium"
+    <linkflags>"-lcurl -lz -lssl -lcrypto -lsodium -lboost_system -lboost_filesystem -lboost_program_options"
 ;
