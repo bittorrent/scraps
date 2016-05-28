@@ -1,5 +1,4 @@
-DEPENDENCIES_PATH = [ SHELL "python3 -m ci_tacklebox.ci.properties dependencies_path" : strip-eol ] ;
-NEEDS_PATH = [ SHELL "python3 -m ci_tacklebox.ci.properties needs_path" : strip-eol ] ;
+path-constant NEEDS_PATH : needs ;
 
 rule clang-defaults ( properties * ) {
     if <toolset>darwin in $(properties) || <toolset>clang in $(properties) {
@@ -47,7 +46,6 @@ rule clang-defaults ( properties * ) {
         result += <cflags>-Wno-unused-parameter ;
         result += <cflags>-Wparentheses ;
         result += <cflags>-Wprotocol ;
-        #result += <cflags>-Wshorten-64-to-32 ;
         result += <cflags>-Wswitch ;
         result += <cflags>-Wundeclared-selector ;
         result += <cflags>-Wunused-function ;
@@ -83,7 +81,6 @@ alias objc : : : :
 
 
 alias scraps_headers :
-    $(DEPENDENCIES_PATH)/boost//boost
     $(NEEDS_PATH)//openssl
     $(NEEDS_PATH)//curl
     $(NEEDS_PATH)//libsodium
@@ -91,15 +88,15 @@ alias scraps_headers :
     $(NEEDS_PATH)//boost
     project_defaults
 :
-    <include>../include
+    <include>include
 : :
-    <include>../include
+    <include>include
 ;
 
 
 cpp-pch pch :
     scraps_headers
-    ../src/pch.h
+    src/pch.h
 :
     <conditional>@use-pch
 ;
@@ -109,9 +106,9 @@ alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
 lib scraps :
     pch
     objc
-    [ glob-tree-ex ../src : *.cpp ]
-    ../include/cppformat/format.cc
-    ../include/json11/json11.cpp
+    [ glob-tree-ex src : *.cpp ]
+    include/cppformat/format.cc
+    include/json11/json11.cpp
     scraps_headers
     mnmlstc
 :

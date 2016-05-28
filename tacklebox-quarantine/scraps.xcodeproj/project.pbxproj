@@ -89,8 +89,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0C0D277B1A9BA21000FF71B0 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = include; sourceTree = "<group>"; };
-		0C0D277C1A9BA21000FF71B0 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+		0C0D277B1A9BA21000FF71B0 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../include; sourceTree = "<group>"; };
+		0C0D277C1A9BA21000FF71B0 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../src; sourceTree = "<group>"; };
 		0C0D277D1A9BA21000FF71B0 /* tests */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tests; sourceTree = "<group>"; };
 		0C1180A01BE93421004C8F8F /* GoogleTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = GoogleTests.mm; path = "dependencies/ci-tacklebox/gtest-xcode/GoogleTests.mm"; sourceTree = "<group>"; };
 		0C1180B21BE98490004C8F8F /* scraps-tests-macosx-bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "scraps-tests-macosx-bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };

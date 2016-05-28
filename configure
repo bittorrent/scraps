@@ -1,33 +1,3 @@
-#!/usr/bin/env python3
-import os
-import subprocess
-
-try:
-    import ci_tacklebox
-except:
-    # check for development git repo in parent folder
-    dev_path = os.path.join(os.path.dirname(os.path.abspath(os.curdir)))
-    if os.path.exists(os.path.join(dev_path, '.git')):
-        subprocess.check_call(['pip3 install -e {}'.format(dev_path)], shell=True)
-        subprocess.check_call(['git merge --ff-only origin/develop'], shell=True, cwd=dev_path)
-    else:
-        # install from master branch on github
-        subprocess.check_call(['pip3 install git+ssh://git@github.com:bittorrent/ci-tacklebox.git@master'], shell=True)
-    import ci_tacklebox
-
-from ci_tacklebox.ci import configure
-configure.main(
-    version='0.1.0',
-    dependencies={
-        'boost-build': {},
-        'clang-analyzer': {},
-        'gtest': {},
-        'gtest-xcode': {},
-        'needy': {},
-        'ocunit2junit': {},
-        'jshackle': {
-            'url': 'git@github.com:bittorrent/jshackle.git',
-        }
-    },
-    prerequisites=['clang', 'cmake']
-)
+#!/bin/sh -x
+./needy/scripts/needy generate jamfile
+echo "\nConfiguration complete. You may now build via b2."

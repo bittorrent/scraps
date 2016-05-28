@@ -1,17 +1,9 @@
-# scraps
+Scraps
+==
 
 Useful C++ scraps of code.
 
-# Build
+Compiling
+--
 
-    ./configure
-    ./build
-
-# Advanced build options
-
-    ./configure --help
-    ./build --help
-
-# Test
-
-    ./test
+First, make sure you have [Boost.Build](http://www.boost.org/build/) installed. Then `./configure` and `b2`.
