@@ -12,7 +12,6 @@ rule clang-defaults ( properties * ) {
         result += <cflags>-Wconditional-uninitialized ;
         result += <cflags>-Wconstant-conversion ;
         result += <cflags>-Wdeprecated-declarations ;
-        result += <cflags>-Wno-deprecated-declarations ;
         result += <cflags>-Wduplicate-method-match ;
         result += <cflags>-Wempty-body ;
         result += <cflags>-Wenum-conversion ;
@@ -25,6 +24,7 @@ rule clang-defaults ( properties * ) {
         result += <cflags>-Wno-c++11-extensions ;
         result += <cflags>-Wno-c++1y-extensions ;
         result += <cflags>-Wno-conversion ;
+        result += <cflags>-Wno-deprecated-declarations ;
         result += <cflags>-Wno-deprecated-implementations ;
         result += <cflags>-Wno-exit-time-destructors ;
         result += <cflags>-Wno-four-char-constants ;
@@ -48,6 +48,7 @@ rule clang-defaults ( properties * ) {
         result += <cflags>-Wprotocol ;
         result += <cflags>-Wswitch ;
         result += <cflags>-Wundeclared-selector ;
+        result += <cflags>-Wunreachable-code ;
         result += <cflags>-Wunused-function ;
         result += <cflags>-Wunused-value ;
         result += <cflags>-Wunused-variable ;

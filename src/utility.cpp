@@ -3,9 +3,12 @@
 #include "scraps/format.h"
 
 #include <ctype.h>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #if !SCRAPS_WINDOWS
 #include <termios.h>
@@ -210,6 +213,26 @@ size_t PhysicalMemory() {
     auto pages = sysconf(_SC_PHYS_PAGES);
     auto pageSize = sysconf(_SC_PAGE_SIZE);
     return (pages > 0 && pageSize > 0) ? pages * pageSize : 0;
+}
+
+stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path) {
+    std::ifstream dataFile{path, std::ifstream::ate | std::ios::binary};
+    const auto fileSize = dataFile.tellg();
+
+    if (dataFile.bad() || fileSize <= 0) {
+        return {};
+    }
+
+    std::vector<Byte> buf;
+    buf.resize(fileSize);
+    dataFile.seekg(0, std::ios::beg);
+    dataFile.read(reinterpret_cast<char*>(buf.data()), fileSize);
+
+    if (dataFile.bad()) {
+        return {};
+    }
+
+    return buf;
 }
 
 } // namespace scraps

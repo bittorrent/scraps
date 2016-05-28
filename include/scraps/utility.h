@@ -198,4 +198,6 @@ auto Trim(gsl::basic_string_span<T, N> str) {
     return TrimLeft(TrimRight(str));
 }
 
+stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path);
+
 } // namespace scraps
