@@ -11,4 +11,5 @@ dependencies
 project-config.jam
 test-reports
 tacklebox-quarantine.xcconfig
+.arcconfig
 
