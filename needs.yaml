@@ -61,12 +61,12 @@ libraries:
         checksum: 4dc36d2f3310585cc1f9211b5f5c71327c86fb61
         dependencies: openssl
         project:
-            linkage: static
             configure-args:
                 - --disable-ldap
                 - --without-libidn
                 - --without-librtmp
                 - --disable-ntlm-wb
+                - --disable-shared
                 - --with-ssl={build_directory}/../../../../openssl/build/{platform}/{architecture}
     gsl:
         repository: git@github.com:Microsoft/GSL.git

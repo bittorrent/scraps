@@ -93,12 +93,18 @@ alias scraps_headers :
     <include>include
 ;
 
+rule use-scraps-pch ( properties * ) {
+    if <target-os>iphone in $(properties) || <target-os>appletv in $(properties) || <target-os>linux in $(properties) {
+        return <build>no ;
+    }
+}
 
 cpp-pch pch :
     scraps_headers
     src/pch.h
 :
-    <conditional>@use-pch
+    <conditional>@use-scraps-pch
+    <cxxflags>"-std=c++14"
 ;
 
 alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
@@ -113,6 +119,7 @@ lib scraps :
     mnmlstc
 :
     <link>static
+    <cxxflags>"-std=c++14"
 : :
     <target-os>darwin:<framework>Foundation
     <target-os>darwin:<framework>CoreServices
@@ -120,4 +127,9 @@ lib scraps :
     <target-os>darwin:<framework>Security
     <target-os>linux:<linkflags>"-lpthread -ldl"
     <linkflags>"-lcurl -lz -lssl -lcrypto -lsodium -lboost_system -lboost_filesystem -lboost_program_options"
+    <cxxflags>"-std=c++14"
 ;
+
+import package ;
+package.install install : <install-source-root>include : : scraps : [ glob-tree-ex include : *.h ] ;
+explicit install ;
