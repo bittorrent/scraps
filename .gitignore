@@ -1,8 +1,21 @@
 .DS_Store
-
-bin
-
-needs
 .needy_lock
+bin
+dist
+needs
 
+.gitignore.swp
+
+*.xcworkspace
+xcuserdata/
+
+# ci-tacklebox
+.arcconfig
+.configure/
+/build
+configure.tackle
+dependencies
+project-config.jam
+test-reports
+tests/scraps-tests.xcconfig
 scraps.xcconfig

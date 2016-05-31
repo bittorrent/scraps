@@ -1,0 +1,13 @@
+#include "./scraps-tests.xcconfig"
+#include "../scraps.xcconfig"
+#include "../dependencies/ci-tacklebox/gtest-xcode/gtest-xcode.xcconfig"
+
+boost_ldflags = $(PROJECT_DIR)/needs/boost/build/universal/$(PLATFORM_NAME)/lib/libboost_system.a $(PROJECT_DIR)/needs/boost/build/universal/$(PLATFORM_NAME)/lib/libboost_filesystem.a $(PROJECT_DIR)/needs/boost/build/universal/$(PLATFORM_NAME)/lib/libboost_program_options.a
+curl_ldflags = $(PROJECT_DIR)/needs/curl/build/universal/$(PLATFORM_NAME)/lib/libcurl.a
+openssl_ldflags = $(PROJECT_DIR)/needs/openssl/build/universal/$(PLATFORM_NAME)/lib/libcrypto.a $(PROJECT_DIR)/needs/openssl/build/universal/$(PLATFORM_NAME)/lib/libssl.a
+
+dependency_ldflags =  $(gtest_ldflags) $(boost_ldflags) $(curl_ldflags) $(openssl_ldflags) "-lz"
+
+OTHER_LDFLAGS = $(inherited) $(scraps_gtests_ldflags) $(scraps_ldflags) $(dependency_ldflags)
+
+HEADER_SEARCH_PATHS = $(inherited) $(gtest_header_search_paths)

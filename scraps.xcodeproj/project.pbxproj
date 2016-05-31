@@ -89,8 +89,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0C0D277B1A9BA21000FF71B0 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../include; sourceTree = "<group>"; };
-		0C0D277C1A9BA21000FF71B0 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../src; sourceTree = "<group>"; };
+		0C0D277B1A9BA21000FF71B0 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = include; sourceTree = "<group>"; };
+		0C0D277C1A9BA21000FF71B0 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		0C0D277D1A9BA21000FF71B0 /* tests */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tests; sourceTree = "<group>"; };
 		0C1180A01BE93421004C8F8F /* GoogleTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = GoogleTests.mm; path = "dependencies/ci-tacklebox/gtest-xcode/GoogleTests.mm"; sourceTree = "<group>"; };
 		0C1180B21BE98490004C8F8F /* scraps-tests-macosx-bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "scraps-tests-macosx-bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -249,11 +249,11 @@
 /* Begin PBXLegacyTarget section */
 		0C0D27751A9BA1BA00FF71B0 /* scraps */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--target=lib --platform=$(PLATFORM_NAME) --configuration=$(CONFIGURATION:rfc1034identifier:lower)";
+			buildArgumentsString = "-m ci_tacklebox.ci.build --platform=$(PLATFORM_NAME) --configuration=$(CONFIGURATION:rfc1034identifier:lower) build";
 			buildConfigurationList = 0C0D27781A9BA1BA00FF71B0 /* Build configuration list for PBXLegacyTarget "scraps" */;
 			buildPhases = (
 			);
-			buildToolPath = ./build;
+			buildToolPath = python3;
 			buildWorkingDirectory = "$(PROJECT_DIR)";
 			dependencies = (
 			);
@@ -263,11 +263,11 @@
 		};
 		0C1180A21BE97F50004C8F8F /* scraps-tests-iphoneos */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--target=tests --platform=iphoneos --configuration=$(CONFIGURATION:rfc1034identifier:lower)";
+			buildArgumentsString = "-m ci_tacklebox.ci.build --target=tests --platform=iphoneos --configuration=$(CONFIGURATION:rfc1034identifier:lower) build";
 			buildConfigurationList = 0C1180A31BE97F50004C8F8F /* Build configuration list for PBXLegacyTarget "scraps-tests-iphoneos" */;
 			buildPhases = (
 			);
-			buildToolPath = ./build;
+			buildToolPath = python3;
 			buildWorkingDirectory = "$(PROJECT_DIR)";
 			dependencies = (
 			);
@@ -277,11 +277,11 @@
 		};
 		0C1180A61BE97F88004C8F8F /* scraps-tests-iphonesimulator */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--target=tests --platform=iphonesimulator --configuration=$(CONFIGURATION:rfc1034identifier:lower)";
+			buildArgumentsString = "-m ci_tacklebox.ci.build --target=tests --platform=iphonesimulator --configuration=$(CONFIGURATION:rfc1034identifier:lower) build";
 			buildConfigurationList = 0C1180A71BE97F88004C8F8F /* Build configuration list for PBXLegacyTarget "scraps-tests-iphonesimulator" */;
 			buildPhases = (
 			);
-			buildToolPath = ./build;
+			buildToolPath = python3;
 			buildWorkingDirectory = "$(PROJECT_DIR)";
 			dependencies = (
 			);
@@ -291,11 +291,11 @@
 		};
 		0C1180BA1BE984A3004C8F8F /* scraps-tests-macosx */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--target=tests --platform=macosx --configuration=$(CONFIGURATION:rfc1034identifier:lower)";
+			buildArgumentsString = "-m ci_tacklebox.ci.build --target=tests --platform=macosx --configuration=$(CONFIGURATION:rfc1034identifier:lower) build";
 			buildConfigurationList = 0C1180BB1BE984A3004C8F8F /* Build configuration list for PBXLegacyTarget "scraps-tests-macosx" */;
 			buildPhases = (
 			);
-			buildToolPath = ./build;
+			buildToolPath = python3;
 			buildWorkingDirectory = "$(PROJECT_DIR)";
 			dependencies = (
 			);
@@ -305,11 +305,11 @@
 		};
 		0C1180CD1BE9866E004C8F8F /* scraps-tests-appletvos */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--target=tests --platform=appletvos --configuration=$(CONFIGURATION:rfc1034identifier:lower)";
+			buildArgumentsString = "-m ci_tacklebox.ci.build --target=tests --platform=appletvos --configuration=$(CONFIGURATION:rfc1034identifier:lower) build";
 			buildConfigurationList = 0C1180CE1BE9866E004C8F8F /* Build configuration list for PBXLegacyTarget "scraps-tests-appletvos" */;
 			buildPhases = (
 			);
-			buildToolPath = ./build;
+			buildToolPath = python3;
 			buildWorkingDirectory = "$(PROJECT_DIR)";
 			dependencies = (
 			);
@@ -319,11 +319,11 @@
 		};
 		0C1180D11BE9867D004C8F8F /* scraps-tests-appletvsimulator */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--target=tests --platform=appletvsimulator --configuration=$(CONFIGURATION:rfc1034identifier:lower)";
+			buildArgumentsString = "-m ci_tacklebox.ci.build --target=tests --platform=appletvsimulator --configuration=$(CONFIGURATION:rfc1034identifier:lower) build";
 			buildConfigurationList = 0C1180D21BE9867D004C8F8F /* Build configuration list for PBXLegacyTarget "scraps-tests-appletvsimulator" */;
 			buildPhases = (
 			);
-			buildToolPath = ./build;
+			buildToolPath = python3;
 			buildWorkingDirectory = "$(PROJECT_DIR)";
 			dependencies = (
 			);
@@ -1081,7 +1081,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "scraps-tests-iphonesimulator-host";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1099,7 +1098,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "scraps-tests-iphonesimulator-host";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1153,7 +1151,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "scraps-tests-iphoneos-host";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1171,7 +1168,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "scraps-tests-iphoneos-host";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1190,7 +1186,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = appletvos;
-				SUPPORTED_PLATFORMS = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
 			};
@@ -1209,7 +1204,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = appletvos;
-				SUPPORTED_PLATFORMS = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
 				VALIDATE_PRODUCT = YES;

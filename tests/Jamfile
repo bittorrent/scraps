@@ -3,7 +3,7 @@ JSHACKLE_PATH = [ SHELL "python3 -m ci_tacklebox.dependencies.path jshackle" : s
 
 alias scraps-tests-common :
     [ glob-tree-ex src : *.cpp : android.cpp ]
-    ../..//scraps
+    ..//scraps
     $(DEPENDENCIES_PATH)/gtest//gtest/<link>static
 ;
 
