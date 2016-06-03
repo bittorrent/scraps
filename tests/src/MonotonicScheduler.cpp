@@ -17,23 +17,26 @@ void SpinSleep(std::chrono::duration<Rep, Period> d) {
 }
 
 
-// Durations are offsets from now
+// Durations are offsets from now.
 // time to sleep, schedule time point, expected output, will reset
 void MonotonicSchedulerTests(std::chrono::steady_clock::duration threshold, std::vector<std::tuple<std::chrono::steady_clock::duration, std::chrono::steady_clock::duration, std::chrono::steady_clock::duration, bool>> tps) {
     bool didReset = false;
-    MonotonicScheduler a(threshold, [&](auto){ didReset = true; });
+    constexpr auto kTestScaleFactor = 5;
+
+    MonotonicScheduler a(threshold * kTestScaleFactor, [&](auto){ didReset = true; });
 
     const auto start = std::chrono::steady_clock::now();
 
     auto prevSleepTp = start;
 
     for (auto& t : tps) {
-        auto sleepTarget = start + std::get<0>(t);
+        auto sleepTarget = start + std::get<0>(t) * kTestScaleFactor;
         auto sleepDuration = sleepTarget - prevSleepTp;
         prevSleepTp = sleepTarget;
         SpinSleep(sleepDuration);
-        auto tp = a.schedule(start + std::get<1>(t) + 10ms); // +10ms to try to kill race conditions
-        EXPECT_NEAR(MillisecondCount(tp - start), MillisecondCount(std::get<2>(t)), 20);
+
+        auto tp = a.schedule(start + std::get<1>(t) * kTestScaleFactor);
+        EXPECT_NEAR(MillisecondCount(tp - start), MillisecondCount(std::get<2>(t) * kTestScaleFactor), 100 * kTestScaleFactor);
         EXPECT_EQ(didReset, std::get<3>(t));
         didReset = false;
     }
@@ -151,7 +154,7 @@ TEST(MonotonicScheduler, exceedThresholdForward) {
         {  300ms,    300ms,  300ms, false },
         {  400ms,    400ms,  400ms, false },
         {  500ms,    500ms,  500ms, false },
-        {  600ms,    900ms,  600ms, true  }, // skip here
+        {  600ms,    900ms,  600ms, true  }, // reset
         {  700ms,   1000ms,  700ms, false },
         {  800ms,   1100ms,  800ms, false },
         {  900ms,   1200ms,  900ms, false },
@@ -167,7 +170,7 @@ TEST(MonotonicScheduler, exceedThresholdBackward) {
         {  300ms,    300ms,  300ms, false },
         {  400ms,    400ms,  400ms, false },
         {  500ms,    500ms,  500ms, false },
-        {  600ms,      0ms,  600ms, true  }, // skip here
+        {  600ms,      0ms,  600ms, true  }, // reset
         {  700ms,    100ms,  700ms, false },
         {  800ms,    200ms,  800ms, false },
         {  900ms,    300ms,  900ms, false },
