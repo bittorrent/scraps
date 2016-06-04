@@ -1,3 +1,16 @@
-#!/bin/sh
-./needy/scripts/needy generate jamfile
+#!/bin/bash
+
+# workaround until Needy has a way to disambiguate a blank '-j' argument
+if [[ $(uname) == 'Darwin' ]] ; then
+    NUM_CORES=$(sysctl -n hw.ncpu)
+else
+    NUM_CORES=$(nproc)
+fi
+
+./needy/scripts/needy generate jamfile --satisfy-args="-j $NUM_CORES"
+if [ ! $? ] ; then
+    echo "Configuration error."
+    exit 1
+fi
+
 echo "Configuration complete. You may now build via b2."
