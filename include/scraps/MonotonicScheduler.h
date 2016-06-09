@@ -93,7 +93,6 @@ public:
 private:
     bool _firstSchedule = true;
     CallbackType _callback;
-    stdts::optional<std::chrono::steady_clock::time_point> _lastRemoteTimePoint;
     std::chrono::steady_clock::duration                    _threshold           = {};
     std::chrono::steady_clock::duration                    _remoteToLocalOffset = {};
     stdts::optional<std::chrono::steady_clock::time_point> _lastLocalTimePoint;
