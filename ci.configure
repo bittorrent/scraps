@@ -29,6 +29,5 @@ configure.main(
         'jshackle': {
             'url': 'git@github.com:bittorrent/jshackle.git',
         }
-    },
-    prerequisites=['clang', 'cmake']
+    }
 )
