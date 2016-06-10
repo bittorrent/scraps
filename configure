@@ -1,16 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-# workaround until Needy has a way to disambiguate a blank '-j' argument
-if [[ $(uname) == 'Darwin' ]] ; then
-    NUM_CORES=$(sysctl -n hw.ncpu)
-else
-    NUM_CORES=$(nproc)
-fi
+try:
+    from ci_tacklebox.ci import configure
+    configure.main(development=True)
+    exit()
+except ImportError:
+    print('For unit test support, install ci_tacklebox. (https://github.com/bittorrent/ci-tacklebox)')
 
-./needy/scripts/needy generate jamfile --satisfy-args="-j $NUM_CORES"
-if [ ! $? ] ; then
-    echo "Configuration error."
-    exit 1
-fi
+import multiprocessing
+import subprocess
 
-echo "Configuration complete. You may now build via b2."
+subprocess.check_call(['./needy/scripts/needy generate jamfile --satisfy-args="-j {}"'.format(multiprocessing.cpu_count())], shell=True)
+print('Configuration complete. You may now build via b2.')
