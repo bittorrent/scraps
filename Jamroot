@@ -108,6 +108,7 @@ cpp-pch pch :
     <cxxflags>"-std=c++14"
 ;
 
+lib libGLESv2    : : <name>GLESv2 <link>shared ;
 alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
 
 lib scraps :
@@ -121,12 +122,19 @@ lib scraps :
 :
     <link>static
     <cxxflags>"-std=c++14"
+    <target-os>android:<source>libGLESv2
 : :
     <target-os>darwin:<framework>Foundation
     <target-os>darwin:<framework>CoreServices
     <target-os>darwin:<framework>CoreFoundation
     <target-os>darwin:<framework>Security
+
+    <target-os>darwin:<framework>OpenGL
+    <target-os>iphone:<framework>OpenGLES
+    <target-os>appletv:<framework>OpenGLES
+
     <target-os>linux:<linkflags>"-lpthread -ldl"
+
     <linkflags>"-lcurl -lz -lssl -lcrypto -lsodium -lboost_system -lboost_filesystem -lboost_program_options"
     <cxxflags>"-std=c++14"
 ;
