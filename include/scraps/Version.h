@@ -2,8 +2,6 @@
 
 #include "scraps/config.h"
 
-#include "scraps/version-config.h"
-
 // XXX: linux has major/minor macros defined somewhere, so let's nuke them here
 #if defined(major)
 #undef major
