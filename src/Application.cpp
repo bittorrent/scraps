@@ -1,5 +1,6 @@
 #include "scraps/Application.h"
 
+#include "scraps/curl.h"
 #include "scraps/ArgumentParser.h"
 #include "scraps/utility.h"
 #include "scraps/loggers.h"
@@ -21,6 +22,7 @@ Application::Application(Version appVersion) :
 {
     SCRAPS_ASSERT(g_instance == nullptr);
     g_instance = this;
+    InitCURLThreadSafety();
 }
 
 Application::~Application() {
