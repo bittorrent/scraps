@@ -14,7 +14,6 @@ lib scraps-gtests : scraps-tests-common :
 
 exe scraps-tests :
     scraps-tests-common/<link>static
-    $(DEPENDENCIES_PATH)/gtest//gtest_main/<link>static
 :
     <conditional>@unit-test-executable
 ;

@@ -89,8 +89,8 @@ public:
 
 private:
     // no copying
-    HTTPRequest(const HTTPRequest& other) {}
-    HTTPRequest& operator=(const HTTPRequest& other) { return *this; }
+    HTTPRequest(const HTTPRequest&) = delete;
+    HTTPRequest& operator=(const HTTPRequest&) = delete;
 
     std::string _caBundlePath;
     std::string _pinnedKey;

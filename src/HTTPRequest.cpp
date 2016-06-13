@@ -1,6 +1,7 @@
 #include "scraps/HTTPRequest.h"
 
 #include "scraps/logging.h"
+#include "scraps/curl.h"
 #include "scraps/thread.h"
 
 #include <gsl.h>
@@ -22,6 +23,8 @@ HTTPRequest::~HTTPRequest() {
 }
 
 void HTTPRequest::initiate(const std::string& url, const void* body, size_t bodyLength, const std::vector<std::string>& headers) {
+    SCRAPS_ASSERT(CURLIsThreadSafe() && "You need to call InitCURLThreadSafety upon application startup.");
+
     _curl = curl_easy_init();
     _curlMultiHandle = curl_multi_init();
 
