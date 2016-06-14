@@ -1,8 +1,9 @@
-#include "scraps/URL.h"
+#include "scraps/net/URL.h"
 
 #include <cstdlib>
 
 namespace scraps {
+namespace net {
 
 namespace {
 
@@ -51,4 +52,4 @@ uint16_t URL::port() const { return std::get<2>(Parse(_url)); }
 
 std::string URL::resource() const { return std::get<3>(Parse(_url)); }
 
-} // namespace scraps
+}} // namespace scraps::net

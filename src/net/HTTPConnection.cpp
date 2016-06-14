@@ -1,13 +1,14 @@
-#include "scraps/HTTPConnection.h"
+#include "scraps/net/HTTPConnection.h"
 
 #include "scraps/chrono.h"
 #include "scraps/logging.h"
-#include "scraps/network.h"
 #include "scraps/utility.h"
+#include "scraps/net/utility.h"
 
 #include <unistd.h>
 
 namespace scraps {
+namespace net {
 
 HTTPConnection::HTTPConnection(int socket, const std::chrono::microseconds& timeout)
     : _socket(socket), _result(kResultUnknown), _timeout(timeout) {}
@@ -203,4 +204,4 @@ std::unordered_map<std::string, std::string> HTTPConnection::ParseQueryString(co
     return ret;
 }
 
-} // namespace scraps
+}} // namespace scraps::net

@@ -11,8 +11,10 @@
 #include <atomic>
 #include <memory>
 #include <queue>
+#include <random>
 
 namespace scraps {
+namespace net {
 
 struct TCPServiceDelegate;
 
@@ -190,6 +192,8 @@ private:
 
     ConnectionMap _connections;
 
+    std::default_random_engine _prng;
+
     void _eventHandler(int fd, short events);
 
     void _connect(ConnectionId connectionId, const sockaddr* address, size_t addressLength);
@@ -206,4 +210,4 @@ struct TCPServiceDelegate {
     virtual void tcpServiceConnectionClosed(TCPService::ConnectionId connectionId) {}
 };
 
-} // namespace scraps
+}} // namespace scraps::net

@@ -1,4 +1,4 @@
-#include "scraps/HTTPRequest.h"
+#include "scraps/net/HTTPRequest.h"
 
 #include "scraps/logging.h"
 #include "scraps/curl.h"
@@ -7,6 +7,7 @@
 #include <gsl.h>
 
 namespace scraps {
+namespace net {
 
 HTTPRequest::~HTTPRequest() {
     abort();
@@ -163,4 +164,4 @@ size_t HTTPRequest::CURLWriteCallback(char* ptr, size_t size, size_t nmemb, void
     return size * nmemb;
 }
 
-} // namespace scraps
+}} // namespace scraps::net

@@ -1,8 +1,9 @@
 #include "gtest/gtest.h"
 
-#include "scraps/TCPService.h"
+#include "scraps/net/TCPService.h"
 
 using namespace scraps;
+using namespace scraps::net;
 
 struct CountingDelegate : TCPServiceDelegate {
     virtual void tcpServiceConnectionEstablished(TCPService::ConnectionId connectionId) override {

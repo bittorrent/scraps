@@ -1,11 +1,13 @@
-#include "scraps/UDPSocket.h"
+#include "scraps/net/UDPSocket.h"
 
 #include "scraps/logging.h"
-#include "scraps/network.h"
+#include "scraps/utility.h"
+#include "scraps/net/utility.h"
 
 #include <gsl.h>
 
 namespace scraps {
+namespace net {
 
 UDPSocket::UDPSocket(Protocol protocol, std::weak_ptr<UDPReceiver> receiver)
     : _socket{::socket(protocol == Protocol::kIPv4 ? AF_INET : AF_INET6, SOCK_DGRAM, 0)}
@@ -83,13 +85,12 @@ bool UDPSocket::bindMulticast(const char* groupAddress, uint16_t port) {
     return true;
 }
 
-bool UDPSocket::send(const UDPEndpoint& destination, const void* data, size_t length) {
+bool UDPSocket::send(const Endpoint& destination, const void* data, size_t length) {
     std::lock_guard<std::mutex> lock(_mutex);
     if (_socket < 0) { return false; }
 
     sockaddr_storage addr;
-    socklen_t addrLength = 0;
-    GetSockAddr(destination.address(), destination.port(), &addr, &addrLength);
+    socklen_t addrLength = destination.getSockAddr(&addr);
     int sent = ::sendto(_socket, data, length, 0, reinterpret_cast<sockaddr*>(&addr), addrLength);
 
     if (sent < 0) {
@@ -128,14 +129,14 @@ void UDPSocket::receive() {
 
         _totalReceivedBytes += bytes;
 
-        UDPEndpoint sender;
+        Endpoint sender;
 
         if (senderStorage.ss_family == AF_INET && senderStorageLength == sizeof(sockaddr_in)) {
             auto sa = reinterpret_cast<sockaddr_in*>(&senderStorage);
-            sender = UDPEndpoint(boost::asio::ip::address_v4(*reinterpret_cast<boost::asio::ip::address_v4::bytes_type*>(&sa->sin_addr)), ntohs(sa->sin_port));
+            sender = Endpoint(boost::asio::ip::address_v4(*reinterpret_cast<boost::asio::ip::address_v4::bytes_type*>(&sa->sin_addr)), ntohs(sa->sin_port));
         } else if (senderStorage.ss_family == AF_INET6 && senderStorageLength == sizeof(sockaddr_in6)) {
             auto sa = reinterpret_cast<sockaddr_in6*>(&senderStorage);
-            sender = UDPEndpoint(boost::asio::ip::address_v6(*reinterpret_cast<boost::asio::ip::address_v6::bytes_type*>(&sa->sin6_addr), ntohl(sa->sin6_scope_id)), ntohs(sa->sin6_port));
+            sender = Endpoint(boost::asio::ip::address_v6(*reinterpret_cast<boost::asio::ip::address_v6::bytes_type*>(&sa->sin6_addr), ntohl(sa->sin6_scope_id)), ntohs(sa->sin6_port));
         } else {
             SCRAPS_ASSERT(false);
         }
@@ -193,4 +194,4 @@ bool UDPSocket::_bind(const char* interface, uint16_t port) {
     return true;
 }
 
-} // namespace scraps
+}} // namespace scraps::net

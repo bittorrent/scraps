@@ -1,9 +1,10 @@
 #include "gtest/gtest.h"
 
-#include "scraps/TCPAcceptor.h"
-#include "scraps/TCPService.h"
+#include "scraps/net/TCPAcceptor.h"
+#include "scraps/net/TCPService.h"
 
 using namespace scraps;
+using namespace scraps::net;
 
 namespace {
     size_t gNumConnections = 0;

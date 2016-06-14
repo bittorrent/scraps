@@ -5,8 +5,8 @@
 #include "scraps/CircularBuffer.h"
 #include "scraps/logging.h"
 #include "scraps/thread.h"
-#include "scraps/UDPSocket.h"
 #include "scraps/utility.h"
+#include "scraps/net/UDPSocket.h"
 
 #include <mutex>
 #include <stdio.h>
@@ -182,15 +182,15 @@ private:
 */
 class DogStatsDLogger : public Logger {
 public:
-    DogStatsDLogger(UDPEndpoint endpoint, LogLevel level = LogLevel::kWarning);
+    DogStatsDLogger(net::Endpoint endpoint, LogLevel level = LogLevel::kWarning);
 
     virtual void log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override;
 
 private:
     std::mutex _mutex;
-    const UDPEndpoint _endpoint;
+    const net::Endpoint _endpoint;
     const LogLevel _level;
-    std::unique_ptr<UDPSocket> _socket;
+    std::unique_ptr<net::UDPSocket> _socket;
 };
 
 } // namespace scraps

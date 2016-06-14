@@ -1,8 +1,9 @@
 #include "gtest/gtest.h"
 
-#include "scraps/HTTPRequest.h"
+#include "scraps/net/HTTPRequest.h"
 
 using namespace scraps;
+using namespace scraps::net;
 
 TEST(HTTPRequest, basicGET) {
     HTTPRequest request("http://www.google.com");

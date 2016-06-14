@@ -89,16 +89,6 @@ TEST(utility, RandomBytes) {
     EXPECT_EQ(32, value.size());
 }
 
-TEST(utility, URLEncode) {
-    ASSERT_EQ("gro%C3%9Fp%C3%B6sna", URLEncode("großpösna"));
-    ASSERT_EQ("-_.+", URLEncode("-_. "));
-};
-
-TEST(utility, URLDecode) {
-    ASSERT_EQ("großpösna", URLDecode("gro%C3%9Fp%C3%B6sna"));
-    ASSERT_EQ("-_. ", URLDecode("-_.+"));
-};
-
 TEST(utility, HexToDec) {
     static_assert(HexToDec('0') == 0, "test failed");
     static_assert(HexToDec('a') == 10, "test failed");

@@ -3,6 +3,7 @@
 #include "scraps/config.h"
 
 namespace scraps {
+namespace net {
 
 class URL {
 public:
@@ -28,4 +29,4 @@ private:
     std::string _url;
 };
 
-} // namespace scraps
+}} // namespace scraps::net

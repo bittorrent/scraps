@@ -1,16 +1,17 @@
 #include "gtest/gtest.h"
 
-#include "scraps/network.h"
-#include "scraps/UDPService.h"
+#include "scraps/net/utility.h"
+#include "scraps/net/UDPService.h"
 
 using namespace scraps;
+using namespace scraps::net;
 
 struct LambdaUDPReceiver : UDPReceiver {
-    LambdaUDPReceiver(std::function<void(const UDPEndpoint& sender, const void* data, size_t length)> function) : function(function) {}
-    virtual void receiveUDP(const UDPEndpoint& sender, const void* data, size_t length) override {
+    LambdaUDPReceiver(std::function<void(const Endpoint& sender, const void* data, size_t length)> function) : function(function) {}
+    virtual void receiveUDP(const Endpoint& sender, const void* data, size_t length) override {
         function(sender, data, length);
     }
-    std::function<void(const UDPEndpoint& sender, const void* data, size_t length)> function;
+    std::function<void(const Endpoint& sender, const void* data, size_t length)> function;
 };
 
 static void BasicTest(UDPSocket::Protocol protocol) {
@@ -19,13 +20,13 @@ static void BasicTest(UDPSocket::Protocol protocol) {
     auto loopback = protocol == UDPSocket::Protocol::kIPv4 ? "127.0.0.1" : "::1";
 
     uint16_t alicePort = 10040;
-    UDPEndpoint aliceEndpoint(Address::from_string(loopback), alicePort);
+    Endpoint aliceEndpoint(Address::from_string(loopback), alicePort);
 
     uint16_t bobPort = 10041;
-    UDPEndpoint bobEndpoint(Address::from_string(loopback), bobPort);
+    Endpoint bobEndpoint(Address::from_string(loopback), bobPort);
 
     uint16_t carolPort = 10042;
-    UDPEndpoint carolEndpoint(Address::from_string(loopback), carolPort);
+    Endpoint carolEndpoint(Address::from_string(loopback), carolPort);
 
     int conversationStep = 0;
     int conversationEndStep = 5;
@@ -34,7 +35,7 @@ static void BasicTest(UDPSocket::Protocol protocol) {
     std::shared_ptr<LambdaUDPReceiver> aliceReceiver, bobReceiver, carolReceiver;
 
     // open alice's port
-    aliceSocket = alice.openSocket(protocol, alicePort, aliceReceiver = std::make_shared<LambdaUDPReceiver>([&](const UDPEndpoint& sender, const void* data, size_t len) {
+    aliceSocket = alice.openSocket(protocol, alicePort, aliceReceiver = std::make_shared<LambdaUDPReceiver>([&](const Endpoint& sender, const void* data, size_t len) {
         switch (conversationStep) {
             case 1:
                 ASSERT_EQ(bobEndpoint, sender);
@@ -56,7 +57,7 @@ static void BasicTest(UDPSocket::Protocol protocol) {
     }));
 
     // open bob's port
-    bobSocket = bob.openSocket(protocol, bobPort, bobReceiver = std::make_shared<LambdaUDPReceiver>([&](const UDPEndpoint& sender, const void* data, size_t len) {
+    bobSocket = bob.openSocket(protocol, bobPort, bobReceiver = std::make_shared<LambdaUDPReceiver>([&](const Endpoint& sender, const void* data, size_t len) {
         switch (conversationStep) {
             case 0:
                 ASSERT_EQ(aliceEndpoint, sender);
@@ -78,7 +79,7 @@ static void BasicTest(UDPSocket::Protocol protocol) {
     }));
 
     // open carol's port
-    carolSocket = carol.openSocket(protocol, carolPort, carolReceiver = std::make_shared<LambdaUDPReceiver>([&](const UDPEndpoint& sender, const void* data, size_t len) {
+    carolSocket = carol.openSocket(protocol, carolPort, carolReceiver = std::make_shared<LambdaUDPReceiver>([&](const Endpoint& sender, const void* data, size_t len) {
         switch (conversationStep) {
             case 4:
                 ASSERT_EQ(aliceEndpoint, sender);
@@ -113,14 +114,14 @@ static void MulticastTest(UDPSocket::Protocol protocol) {
 
     uint16_t multicastPort = 30001;
     Address multicastAddress(Address::from_string(protocol == UDPSocket::Protocol::kIPv4 ? "239.255.0.1" : "ff03::1"));
-    UDPEndpoint multicastEndpoint(multicastAddress, multicastPort);
+    Endpoint multicastEndpoint(multicastAddress, multicastPort);
 
     std::shared_ptr<UDPSocket> aliceSocket, bobSocket, carolSocket;
     std::shared_ptr<LambdaUDPReceiver> aliceReceiver, bobReceiver, carolReceiver;
 
     bool received[3][2]{};
 
-    aliceSocket = alice.openMulticastSocket(multicastAddress, multicastPort, aliceReceiver = std::make_shared<LambdaUDPReceiver>([&](const UDPEndpoint& sender, const void* data, size_t len) {
+    aliceSocket = alice.openMulticastSocket(multicastAddress, multicastPort, aliceReceiver = std::make_shared<LambdaUDPReceiver>([&](const Endpoint& sender, const void* data, size_t len) {
         if (len == 15 && memcmp(data, "hello everyone!", 15)) {
             received[0][0] = true;
         }
@@ -129,7 +130,7 @@ static void MulticastTest(UDPSocket::Protocol protocol) {
         }
     }));
 
-    bobSocket = bob.openMulticastSocket(multicastAddress, multicastPort, bobReceiver = std::make_shared<LambdaUDPReceiver>([&](const UDPEndpoint& sender, const void* data, size_t len) {
+    bobSocket = bob.openMulticastSocket(multicastAddress, multicastPort, bobReceiver = std::make_shared<LambdaUDPReceiver>([&](const Endpoint& sender, const void* data, size_t len) {
         if (len == 15 && memcmp(data, "hello everyone!", 15)) {
             received[1][0] = true;
         }
@@ -138,7 +139,7 @@ static void MulticastTest(UDPSocket::Protocol protocol) {
         }
     }));
 
-    carolSocket = carol.openMulticastSocket(multicastAddress, multicastPort, carolReceiver = std::make_shared<LambdaUDPReceiver>([&](const UDPEndpoint& sender, const void* data, size_t len) {
+    carolSocket = carol.openMulticastSocket(multicastAddress, multicastPort, carolReceiver = std::make_shared<LambdaUDPReceiver>([&](const Endpoint& sender, const void* data, size_t len) {
         if (len == 15 && memcmp(data, "hello everyone!", 15)) {
             received[2][0] = true;
         }

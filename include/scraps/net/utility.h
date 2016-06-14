@@ -2,9 +2,12 @@
 
 #include "scraps/config.h"
 
-#include "scraps/types.h"
+#include "scraps/net/Address.h"
+
+#include <vector>
 
 namespace scraps {
+namespace net {
 
 /**
 * Returns the code for the most recent socket error
@@ -18,15 +21,6 @@ inline int SocketError() {
     return errno;
 #endif
 }
-
-/**
-* Sets the given file descriptor to blocking or non-blocking.
-*
-* @param fd the file descriptor
-* @param blocking true if the file descriptor should be set to blocking. false if it should be set to non-blocking
-* @return true on success
-*/
-bool SetBlocking(int fd, bool blocking = true);
 
 /**
 * Gracefully shuts down and closes a socket.
@@ -44,13 +38,17 @@ void ShutdownAndCloseTCPSocket(int fd);
 bool IsLocal(const Address& address);
 
 /**
-* Performs a blocking resolution of the given ipv4 address.
+* Performs a blocking resolution of the given host.
 *
-* @param address the address to resolve, optionally with a port specified in the format host:port
-* @param ec the resulting error code
-* @return the resolved endpoint
+* @param address the host to resolve
+* @return the resolved addresses
 */
-UDPEndpoint ResolveIPv4(const char* address, boost::system::error_code& ec);
+std::vector<Address> Resolve(const std::string& host);
+
+/**
+* Like Resolve, but only returns IPv4 addresses.
+*/
+std::vector<Address> ResolveIPv4(const std::string& host);
 
 /**
 * Returns the address for the default Internet-facing interface. If there are none available,
@@ -65,8 +63,23 @@ inline Address DefaultIPv4Interface() { return DefaultInterface(false); }
 inline Address DefaultIPv6Interface() { return DefaultInterface(true); }
 
 /**
-* Used to get a sockaddr struct for the given address / port.
+* Returns a string in which all non-alphanumeric characters except dashes, underscores,
+* spaces, and periods are replaced with a percent sign followed by their hexadecimal
+* value. Spaces are replaced with plus signs.
+*
+* @return the url-encoded string
 */
-void GetSockAddr(Address address, uint16_t port, sockaddr_storage* storage, socklen_t* length);
+std::string URLEncode(const char* str);
 
-} // namespace scraps
+inline std::string URLEncode(const std::string& str) { return URLEncode(str.c_str()); }
+
+/**
+* Returns a string in which the effects of URLEncode have been reversed.
+*
+* @return the url-decoded string
+*/
+std::string URLDecode(const char* str);
+
+inline std::string URLDecode(const std::string& str) { return URLDecode(str.c_str()); }
+
+}} // namespace scraps::net

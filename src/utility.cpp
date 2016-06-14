@@ -4,9 +4,7 @@
 
 #include <ctype.h>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -15,45 +13,9 @@
 #include <unistd.h>
 #endif
 
+#include <fcntl.h>
+
 namespace scraps {
-
-std::string URLEncode(const char* str) {
-    std::ostringstream ret;
-
-    while (char c = *str) {
-        if (isalnum(c) || c == '-' || c == '_' || c == '.') {
-            ret << c;
-        } else if (c == ' ') {
-            ret << '+';
-        } else {
-            ret << '%' << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << (int)static_cast<unsigned char>(c);
-        }
-        ++str;
-    }
-
-    return ret.str();
-}
-
-std::string URLDecode(const char* str) {
-    std::ostringstream ret;
-
-    while (char c = *str) {
-        if (c == '+') {
-            ret << ' ';
-        } else if (c == '%' && str[1] && str[2]) {
-            char tmp[3];
-            tmp[0] = *++str;
-            tmp[1] = *++str;
-            tmp[2] = '\0';
-            ret << (unsigned char)strtoul(tmp, nullptr, 16);
-        } else {
-            ret << c;
-        }
-        ++str;
-    }
-
-    return ret.str();
-}
 
 std::string JSONEscape(const char* str) {
     std::string ret;
@@ -233,6 +195,19 @@ stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path) {
     }
 
     return buf;
+}
+
+bool SetBlocking(int fd, bool blocking) {
+#ifdef _WIN32
+    unsigned long arg = blocking ? 1 : 0;
+    return !ioctlsocket(fd, FIONBIO, &arg);
+#else
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags < 0) {
+        return false;
+    }
+    return !fcntl(fd, F_SETFL, blocking ? flags & ~O_NONBLOCK : flags | O_NONBLOCK);
+#endif
 }
 
 } // namespace scraps

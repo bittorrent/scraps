@@ -1,7 +1,9 @@
-#include "scraps/TCPService.h"
+#include "scraps/net/TCPService.h"
 
 #include "scraps/logging.h"
-#include "scraps/network.h"
+#include "scraps/utility.h"
+#include "scraps/net/Endpoint.h"
+#include "scraps/net/utility.h"
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -12,6 +14,7 @@
 #include <thread>
 
 namespace scraps {
+namespace net {
 
 TCPService::Connection::~Connection() {
     close();
@@ -47,14 +50,14 @@ bool TCPService::bind(const std::string& interface, uint16_t port) {
     bzero(&addr, sizeof(addr));
     addr.sin_family = AF_INET;
     if (::inet_pton(addr.sin_family, interface.c_str(), &addr.sin_addr.s_addr) <= 0) {
-        SCRAPS_LOGF_ERROR("invalid interface");
+        SCRAPS_LOG_ERROR("invalid interface");
         return false;
     }
     addr.sin_port = htons(port);
 
     auto fd = ::socket(addr.sin_family, SOCK_STREAM, 0);
     if (fd < 0) {
-        SCRAPS_LOGF_ERROR("error opening socket (errno = %d)", static_cast<int>(errno));
+        SCRAPS_LOG_ERROR("error opening socket (errno = {})", static_cast<int>(errno));
         return false;
     }
 
@@ -62,13 +65,13 @@ bool TCPService::bind(const std::string& interface, uint16_t port) {
     ::setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
     if (::bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        SCRAPS_LOGF_ERROR("error binding socket (errno = %d)", static_cast<int>(errno));
+        SCRAPS_LOG_ERROR("error binding socket (errno = {})", static_cast<int>(errno));
         ::close(fd);
         return false;
     }
 
     if (!SetBlocking(fd, false)) {
-        SCRAPS_LOGF_ERROR("couldn't make socket non-blocking");
+        SCRAPS_LOG_ERROR("couldn't make socket non-blocking");
         ::close(fd);
         return false;
     }
@@ -159,16 +162,15 @@ TCPService::ConnectionId TCPService::connect(const std::string& host, uint16_t p
     ConnectionId id = ++_connectionIdCounter;
 
     _runLoop.async([this, host, port, id] {
-        struct addrinfo* result = nullptr;
-        char portStr[20];
-        snprintf(portStr, sizeof(portStr), "%hu", port);
-        auto err = getaddrinfo(host.c_str(), portStr, nullptr, &result);
-        if (err || !result) {
-            SCRAPS_LOGF_ERROR("unable to resolve host %s (err = %d)", host.c_str(), err);
+        auto addresses = ResolveIPv4(host);
+        if (addresses.empty()) {
+            SCRAPS_LOG_ERROR("unable to resolve host {}", host);
             return;
         }
-        _connect(id, result->ai_addr, result->ai_addrlen);
-        freeaddrinfo(result);
+        Endpoint endpoint{addresses[UniformDistribution(_prng, 0, addresses.size() - 1)], port};
+        sockaddr_storage addr;
+        auto addrLength = endpoint.getSockAddr(&addr);
+        _connect(id, reinterpret_cast<sockaddr*>(&addr), addrLength);
     });
 
     return id;
@@ -208,15 +210,15 @@ void TCPService::_eventHandler(int fd, short events) {
         // TODO: limit or filter our connections instead of blindly accepting everything?
         auto newFD = accept(fd, nullptr, nullptr);
         if (newFD < 0) {
-            SCRAPS_LOGF_ERROR("error accepting connection");
+            SCRAPS_LOG_ERROR("error accepting connection");
             return;
         }
         if (!SetBlocking(newFD, false)) {
-            SCRAPS_LOGF_ERROR("couldn't make socket non-blocking");
+            SCRAPS_LOG_ERROR("couldn't make socket non-blocking");
             ::close(newFD);
             return;
         }
-        SCRAPS_LOGF_INFO("accepted connection (fd = %d)", newFD);
+        SCRAPS_LOG_INFO("accepted connection (fd = {})", newFD);
         _runLoop.add(newFD, POLLIN | POLLOUT | POLLHUP);
         auto id = ++_connectionIdCounter;
         _connections.emplace(id, newFD, Connection::kConnected);
@@ -233,7 +235,7 @@ void TCPService::_eventHandler(int fd, short events) {
 
     if ((events & POLLHUP) || (connection->isClosing() && (events & POLLIN))) {
         // finishing up a graceful shutdown
-        SCRAPS_LOGF_INFO("connection closed (fd = %d)", fd);
+        SCRAPS_LOG_INFO("connection closed (fd = {})", fd);
 
         shutdown(fd, SHUT_WR);
         recv(fd, nullptr, 0, 0);
@@ -247,10 +249,10 @@ void TCPService::_eventHandler(int fd, short events) {
             int err = 0;
             socklen_t errSize = sizeof(err);
             if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &errSize) < 0 || err) {
-                SCRAPS_LOGF_INFO("connection failed (fd = %d, err = %d)", fd, err);
+                SCRAPS_LOG_INFO("connection failed (fd = {}, err = {})", fd, err);
                 _delegate->tcpServiceConnectionFailed(connection->id);
             } else {
-                SCRAPS_LOGF_INFO("connection established (fd = %d)", fd);
+                SCRAPS_LOG_INFO("connection established (fd = {})", fd);
                 connection->state = Connection::kConnected;
                 _delegate->tcpServiceConnectionEstablished(connection->id);
             }
@@ -270,9 +272,9 @@ void TCPService::_eventHandler(int fd, short events) {
 
             if (bytes <= 0) {
                 if (bytes < 0) {
-                    SCRAPS_LOGF_ERROR("socket error (fd = %d, errno = %d)", fd, static_cast<int>(errno));
+                    SCRAPS_LOG_ERROR("socket error (fd = {}, errno = {})", fd, static_cast<int>(errno));
                 } else {
-                    SCRAPS_LOGF_INFO("closing connection (fd = %d)", fd);
+                    SCRAPS_LOG_INFO("closing connection (fd = {})", fd);
                 }
 
                 _closeAndErase(*connection);
@@ -288,20 +290,20 @@ void TCPService::_connect(TCPService::ConnectionId connectionId, const sockaddr*
     auto s = socket(address->sa_family, SOCK_STREAM, 0);
 
     if (s < 0) {
-        SCRAPS_LOGF_ERROR("error opening socket (errno = %d)", static_cast<int>(errno));
+        SCRAPS_LOG_ERROR("error opening socket (errno = {})", static_cast<int>(errno));
     } else if (!SetBlocking(s, false)) {
-        SCRAPS_LOGF_ERROR("couldn't make socket non-blocking");
+        SCRAPS_LOG_ERROR("couldn't make socket non-blocking");
         ::close(s);
         s = -1;
     } else if (::connect(s, address, addressLength) < 0 && errno != EINPROGRESS) {
-        SCRAPS_LOGF_ERROR("error connecting socket (errno = %d)", static_cast<int>(errno));
+        SCRAPS_LOG_ERROR("error connecting socket (errno = {})", static_cast<int>(errno));
         ::close(s);
         s = -1;
     }
 
     int one = 1;
     if (s >= 0 && setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one)) < 0) {
-        SCRAPS_LOGF_WARNING("unable to set TCP_NODELAY on socket (errno = %d)", static_cast<int>(errno));
+        SCRAPS_LOG_WARNING("unable to set TCP_NODELAY on socket (errno = {})", static_cast<int>(errno));
     }
 
     if (s < 0) {
@@ -333,7 +335,7 @@ void TCPService::_trySend(Connection& connection) {
             if (errno == EWOULDBLOCK || errno == EAGAIN) {
                 break;
             } else {
-                SCRAPS_LOGF_ERROR("socket send error (errno = %d)", static_cast<int>(errno));
+                SCRAPS_LOG_ERROR("socket send error (errno = {})", static_cast<int>(errno));
                 _closeAndErase(connection);
                 return;
             }
@@ -364,4 +366,4 @@ void TCPService::_closeAndErase(Connection& connection) {
     }
 }
 
-} // namespace scraps
+}} // namespace scraps::net

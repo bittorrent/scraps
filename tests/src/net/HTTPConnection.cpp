@@ -1,11 +1,12 @@
 #include "gtest/gtest.h"
 
-#include "scraps/HTTPConnection.h"
-#include "scraps/HTTPRequest.h"
 #include "scraps/logging.h"
-#include "scraps/TCPAcceptor.h"
+#include "scraps/net/HTTPConnection.h"
+#include "scraps/net/HTTPRequest.h"
+#include "scraps/net/TCPAcceptor.h"
 
 using namespace scraps;
+using namespace scraps::net;
 
 class TestHTTPConnection : public HTTPConnection {
 public:

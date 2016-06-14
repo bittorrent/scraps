@@ -2,8 +2,9 @@
 
 #include "scraps/config.h"
 
-#include "scraps/UDPReceiver.h"
-#include "scraps/UDPSender.h"
+#include "scraps/net/Address.h"
+#include "scraps/net/UDPReceiver.h"
+#include "scraps/net/UDPSender.h"
 
 #include <array>
 #include <mutex>
@@ -11,16 +12,14 @@
 #include <atomic>
 
 namespace scraps {
+namespace net {
 
 /**
 * Thread-safe.
 */
 class UDPSocket : public UDPSender {
 public:
-    enum class Protocol {
-        kIPv4,
-        kIPv6,
-    };
+    using Protocol = Address::Protocol;
 
     /**
     * Creates a new UDP socket.
@@ -60,7 +59,7 @@ public:
     /**
     * Sends data on the socket.
     */
-    virtual bool send(const UDPEndpoint& destination, const void* data, size_t length) override;
+    virtual bool send(const Endpoint& destination, const void* data, size_t length) override;
 
     /**
     * Attempts to receive data on the socket and dispatch it to its receiver.
@@ -91,4 +90,4 @@ private:
     bool _bind(const char* interface, uint16_t port);
 };
 
-} // namespace scraps
+}} // namespace scraps::net

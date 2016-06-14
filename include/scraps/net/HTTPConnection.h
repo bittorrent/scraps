@@ -1,11 +1,11 @@
 #pragma once
 
 #include "scraps/config.h"
-#include "scraps/types.h"
 
 #include <unordered_map>
 
 namespace scraps {
+namespace net {
 
 class HTTPConnection {
 public:
@@ -81,4 +81,4 @@ private:
     static std::unordered_map<std::string, std::string> ParseQueryString(const std::string& queryString);
 };
 
-} // namespace scraps
+}} // namespace scraps::net

@@ -3,8 +3,8 @@
 #include "scraps/config.h"
 
 #include "scraps/logging.h"
-#include "scraps/network.h"
 #include "scraps/thread.h"
+#include "scraps/net/utility.h"
 
 #include <unordered_map>
 
@@ -21,6 +21,7 @@ SCRAPS_IGNORE_WARNINGS_POP
 #include <condition_variable>
 
 namespace scraps {
+namespace net {
 
 /**
 * Implements a tcp server. ConnectionClass should be a class with a run() method, to
@@ -243,4 +244,4 @@ private:
     }
 };
 
-} // namespace scraps
+}} // namespace scraps::net

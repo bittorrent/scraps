@@ -67,8 +67,12 @@ UniformDistribution(Generator& g,
 }
 
 /**
-* Returns vector with n random non-duplicate iterators to elements in the input range, with
+* Returns a vector with n random non-duplicate iterators to elements in the input range, with
 * uniform probability, in O(n) time. n must be smaller than the input range length.
+*
+* Only the chosen elements is random, and the order in which they are returned is *not*
+* random. For example, choosing n random elements from an n-sized set will always return the
+* elements in the same order.
 */
 template <class InputIt, class Generator>
 std::vector<InputIt> NRandomElements(InputIt inFirst, InputIt inLast, size_t n, Generator& g) {
@@ -100,26 +104,6 @@ std::vector<uint8_t> RandomBytes(size_t n, Generator& g) {
 
     return result;
 }
-
-/**
-* Returns a string in which all non-alphanumeric characters except dashes, underscores,
-* spaces, and periods are replaced with a percent sign followed by their hexadecimal
-* value. Spaces are replaced with plus signs.
-*
-* @return the url-encoded string
-*/
-std::string URLEncode(const char* str);
-
-inline std::string URLEncode(const std::string& str) { return URLEncode(str.c_str()); }
-
-/**
-* Returns a string in which the effects of URLEncode have been reversed.
-*
-* @return the url-decoded string
-*/
-std::string URLDecode(const char* str);
-
-inline std::string URLDecode(const std::string& str) { return URLDecode(str.c_str()); }
 
 /**
 * Returns a string escaped according to RFC 4627.
@@ -199,5 +183,14 @@ auto Trim(gsl::basic_string_span<T, N> str) {
 }
 
 stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path);
+
+/**
+* Sets the given file descriptor to blocking or non-blocking.
+*
+* @param fd the file descriptor
+* @param blocking true if the file descriptor should be set to blocking. false if it should be set to non-blocking
+* @return true on success
+*/
+bool SetBlocking(int fd, bool blocking = true);
 
 } // namespace scraps

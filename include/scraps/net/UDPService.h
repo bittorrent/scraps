@@ -3,9 +3,10 @@
 #include "scraps/config.h"
 
 #include "scraps/RunLoop.h"
-#include "scraps/UDPSocket.h"
+#include "scraps/net/UDPSocket.h"
 
 namespace scraps {
+namespace net {
 
 /**
 * Service for sending / receiving data via UDP. The service owns a thread that it will use to invoke socket methods.
@@ -52,4 +53,4 @@ private:
     void _purgeDeadSockets();
 };
 
-} // namespace scraps
+}} // namespace scraps::net

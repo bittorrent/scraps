@@ -9,6 +9,7 @@
 #include <curl/curl.h>
 
 namespace scraps {
+namespace net {
 
 /**
 * Executes HTTP requests asyncronously. This class is thread-safe.
@@ -114,4 +115,4 @@ private:
     static size_t CURLWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata);
 };
 
-} // namespace scraps
+}} // namespace scraps::net

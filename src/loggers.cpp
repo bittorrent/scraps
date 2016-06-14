@@ -164,10 +164,10 @@ std::string CircularBufferLogger::contents() const {
     return std::string(_buffer.begin(), _buffer.end());
 }
 
-DogStatsDLogger::DogStatsDLogger(UDPEndpoint endpoint, LogLevel level)
+DogStatsDLogger::DogStatsDLogger(net::Endpoint endpoint, LogLevel level)
     : _endpoint{std::move(endpoint)}
     , _level{level}
-    , _socket{std::make_unique<UDPSocket>(UDPSocket::Protocol::kIPv4)}
+    , _socket{std::make_unique<net::UDPSocket>(net::UDPSocket::Protocol::kIPv4)}
 {}
 
 void DogStatsDLogger::log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) {
