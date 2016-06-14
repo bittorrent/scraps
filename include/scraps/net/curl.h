@@ -6,6 +6,7 @@
 #include <curl/curl.h>
 
 namespace scraps {
+namespace net {
 
 #ifdef OPENSSL_THREADS
 
@@ -18,4 +19,4 @@ inline bool CURLIsThreadSafe() { return false; }
 
 #endif
 
-} // namespace scraps
+}} // namespace scraps::net

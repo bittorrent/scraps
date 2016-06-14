@@ -1,8 +1,8 @@
 #include "scraps/net/HTTPRequest.h"
 
 #include "scraps/logging.h"
-#include "scraps/curl.h"
 #include "scraps/thread.h"
+#include "scraps/net/curl.h"
 
 #include <gsl.h>
 

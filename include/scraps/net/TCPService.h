@@ -192,7 +192,7 @@ private:
 
     ConnectionMap _connections;
 
-    std::default_random_engine _prng;
+    std::default_random_engine _prng{static_cast<std::default_random_engine::result_type>(std::chrono::system_clock::now().time_since_epoch().count())};
 
     void _eventHandler(int fd, short events);
 
