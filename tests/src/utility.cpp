@@ -237,3 +237,13 @@ TEST(utility, Trim) {
     EXPECT_EQ(gsl::to_string(Trim(gsl::string_span<>(s3))), std::string{"c"});
     EXPECT_EQ(gsl::to_string(Trim(gsl::string_span<>(s4))), std::string{"c"});
 }
+
+TEST(utility, URLEncode) {
+    EXPECT_EQ("gro%C3%9Fp%C3%B6sna", URLEncode("großpösna"));
+    EXPECT_EQ("-_.+", URLEncode("-_. "));
+};
+
+TEST(utility, URLDecode) {
+    EXPECT_EQ("großpösna", URLDecode("gro%C3%9Fp%C3%B6sna"));
+    EXPECT_EQ("-_. ", URLDecode("-_.+"));
+};

@@ -1,9 +1,8 @@
 #include "gtest/gtest.h"
 
-#include "scraps/net/URL.h"
+#include "scraps/URL.h"
 
 using namespace scraps;
-using namespace scraps::net;
 
 TEST(URL, http) {
     URL url{"http://www.example.com"};

@@ -114,6 +114,26 @@ std::vector<uint8_t> RandomBytes(size_t n, Generator& g) {
 std::string JSONEscape(const char* str);
 
 /**
+* Returns a string in which all non-alphanumeric characters except dashes, underscores,
+* spaces, and periods are replaced with a percent sign followed by their hexadecimal
+* value. Spaces are replaced with plus signs.
+*
+* @return the url-encoded string
+*/
+std::string URLEncode(const char* str);
+
+inline std::string URLEncode(const std::string& str) { return URLEncode(str.c_str()); }
+
+/**
+* Returns a string in which the effects of URLEncode have been reversed.
+*
+* @return the url-decoded string
+*/
+std::string URLDecode(const char* str);
+
+inline std::string URLDecode(const std::string& str) { return URLDecode(str.c_str()); }
+
+/**
 * Returns the basename of a given path.
 */
 std::string Basename(const std::string& path);

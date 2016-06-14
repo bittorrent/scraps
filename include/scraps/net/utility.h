@@ -62,24 +62,4 @@ Address DefaultInterface(bool ipv6 = false);
 inline Address DefaultIPv4Interface() { return DefaultInterface(false); }
 inline Address DefaultIPv6Interface() { return DefaultInterface(true); }
 
-/**
-* Returns a string in which all non-alphanumeric characters except dashes, underscores,
-* spaces, and periods are replaced with a percent sign followed by their hexadecimal
-* value. Spaces are replaced with plus signs.
-*
-* @return the url-encoded string
-*/
-std::string URLEncode(const char* str);
-
-inline std::string URLEncode(const std::string& str) { return URLEncode(str.c_str()); }
-
-/**
-* Returns a string in which the effects of URLEncode have been reversed.
-*
-* @return the url-decoded string
-*/
-std::string URLDecode(const char* str);
-
-inline std::string URLDecode(const std::string& str) { return URLDecode(str.c_str()); }
-
 }} // namespace scraps::net

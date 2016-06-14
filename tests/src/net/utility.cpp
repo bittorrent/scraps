@@ -15,13 +15,3 @@ TEST(NetUtility, ResolveWithIPAddress) {
     ASSERT_FALSE(addresses.empty());
     EXPECT_EQ(addresses[0].to_v4().to_ulong(), 0x7f000001);
 }
-
-TEST(NetUtility, URLEncode) {
-    EXPECT_EQ("gro%C3%9Fp%C3%B6sna", URLEncode("großpösna"));
-    EXPECT_EQ("-_.+", URLEncode("-_. "));
-};
-
-TEST(NetUtility, URLDecode) {
-    EXPECT_EQ("großpösna", URLDecode("gro%C3%9Fp%C3%B6sna"));
-    EXPECT_EQ("-_. ", URLDecode("-_.+"));
-};

@@ -4,7 +4,9 @@
 
 #include <ctype.h>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -109,6 +111,44 @@ std::string Base64Encode(const char* data, size_t length) {
     }
 
     return encoded;
+}
+
+std::string URLEncode(const char* str) {
+    std::ostringstream ret;
+
+    while (char c = *str) {
+        if (isalnum(c) || c == '-' || c == '_' || c == '.') {
+            ret << c;
+        } else if (c == ' ') {
+            ret << '+';
+        } else {
+            ret << '%' << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << (int)static_cast<unsigned char>(c);
+        }
+        ++str;
+    }
+
+    return ret.str();
+}
+
+std::string URLDecode(const char* str) {
+    std::ostringstream ret;
+
+    while (char c = *str) {
+        if (c == '+') {
+            ret << ' ';
+        } else if (c == '%' && str[1] && str[2]) {
+            char tmp[3];
+            tmp[0] = *++str;
+            tmp[1] = *++str;
+            tmp[2] = '\0';
+            ret << (unsigned char)strtoul(tmp, nullptr, 16);
+        } else {
+            ret << c;
+        }
+        ++str;
+    }
+
+    return ret.str();
 }
 
 std::string Basename(const std::string& path) {
