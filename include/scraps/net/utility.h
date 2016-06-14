@@ -3,6 +3,8 @@
 #include "scraps/config.h"
 
 #include "scraps/net/Address.h"
+#include "scraps/net/Endpoint.h"
+#include "scraps/utility.h"
 
 #include <vector>
 
@@ -49,6 +51,16 @@ std::vector<Address> Resolve(const std::string& host);
 * Like Resolve, but only returns IPv4 addresses.
 */
 std::vector<Address> ResolveIPv4(const std::string& host);
+
+/**
+* Resolves the given host-port pair and returns a random endpoint.
+*/
+stdts::optional<Endpoint> ResolveRandomEndpoint(const std::string& hostPortPair, uint16_t defaultPort = 0);
+
+/**
+* Like ResolveRandomEndpoint, but only returns IPv4 addresses.
+*/
+stdts::optional<Endpoint> ResolveRandomIPv4Endpoint(const std::string& hostPortPair, uint16_t defaultPort = 0);
 
 /**
 * Returns the address for the default Internet-facing interface. If there are none available,

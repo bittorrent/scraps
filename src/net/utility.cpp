@@ -72,6 +72,24 @@ std::vector<Address> ResolveIPv4(const std::string& host) {
     return ret;
 }
 
+stdts::optional<Endpoint> ResolveRandomEndpoint(const std::string& hostPortPair, uint16_t defaultPort) {
+    auto parsed = ParseAddressAndPort(hostPortPair, defaultPort);
+    if (!std::get<1>(parsed)) { return {}; }
+    auto addresses = Resolve(std::get<0>(parsed));
+    if (addresses.empty()) { return {}; }
+    std::default_random_engine rng{static_cast<std::default_random_engine::result_type>(std::chrono::system_clock::now().time_since_epoch().count())};
+    return Endpoint{addresses[UniformDistribution(rng, 0, addresses.size() - 1)], std::get<1>(parsed)};
+}
+
+stdts::optional<Endpoint> ResolveRandomIPv4Endpoint(const std::string& hostPortPair, uint16_t defaultPort) {
+    auto parsed = ParseAddressAndPort(hostPortPair, defaultPort);
+    if (!std::get<1>(parsed)) { return {}; }
+    auto addresses = ResolveIPv4(std::get<0>(parsed));
+    if (addresses.empty()) { return {}; }
+    std::default_random_engine rng{static_cast<std::default_random_engine::result_type>(std::chrono::system_clock::now().time_since_epoch().count())};
+    return Endpoint{addresses[UniformDistribution(rng, 0, addresses.size() - 1)], std::get<1>(parsed)};
+}
+
 Address DefaultInterface(bool ipv6) {
     boost::asio::io_service service;
     auto thread = std::thread([&] { service.run(); });
