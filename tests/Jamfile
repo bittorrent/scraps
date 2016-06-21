@@ -1,27 +1,23 @@
-DEPENDENCIES_PATH = [ SHELL "python3 -m ci_tacklebox.ci.properties dependencies_path" : strip-eol ] ;
-JSHACKLE_PATH = [ SHELL "python3 -m ci_tacklebox.dependencies.path jshackle" : strip-eol ] ;
+path-constant NEEDS_PATH : ../needs ;
+
+lib gtest : $(NEEDS_PATH)//googletest : <name>gtest ;
 
 alias scraps-tests-common :
     [ glob-tree-ex src : *.cpp : android.cpp ]
     ..//scraps
-    $(DEPENDENCIES_PATH)/gtest//gtest/<link>static
+    gtest
 ;
 
-lib scraps-gtests : scraps-tests-common :
-    <conditional>@unit-test-library
-    <link>static
-;
+exe scraps-tests : scraps-tests-common/<link>static ;
 
-exe scraps-tests :
-    scraps-tests-common/<link>static
-:
-    <conditional>@unit-test-executable
-;
+import testing ;
+unit-test run : scraps-tests ;
+explicit run ;
 
 lib scraps-tests-android :
     src/android.cpp
     scraps-tests-common/<link>static
-    $(JSHACKLE_PATH)//jshackle
+    $(NEEDS_PATH)//jshackle
 :
     <link>shared
     <build>no

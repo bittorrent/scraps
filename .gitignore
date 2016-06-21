@@ -3,6 +3,7 @@
 bin
 dist
 needs
+b2
 
 # doxygen
 /docs

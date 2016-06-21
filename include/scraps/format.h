@@ -2,9 +2,7 @@
 
 #include "scraps/config.h"
 
-SCRAPS_IGNORE_WARNINGS_PUSH
-#include "cppformat/format.h"
-SCRAPS_IGNORE_WARNINGS_POP
+#include "fmt/format.h"
 
 namespace scraps {
 

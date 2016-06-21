@@ -1,14 +1,42 @@
 #!/usr/bin/env python3
 
-try:
+import os
+import multiprocessing
+import stat
+import subprocess
+import sys
+
+# TODO: get rid of this
+if len(sys.argv) > 1:
     from ci_tacklebox.ci import configure
     configure.main(development=True)
-    exit()
-except ImportError:
-    print('For unit test support, install ci_tacklebox. (https://github.com/bittorrent/ci-tacklebox)')
+    sys.exit(0)
 
-import multiprocessing
-import subprocess
+# ci-tacklebox puts this here. we should eventually allow user customization via project-config, but for now, get rid of it since
+# we want to eliminate the side-effects of previous ci-tacklebox builds
+if os.path.lexists('project-config.jam'):
+    os.unlink('project-config.jam')
 
-subprocess.check_call(['./needy/scripts/needy generate jamfile --satisfy-args="-j {}"'.format(multiprocessing.cpu_count())], shell=True)
-print('Configuration complete. You may now build via b2.')
+project_root = os.path.dirname(os.path.abspath(__file__))
+os.chdir(project_root)
+
+needy = os.path.join(project_root, 'needy', 'scripts', 'needy')
+
+
+def bootstrap_b2():
+    subprocess.check_call([needy, 'satisfy', 'boost-build'])
+
+    b2 = os.path.join(os.path.dirname(__file__), 'b2')
+    b2_bin = os.path.join(subprocess.check_output([needy, 'builddir', 'boost-build']).decode(), 'bin')
+
+    with open(b2, 'w') as f:
+        f.write('#!/bin/sh\n{} "$@"'.format(os.path.join(b2_bin, 'b2')))
+    os.chmod(b2, os.stat(b2).st_mode | stat.S_IEXEC)
+
+
+def generate_needs_jamfile():
+    subprocess.check_call([needy, 'generate', 'jamfile', '--satisfy-args="-j {}"'.format(multiprocessing.cpu_count())])
+
+bootstrap_b2()
+generate_needs_jamfile()
+print('Configuration complete. You may now build via ./b2')

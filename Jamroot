@@ -1,3 +1,5 @@
+project scraps ;
+
 path-constant NEEDS_PATH : needs ;
 
 rule clang-defaults ( properties * ) {
@@ -80,13 +82,31 @@ alias objc : : : :
     <target-os>appletv:<cflags>-fobjc-arc
 ;
 
+lib ssl       : $(NEEDS_PATH)//openssl : <name>ssl ;
+lib crypto    : $(NEEDS_PATH)//openssl : <name>crypto ;
+alias openssl : ssl crypto ;
+
+lib curl   : $(NEEDS_PATH)//curl : <name>curl ;
+lib fmt    : $(NEEDS_PATH)//fmtlib : <name>fmt ;
+lib sodium : $(NEEDS_PATH)//libsodium : <name>sodium ;
+alias gsl  : $(NEEDS_PATH)//gsl ;
+
+lib boost_system          : $(NEEDS_PATH)//boost : <name>boost_system ;
+lib boost_filesystem      : $(NEEDS_PATH)//boost : <name>boost_filesystem ;
+lib boost_program_options : $(NEEDS_PATH)//boost : <name>boost_program_options ;
+
+alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
 
 alias scraps_headers :
-    $(NEEDS_PATH)//openssl
-    $(NEEDS_PATH)//curl
-    $(NEEDS_PATH)//libsodium
-    $(NEEDS_PATH)//gsl
-    $(NEEDS_PATH)//boost
+    openssl
+    curl
+    fmt
+    sodium
+    gsl
+    boost_system
+    boost_filesystem
+    boost_program_options
+    mnmlstc
     project_defaults
 :
     <include>include
@@ -108,17 +128,16 @@ cpp-pch pch :
     <cxxflags>"-std=c++14"
 ;
 
-lib libGLESv2    : : <name>GLESv2 <link>shared ;
-alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
+lib libGLESv2 : : <name>GLESv2 <link>shared ;
+lib z : : <name>z ;
 
 lib scraps :
     pch
     objc
     [ glob-tree-ex src : *.cpp ]
-    include/cppformat/format.cc
-    include/json11/json11.cpp
     scraps_headers
     mnmlstc
+    z
 :
     <link>static
     <cxxflags>"-std=c++14"
@@ -135,7 +154,6 @@ lib scraps :
 
     <target-os>linux:<linkflags>"-lpthread -ldl"
 
-    <linkflags>"-lcurl -lz -lssl -lcrypto -lsodium -lboost_system -lboost_filesystem -lboost_program_options"
     <cxxflags>"-std=c++14"
 ;
 
