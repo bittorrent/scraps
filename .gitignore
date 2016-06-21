@@ -4,7 +4,9 @@ bin
 dist
 needs
 
-.gitignore.swp
+# doxygen
+/docs
+/doxygen-warnings.log
 
 *.xcworkspace
 xcuserdata/
