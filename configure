@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import os
 import multiprocessing
 import stat
@@ -26,6 +27,13 @@ def bootstrap_b2():
 def generate_needs_jamfile():
     subprocess.check_call([needy, 'generate', 'jamfile', '--satisfy-args="-j {}"'.format(multiprocessing.cpu_count())])
 
-bootstrap_b2()
+parser = argparse.ArgumentParser(description='Configures Scraps.')
+parser.add_argument('--bootstrap-b2', action='store_true', help='bootstrap b2')
+args = parser.parse_args()
+
+if args.bootstrap_b2:
+    bootstrap_b2()
+
 generate_needs_jamfile()
-print('Configuration complete. You may now build via ./b2')
+
+print('Configuration complete. You may now build via b2')
