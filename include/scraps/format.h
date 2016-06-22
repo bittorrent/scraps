@@ -3,6 +3,7 @@
 #include "scraps/config.h"
 
 #include "fmt/format.h"
+#include "fmt/ostream.h"
 
 namespace scraps {
 
