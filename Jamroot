@@ -110,14 +110,12 @@ alias scraps_headers :
 ;
 
 lib libGLESv2 : : <name>GLESv2 <link>shared ;
-lib z : : <name>z ;
 
 lib scraps :
     objc
     [ glob-tree-ex src : *.cpp ]
     scraps_headers
     mnmlstc
-    z
 :
     <link>static
     <cxxflags>"-std=c++14"
@@ -133,6 +131,7 @@ lib scraps :
     <target-os>appletv:<framework>OpenGLES
 
     <target-os>linux:<linkflags>"-lpthread -ldl"
+    <linkflags>"-lz"
 
     <cxxflags>"-std=c++14"
 ;
