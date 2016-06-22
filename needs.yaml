@@ -41,26 +41,27 @@ libraries:
         commit: OpenSSL_1_0_1p
         project:
             build-steps:
+                {%- set openssl_flags = ' --prefix={build_directory} no-weak-ssl-ciphers' -%}
                 {% if platform == 'osx' %}
-                - sh ./Configure darwin64-x86_64-cc --prefix={build_directory}
+                - sh ./Configure darwin64-x86_64-cc {{openssl_flags}}
                 - make install
                 {% elif platform == 'ios' %}
-                - sh ./Configure iphoneos-cross --prefix={build_directory}
+                - sh ./Configure iphoneos-cross {{openssl_flags}}
                 - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/iPhoneOS.platform/Developer CROSS_SDK=iPhoneOS.sdk'
                 {% elif platform == 'iossimulator' %}
-                - sh ./Configure iphoneos-cross --prefix={build_directory} -D__STRICT_ANSI__=1 no-asm
+                - sh ./Configure iphoneos-cross  -D__STRICT_ANSI__=1 no-asm {{openssl_flags}}
                 - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/iPhoneSimulator.platform/Developer CROSS_SDK=iPhoneSimulator.sdk'
                 {% elif platform == 'tvos' %}
-                - sh ./Configure iphoneos-cross --prefix={build_directory} -DHAVE_FORK=0
+                - sh ./Configure iphoneos-cross  -DHAVE_FORK=0 {{openssl_flags}}
                 - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/AppleTVOS.platform/Developer CROSS_SDK=AppleTVOS.sdk'
                 {% elif platform == 'tvossimulator' %}
-                - sh ./Configure iphoneos-cross --prefix={build_directory} -D__STRICT_ANSI__=1 -DHAVE_FORK=0 no-asm
+                - sh ./Configure iphoneos-cross  -D__STRICT_ANSI__=1 -DHAVE_FORK=0 no-asm {{openssl_flags}}
                 - sh -c 'make install CROSS_TOP=`xcode-select -p`/Platforms/AppleTVSimulator.platform/Developer CROSS_SDK=AppleTVSimulator.sdk'
                 {% elif platform == 'android' %}
-                - sh ./Configure android --prefix={build_directory}
+                - sh ./Configure android {{openssl_flags}}
                 - make install
                 {% elif platform == host_platform %}
-                - sh ./config --prefix={build_directory}
+                - sh ./config {{openssl_flags}}
                 - make install
                 {% endif %}
     curl:
