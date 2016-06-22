@@ -90,9 +90,11 @@ libraries:
         repository: git@github.com:fmtlib/fmt.git
         commit: 3.0.0
         project:
-            cmake-options:
-                FMT_DOC: OFF
-                FMT_TEST: OFF
+            build-steps:
+                - mkdir -p {build_directory}/include/fmt
+                - cp fmt/*.h {build_directory}/include/fmt
+                - $CXX -std=c++11 -c fmt/format.cc -I . -o fmt/format.o
+                - ar -rv {build_directory}/lib/libfmt.a fmt/format.o
     json11:
         repository: git@github.com:dropbox/json11.git
         commit: a20878aaa5bd2546466585b18b6d09808a98233d
