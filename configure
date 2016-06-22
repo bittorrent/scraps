@@ -1,21 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import os
 import multiprocessing
 import stat
 import subprocess
 import sys
-
-# TODO: get rid of this
-if len(sys.argv) < 2 or sys.argv[1] != '--without-ci-tacklebox':
-    from ci_tacklebox.ci import configure
-    configure.main(development=True)
-    sys.exit(0)
-
-# ci-tacklebox puts this here. we should eventually allow user customization via project-config, but for now, get rid of it since
-# we want to eliminate the side-effects of previous ci-tacklebox builds
-if os.path.lexists('project-config.jam'):
-    os.unlink('project-config.jam')
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 os.chdir(project_root)
