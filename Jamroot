@@ -8,7 +8,6 @@ rule clang-defaults ( properties * ) {
         result += <cflags>-fdiagnostics-show-note-include-stack ;
         result += <cflags>-fmacro-backtrace-limit=0 ;
         result += <cflags>-fmessage-length=0 ;
-        result += <cflags>-fmodules ;
         result += <cflags>-fstrict-aliasing ;
         result += <cflags>-Wbool-conversion ;
         result += <cflags>-Wconditional-uninitialized ;
