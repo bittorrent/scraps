@@ -74,12 +74,8 @@ alias project_defaults : : : :
 
 
 alias objc : : : :
-    <target-os>darwin:<cxxflags>"-x objective-c++"
-    <target-os>iphone:<cxxflags>"-x objective-c++"
-    <target-os>appletv:<cxxflags>"-x objective-c++"
-    <target-os>darwin:<cflags>-fobjc-arc
-    <target-os>iphone:<cflags>-fobjc-arc
-    <target-os>appletv:<cflags>-fobjc-arc
+    <toolset>darwin:<cxxflags>"-x objective-c++"
+    <toolset>darwin:<cflags>-fobjc-arc
 ;
 
 lib ssl       : $(NEEDS_PATH)//openssl : <name>ssl ;
@@ -114,25 +110,10 @@ alias scraps_headers :
     <include>include
 ;
 
-rule use-scraps-pch ( properties * ) {
-    if <target-os>iphone in $(properties) || <target-os>appletv in $(properties) || <target-os>linux in $(properties) {
-        return <build>no ;
-    }
-}
-
-cpp-pch pch :
-    scraps_headers
-    src/pch.h
-:
-    <conditional>@use-scraps-pch
-    <cxxflags>"-std=c++14"
-;
-
 lib libGLESv2 : : <name>GLESv2 <link>shared ;
 lib z : : <name>z ;
 
 lib scraps :
-    pch
     objc
     [ glob-tree-ex src : *.cpp ]
     scraps_headers

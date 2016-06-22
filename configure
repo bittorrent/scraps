@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 # TODO: get rid of this
-if len(sys.argv) > 1:
+if len(sys.argv) < 2 or sys.argv[1] != '--without-ci-tacklebox':
     from ci_tacklebox.ci import configure
     configure.main(development=True)
     sys.exit(0)

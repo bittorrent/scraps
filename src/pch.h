@@ -1,1 +1,0 @@
-#include "scraps/config.h"
