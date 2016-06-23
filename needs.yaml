@@ -1,3 +1,8 @@
+{% if platform == 'android' %}
+{% set common_cxx_flags = '-fvisibility=hidden' %}
+{% else %}
+{% set common_cxx_flags = '-fvisibility=hidden -stdlib=libc++' %}
+{% endif %}
 libraries:
     boost:
         download: http://iweb.dl.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.bz2
@@ -9,11 +14,7 @@ libraries:
                 - --with-program_options
                 - --with-filesystem
                 - link=static
-                {% if platform == 'android' %}
-                - cxxflags=-fvisibility=hidden
-                {% else %}
-                - cxxflags=-fvisibility=hidden -stdlib=libc++
-                {% endif %}
+                - cxxflags={{common_cxx_flags}}
     boost-build:
         download: https://github.com/boostorg/build/archive/2016.03.tar.gz
         checksum: 0e6936337c25fc87d2aff8ea6c63019e9c1e319a
@@ -94,7 +95,7 @@ libraries:
                 - mkdir -p {build_directory}/include/fmt
                 - cp fmt/*.h {build_directory}/include/fmt
                 - cp fmt/*.cc {build_directory}/include/fmt
-                - $CXX -std=c++11 {{ '-stdlib=libc++' if platform != 'android' }} -c fmt/format.cc -I . -o fmt/format.o
+                - $CXX -std=c++11 {{common_cxx_flags}} -c fmt/format.cc -I . -o fmt/format.o
                 - ar -rv {build_directory}/lib/libfmt.a fmt/format.o
     googletest:
         repository: git@github.com:google/googletest.git
@@ -102,7 +103,7 @@ libraries:
         project:
             build-steps:
                 - cp -R googletest/include {build_directory}
-                - $CXX -std=c++11 {{ '-stdlib=libc++' if platform != 'android' }} -c googletest/src/gtest-all.cc -isystem googletest/include -I googletest -o googletest/src/gtest-all.o
+                - $CXX -std=c++11 {{common_cxx_flags}} -c googletest/src/gtest-all.cc -isystem googletest/include -I googletest -o googletest/src/gtest-all.o
                 - ar -rv {build_directory}/lib/libgtest.a googletest/src/gtest-all.o
     jshackle:
         repository: git@github.com:bittorrent/jshackle.git
