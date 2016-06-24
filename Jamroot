@@ -73,8 +73,12 @@ alias project_defaults : : : :
 
 
 alias objc : : : :
-    <toolset>darwin:<cxxflags>"-x objective-c++"
-    <toolset>darwin:<cflags>-fobjc-arc
+    <target-os>darwin:<cxxflags>"-x objective-c++"
+    <target-os>iphone:<cxxflags>"-x objective-c++"
+    <target-os>appletv:<cxxflags>"-x objective-c++"
+    <target-os>darwin:<cflags>-fobjc-arc
+    <target-os>iphone:<cflags>-fobjc-arc
+    <target-os>appletv:<cflags>-fobjc-arc
 ;
 
 lib ssl       : $(NEEDS_PATH)//openssl : <name>ssl ;
