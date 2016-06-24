@@ -8,7 +8,10 @@ alias scraps-tests-common :
     gtest
 ;
 
-exe scraps-tests : scraps-tests-common/<link>static ;
+exe scraps-tests : scraps-tests-common/<link>static :
+    <target-os>iphone:<build>no
+    <target-os>appletv:<build>no
+;
 
 import testing ;
 unit-test run : scraps-tests ;
