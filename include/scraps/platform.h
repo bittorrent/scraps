@@ -74,6 +74,18 @@
 namespace scraps {
 namespace platform {
 
+#if SCRAPS_ANDROID
+constexpr bool kIsAndroid = true;
+#else
+constexpr bool kIsAndroid = false;
+#endif
+
+#if SCRAPS_IOS
+constexpr bool kIsIOS = true;
+#else
+constexpr bool kIsIOS = false;
+#endif
+
 #if SCRAPS_TVOS
 constexpr bool kIsTVOS = true;
 #else
@@ -90,6 +102,12 @@ constexpr bool kIsMacOSX = false;
 constexpr bool kIsMobile = true;
 #else
 constexpr bool kIsMobile = false;
+#endif
+
+#if SCRAPS_WINDOWS
+constexpr bool kIsWindows = true;
+#else
+constexpr bool kIsWindows = false;
 #endif
 
 } } // namespace scraps::platform
