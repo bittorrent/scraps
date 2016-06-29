@@ -87,30 +87,6 @@ void LoggerLogger::log(LogLevel level, std::chrono::system_clock::time_point tim
     }
 }
 
-BufferLogger::BufferLogger(std::shared_ptr<Logger> logger, const BufferLogger::DurationType& flushInterval, size_t flushSize)
-    : _flushInterval(flushInterval)
-    , _flushSize(flushSize)
-    , _logger(logger)
-    , _lastFlush(std::chrono::steady_clock::now().time_since_epoch())
-    , _logLevel{} {}
-
-BufferLogger::~BufferLogger() {
-    if (!_buffer.empty()) { _logger->log(_logLevel, _buffer.c_str()); }
-}
-
-void BufferLogger::log(LogLevel level, const std::string& message) {
-    std::lock_guard<std::mutex> lock{_mutex};
-    if (!_buffer.empty()) { _buffer.push_back('\n'); }
-    _buffer.append(message);
-    if (level > _logLevel) { _logLevel = level; }
-    auto t = std::chrono::steady_clock::now().time_since_epoch();
-    if (_buffer.size() >= _flushSize || t >= _lastFlush + _flushInterval) {
-        _logger->log(_logLevel, _buffer.c_str());
-        _buffer.clear();
-        _lastFlush = t;
-    }
-}
-
 AsyncLogger::AsyncLogger(std::shared_ptr<Logger> logger) : _logger(logger), _shouldReturn(false) {
     _worker = std::thread(&AsyncLogger::_run, this);
 }
@@ -127,7 +103,7 @@ AsyncLogger::~AsyncLogger() {
 void AsyncLogger::log(LogLevel level, const std::string& message) {
     {
         std::lock_guard<std::mutex> lock{_mutex};
-        _backlog.push(std::pair<LogLevel, std::string>(level, message));
+        _backlog.emplace(level, message);
     }
     _condition.notify_one();
 }
@@ -139,39 +115,126 @@ void AsyncLogger::_run() {
     while (!_shouldReturn) {
         if (_backlog.empty()) { _condition.wait(lock); }
         while (!_backlog.empty()) {
-            std::pair<LogLevel, std::string> next = std::move(_backlog.front());
+            LogLevel level{};
+            std::string message;
+            std::tie(level, message) = std::move(_backlog.front());
             _backlog.pop();
+
             lock.unlock(); // unlock to call out
-            _logger->log(next.first, next.second);
+            _logger->log(level, message);
             lock.lock();
         }
     }
 }
 
-void FilterLogger::log(LogLevel level, const std::string& message) {
-    if (level < _minimumLevel) { return; }
-    _logger->log(level, message);
+void FilterLogger::log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) {
+    if (_predicate(level, time, file, line, message)) {
+        _destination->log(level, time, file, line, message);
+    }
 }
 
-void CircularBufferLogger::log(LogLevel level, const std::string& message) {
-    std::lock_guard<std::mutex> lock{_mutex};
-    _buffer.push(message.data(), message.size());
-    _buffer.push('\n');
+void RateLimitedLogger::log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) {
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    auto& state = _messageState[{std::string{file}, line}];
+    state.history.setMaxSize(static_cast<size_t>(_maximumMessagesPerSecond * 1.5 * std::chrono::duration_cast<std::chrono::duration<double>>(_sampleDuration).count()));
+    state.history.insert(time, 1);
+
+    auto now = std::chrono::steady_clock::now();
+    auto wasLogging = state.isLogging;
+    state.mostRecentMessage = message;
+
+    if (_tryToResumeLogging(&state, time, file, line)) {
+        _destination->log(level, time, file, line, message);
+    } else {
+        ++state.numSuppressed[level];
+        if (wasLogging) {
+            _destination->log(LogLevel::kWarning, time, file, line, "[too many log entries: going quiet]");
+            state.lastRateLimitNotification = now;
+        }
+    }
 }
 
-std::string CircularBufferLogger::contents() const {
-    std::lock_guard<std::mutex> lock{_mutex};
-    return std::string(_buffer.begin(), _buffer.end());
+void RateLimitedLogger::_logReminders() {
+
+    auto now = std::chrono::steady_clock::now();
+    auto systemNow = std::chrono::system_clock::now();
+
+    std::lock_guard<std::mutex> lock(_mutex);
+    for (auto it = _messageState.begin(); it != _messageState.end();) {
+        if (_stateIsStale(it->second)) {
+            it = _messageState.erase(it);
+            continue;
+        }
+        ++it;
+    }
+
+    for (auto& kv : _messageState) {
+        auto& fileLine = kv.first;
+        auto& state = kv.second;
+
+        if (state.isLogging || state.numSuppressed.empty()) {
+            continue;
+        }
+
+        if (_tryToResumeLogging(&state, systemNow, fileLine.first.c_str(), fileLine.second)) {
+            continue;
+        };
+
+        auto highestSuppressedLogLevel = std::prev(state.numSuppressed.end())->first;
+
+        if (now - state.lastRateLimitNotification > _reminderInterval) {
+            _destination->log(highestSuppressedLogLevel, systemNow, fileLine.first.c_str(), fileLine.second, Format("[{}, most recent: {}]", _suppressedLogString(state), state.mostRecentMessage));
+            state.numSuppressed = {};
+            state.lastRateLimitNotification = now;
+        }
+    }
+
+    _reminderThread.asyncAfter(_reminderInterval, [&]{
+        _logReminders();
+    });
 }
 
-DogStatsDLogger::DogStatsDLogger(net::Endpoint endpoint, LogLevel level)
+bool RateLimitedLogger::_tryToResumeLogging(LogMessageState* state, std::chrono::system_clock::time_point time, const char* file, unsigned int line) {
+    auto wasLogging = state->isLogging;
+    state->isLogging = !_stateExceedsMessageRate(*state, time);
+
+    if (state->isLogging && !wasLogging) {
+        SCRAPS_ASSERT(!state->numSuppressed.empty());
+        auto highestSuppressedLogLevel = std::prev(state->numSuppressed.end())->first;
+        _destination->log(highestSuppressedLogLevel, time, file, line, "["s + _suppressedLogString(*state) + "]");
+        state->numSuppressed = {};
+    }
+
+    return state->isLogging;
+}
+
+bool RateLimitedLogger::_stateExceedsMessageRate(const LogMessageState& state, std::chrono::system_clock::time_point endTimePoint) {
+    auto rate = AverageRate<std::chrono::seconds>(state.history.samples(), endTimePoint - _sampleDuration);
+    return rate ? *rate >= _maximumMessagesPerSecond : false;
+}
+
+bool RateLimitedLogger::_stateIsStale(const LogMessageState& state) {
+    auto now = std::chrono::system_clock::now();
+    auto lastSampleTimePoint = std::prev(state.history.samples().end())->first;
+    auto firstSampleTimePoint = state.history.samples().begin()->first;
+    return state.numSuppressed.empty() && (state.history.samples().empty() || lastSampleTimePoint + _sampleDuration < now || firstSampleTimePoint > now);
+}
+
+std::string RateLimitedLogger::_suppressedLogString(const LogMessageState& state){
+    return std::accumulate(state.numSuppressed.begin(), state.numSuppressed.end(), std::string{},
+            [](auto& carry, auto& kv) {
+                auto str = Format("{} {}", std::to_string(kv.second), LogLevelString(kv.first));
+                return carry.empty() ? str : carry + ", " + str; }
+        ) + " messages suppressed";
+}
+
+DogStatsDLogger::DogStatsDLogger(net::Endpoint endpoint)
     : _endpoint{std::move(endpoint)}
-    , _level{level}
     , _socket{std::make_unique<net::UDPSocket>(net::UDPSocket::Protocol::kIPv4)}
 {}
 
 void DogStatsDLogger::log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) {
-    if (level < _level) { return; }
     std::lock_guard<std::mutex> lock{_mutex};
 
     auto text = Format("{} ({}:{})", message, file, line);

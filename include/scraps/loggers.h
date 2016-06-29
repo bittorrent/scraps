@@ -7,11 +7,17 @@
 #include "scraps/thread.h"
 #include "scraps/utility.h"
 #include "scraps/net/UDPSocket.h"
+#include "scraps/AverageRate.h"
+#include "scraps/TaskThread.h"
 
 #include <mutex>
 #include <stdio.h>
 #include <queue>
 #include <condition_variable>
+#include <initializer_list>
+#include <map>
+#include <utility>
+#include <string>
 
 namespace scraps {
 
@@ -28,6 +34,7 @@ private:
 };
 
 #if __ANDROID__
+
 /**
 * The AndroidLogger class logs messages to the Android log.
 */
@@ -39,7 +46,8 @@ public:
 private:
     std::mutex _mutex;
 };
-#endif
+
+#endif // __ANDROID__
 
 /**
 * The FileLogger class logs messages to a file.
@@ -50,6 +58,9 @@ public:
     virtual ~FileLogger();
 
     virtual void log(LogLevel level, const std::string& message) override;
+
+    FileLogger(const FileLogger&) = delete;
+    FileLogger& operator=(const FileLogger&) = delete;
 
     /**
     * Returns the default logging path for the current system.
@@ -62,9 +73,6 @@ public:
     static std::string DefaultLogPath(const std::string& appName);
 
 private:
-    FileLogger(const FileLogger& other) {}
-    FileLogger& operator=(const FileLogger& other) { return *this; }
-
     void _rotate();
     std::string _numberString(size_t n);
 
@@ -81,47 +89,16 @@ private:
 class LoggerLogger : public Logger {
 public:
     template <typename... Loggers>
-    LoggerLogger(Loggers&&... loggers) {
-        _addLoggers(std::forward<Loggers>(loggers)...);
-    }
+    explicit LoggerLogger(Loggers&& ... loggers)
+        : _loggers{std::initializer_list<std::shared_ptr<Logger>>{std::forward<Loggers>(loggers)...}}
+    {}
 
     virtual ~LoggerLogger() {}
 
     virtual void log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override;
 
 private:
-    void _addLoggers() {}
-
-    template <typename Next, typename... Loggers>
-    void _addLoggers(Next&& next, Loggers&&... loggers) {
-        _loggers.push_back(next);
-        _addLoggers(loggers...);
-    }
-
     std::vector<std::shared_ptr<Logger>> _loggers;
-};
-
-/**
-* The BufferLogger class logs messages to a buffer and passes them on in batches.
-* Each batch is spliced together via newline and passed on at the highest level in the batch.
-*/
-class BufferLogger : public Logger {
-public:
-    typedef decltype(std::chrono::steady_clock::now().time_since_epoch()) DurationType;
-
-    BufferLogger(std::shared_ptr<Logger> logger, const DurationType& flushInterval, size_t flushSize);
-    virtual ~BufferLogger();
-
-    virtual void log(LogLevel level, const std::string& message) override;
-
-private:
-    DurationType _flushInterval;
-    size_t _flushSize;
-    std::shared_ptr<Logger> _logger;
-    DurationType _lastFlush;
-    LogLevel _logLevel;
-    std::string _buffer;
-    std::mutex _mutex;
 };
 
 /**
@@ -129,7 +106,7 @@ private:
 */
 class AsyncLogger : public Logger {
 public:
-    AsyncLogger(std::shared_ptr<Logger> logger);
+    explicit AsyncLogger(std::shared_ptr<Logger> logger);
     virtual ~AsyncLogger();
 
     virtual void log(LogLevel level, const std::string& message) override;
@@ -137,44 +114,80 @@ public:
 private:
     void _run();
 
-    std::shared_ptr<Logger> _logger;
-    std::thread _worker;
-    std::mutex _mutex;
-    std::condition_variable _condition;
-    bool _shouldReturn;
+    std::shared_ptr<Logger>                      _logger;
+    std::thread                                  _worker;
+    std::mutex                                   _mutex;
+    std::condition_variable                      _condition;
+    bool                                         _shouldReturn;
     std::queue<std::pair<LogLevel, std::string>> _backlog;
 };
 
 /**
-* Filters logs.
-*/
+ * Filter log messages with arbitrary predicate.
+ */
 class FilterLogger : public Logger {
 public:
-    FilterLogger(std::shared_ptr<Logger> logger, LogLevel minimumLevel) : _logger(logger), _minimumLevel(minimumLevel) {}
-    virtual ~FilterLogger() {}
+    using FilterPredicate = std::function<bool(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message)>;
 
-    virtual void log(LogLevel level, const std::string& message) override;
+    /**
+     * Predicate should return true if the message should be logged, false
+     * otherwise.
+     */
+    explicit FilterLogger(std::shared_ptr<Logger> destination, FilterPredicate predicate)
+        : _destination{destination}
+        , _predicate{predicate}
+    {}
+
+    virtual void log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override;
 
 private:
-    std::shared_ptr<Logger> _logger;
-    LogLevel _minimumLevel;
+    std::shared_ptr<Logger> _destination;
+    FilterPredicate _predicate;
 };
 
 /**
-* The CircularBufferLogger class logs messages to a circular buffer.
-*/
-class CircularBufferLogger : public Logger {
+ * Rate-limits total output of input messages. If the threshold has been reached,
+ * instead of outputing new messages, the logger will go silent (periodically
+ * emitting a message that it has gone silent) until the rate of input messages
+ * is back under the desired threshold.
+ */
+class RateLimitedLogger : public Logger {
 public:
-    CircularBufferLogger(size_t capacity) : _buffer(capacity) {}
-    virtual ~CircularBufferLogger() {}
+    explicit RateLimitedLogger(std::shared_ptr<Logger> destination, double maximumMessagesPerSecond, std::chrono::system_clock::duration sampleDuration = 15s, std::chrono::steady_clock::duration reminderInterval = 5s)
+        : _destination{destination}
+        , _maximumMessagesPerSecond{maximumMessagesPerSecond}
+        , _sampleDuration{sampleDuration}
+        , _reminderInterval{reminderInterval}
+    {
+        _logReminders();
+    }
 
-    virtual void log(LogLevel level, const std::string& message) override;
-
-    std::string contents() const;
+    virtual void log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override;
 
 private:
-    mutable std::mutex _mutex;
-    CircularBuffer<char> _buffer;
+    struct LogMessageState {
+        bool isLogging = true;
+        std::map<LogLevel, size_t> numSuppressed{};
+        std::chrono::steady_clock::time_point lastRateLimitNotification{};
+        TimeValueSamples<size_t, std::chrono::system_clock::time_point> history;
+        std::string mostRecentMessage;
+    };
+
+    void _logReminders();
+    bool _stateIsStale(const LogMessageState& state);
+    std::string _suppressedLogString(const LogMessageState& state);
+    bool _stateExceedsMessageRate(const LogMessageState& state, std::chrono::system_clock::time_point endTimePoint);
+    bool _tryToResumeLogging(LogMessageState* state, std::chrono::system_clock::time_point time, const char* file, unsigned int line);
+
+    std::map<std::pair</* file */ std::string, /* line */ size_t>, LogMessageState> _messageState;
+
+    std::mutex _mutex;
+    std::shared_ptr<Logger> _destination;
+    double _maximumMessagesPerSecond;
+    std::chrono::system_clock::duration _sampleDuration;
+    std::chrono::steady_clock::duration _reminderInterval;
+
+    TaskThread _reminderThread{"RateLimitedLogger Status"};
 };
 
 /**
@@ -182,14 +195,13 @@ private:
 */
 class DogStatsDLogger : public Logger {
 public:
-    DogStatsDLogger(net::Endpoint endpoint, LogLevel level = LogLevel::kWarning);
+    explicit DogStatsDLogger(net::Endpoint endpoint);
 
     virtual void log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override;
 
 private:
-    std::mutex _mutex;
-    const net::Endpoint _endpoint;
-    const LogLevel _level;
+    std::mutex                      _mutex;
+    const net::Endpoint             _endpoint;
     std::unique_ptr<net::UDPSocket> _socket;
 };
 

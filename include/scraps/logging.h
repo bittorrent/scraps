@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <ctime>
+#include <functional>
 
 namespace scraps {
 
@@ -46,7 +47,7 @@ public:
         auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(d - std::chrono::duration_cast<std::chrono::seconds>(d));
         auto timet = std::chrono::system_clock::to_time_t(time);
         strftime(buffer, sizeof(buffer), "%F %T", gmtime(&timet));
-        log(level, Formatf("[%s.%03d] %s %s:%u %s", buffer, milliseconds.count(), LogLevelString(level), file, line, message).c_str());
+        log(level, Formatf("[%s.%03d] %s %s:%u %s", buffer, milliseconds.count(), LogLevelString(level), file, line, message));
     }
 
     /**
@@ -94,6 +95,8 @@ inline LogLevel CurrentLogLevel() { return _gLogLevel; }
 */
 inline void SetLogLevel(LogLevel level) { _gLogLevel = level; }
 
+namespace detail {
+
 inline void LogImpl(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) {
     static std::recursive_mutex mutex;
     std::lock_guard<std::recursive_mutex> lock{mutex};
@@ -106,13 +109,15 @@ inline void LogImpl(LogLevel level, std::chrono::system_clock::time_point time, 
     }
 }
 
+} // namepsace detail
+
 /**
 * Formats a log message and sends it to the current logger.
 */
 template <typename... Args>
 void Logf(LogLevel level, const char* file, unsigned int line, const char* format, Args&&... args) {
     if (level < _gLogLevel) { return; }
-    LogImpl(level, std::chrono::system_clock::now(), file, line, Formatf(format, std::forward<Args>(args)...));
+    detail::LogImpl(level, std::chrono::system_clock::now(), file, line, Formatf(format, std::forward<Args>(args)...));
 }
 
 /**
@@ -121,7 +126,7 @@ void Logf(LogLevel level, const char* file, unsigned int line, const char* forma
 template <typename... Args>
 void Log(LogLevel level, const char* file, unsigned int line, const char* format, Args&&... args) {
     if (level < _gLogLevel) { return; }
-    LogImpl(level, std::chrono::system_clock::now(), file, line, Format(format, std::forward<Args>(args)...));
+    detail::LogImpl(level, std::chrono::system_clock::now(), file, line, Format(format, std::forward<Args>(args)...));
 }
 
 #define SCRAPS_LOG(LEVEL, ...)   scraps::Log(LEVEL, __FILE__, __LINE__, __VA_ARGS__)
