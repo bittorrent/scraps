@@ -199,6 +199,18 @@ public:
 
     virtual void log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override;
 
+    /**
+     * Common DogStatsDLogger setup.
+     */
+    template <typename... DogStatsDLoggerArgs>
+    static std::shared_ptr<Logger> FilteredRateLimitedLogger(double maximumMessagesPerSecond, std::chrono::system_clock::duration sampleDuration, std::chrono::steady_clock::duration reminderInterval, DogStatsDLoggerArgs&& ... args) {
+        return std::make_shared<FilterLogger>(
+            std::make_shared<RateLimitedLogger>(
+                std::make_shared<DogStatsDLogger>(std::forward<DogStatsDLoggerArgs>(args)...),
+                maximumMessagesPerSecond, sampleDuration, reminderInterval),
+            [](LogLevel level, auto...) { return level >= LogLevel::kWarning; });
+    }
+
 private:
     std::mutex                      _mutex;
     const net::Endpoint             _endpoint;
