@@ -46,12 +46,27 @@
 
 #endif
 
+namespace scraps {
+
+constexpr const char* getGLErrorType(GLenum err) {
+    switch (err) {
+        case GL_INVALID_OPERATION:              return "INVALID_OPERATION";
+        case GL_INVALID_ENUM:                   return "INVALID_ENUM";
+        case GL_INVALID_VALUE:                  return "INVALID_VALUE";
+        case GL_OUT_OF_MEMORY:                  return "OUT_OF_MEMORY";
+        case GL_INVALID_FRAMEBUFFER_OPERATION:  return "INVALID_FRAMEBUFFER_OPERATION";
+        default:                                return "unknown";
+    };
+}
+
+}
+
 #if !NDEBUG
 #define SCRAPS_GL_ERROR_CHECK() \
     { \
         auto err = glGetError(); \
         if (err != GL_NO_ERROR) { \
-            SCRAPS_LOGF_WARNING("opengl error 0x%x", err);\
+            SCRAPS_LOG_WARNING("opengl error 0x{:x} {}", err, scraps::getGLErrorType(err)); \
         } \
     }
 #else
