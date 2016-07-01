@@ -2,7 +2,7 @@
 
 namespace scraps {
 namespace opengl {
-    
+
 VertexBuffer::VertexBuffer() {
     glGenBuffers(1, &_object);
 }

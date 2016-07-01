@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/net/curl.h"
+
+#include <gtest/gtest.h>
 
 int main(int argc, char* argv[]) {
     ::testing::InitGoogleTest(&argc, argv);

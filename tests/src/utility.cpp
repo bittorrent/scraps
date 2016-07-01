@@ -1,7 +1,6 @@
-#include "gtest/gtest.h"
-
-#include "scraps/platform.h"
 #include "scraps/utility.h"
+
+#include <gtest/gtest.h>
 
 #include <array>
 

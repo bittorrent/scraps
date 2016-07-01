@@ -1,9 +1,9 @@
-#include "gtest/gtest.h"
-
 #include "scraps/logging.h"
 #include "scraps/net/HTTPConnection.h"
 #include "scraps/net/HTTPRequest.h"
 #include "scraps/net/TCPAcceptor.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 using namespace scraps::net;

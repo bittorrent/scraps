@@ -1,7 +1,7 @@
-#include "gtest/gtest.h"
-
 #include <atomic>
 #include <limits>
+
+#include <gtest/gtest.h>
 
 /**
  * When linking with -latomic on Android with Clang, it appears that

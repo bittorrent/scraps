@@ -71,7 +71,6 @@ alias project_defaults : : : :
     <cflags>-U__STRICT_ANSI__
 ;
 
-
 alias objc : : : :
     <target-os>darwin:<cxxflags>"-x objective-c++"
     <target-os>iphone:<cxxflags>"-x objective-c++"
@@ -96,7 +95,12 @@ lib boost_program_options : $(NEEDS_PATH)//boost : <name>boost_program_options ;
 
 alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
 
-alias scraps_headers :
+lib GLESv2 : : <link>shared ;
+lib z : : <link>shared ;
+lib dl : : <link>shared ;
+lib pthread : : <link>shared ;
+
+alias scraps_deps :
     openssl
     curl
     fmt
@@ -107,24 +111,10 @@ alias scraps_headers :
     boost_program_options
     mnmlstc
     project_defaults
-:
-    <include>include
-: :
-    <include>include
-;
-
-lib libGLESv2 : : <name>GLESv2 <link>shared ;
-
-lib scraps :
     objc
-    [ glob-tree-ex src : *.cpp ]
-    scraps_headers
-    mnmlstc
-:
-    <link>static
-    <cxxflags>"-std=c++14"
-    <target-os>android:<source>libGLESv2
-: :
+: : :
+    <include>include
+
     <target-os>darwin:<framework>Foundation
     <target-os>darwin:<framework>CoreServices
     <target-os>darwin:<framework>CoreFoundation
@@ -133,11 +123,18 @@ lib scraps :
     <target-os>darwin:<framework>OpenGL
     <target-os>iphone:<framework>OpenGLES
     <target-os>appletv:<framework>OpenGLES
+;
 
-    <target-os>linux:<linkflags>"-lpthread -ldl"
-    <linkflags>"-lz"
-
-    <cxxflags>"-std=c++14"
+lib scraps :
+    [ glob-tree-ex src : *.cpp ]
+    scraps_deps
+    mnmlstc
+    z
+:
+    <link>static
+    <target-os>android:<source>GLESv2
+    <target-os>linux:<source>pthread
+    <target-os>linux:<source>dl
 ;
 
 import package ;

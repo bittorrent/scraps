@@ -3,7 +3,7 @@ path-constant NEEDS_PATH : ../needs ;
 lib gtest : $(NEEDS_PATH)//googletest : <name>gtest ;
 
 alias scraps-tests-common :
-    [ glob-tree-ex src : *.cpp : android.cpp ]
+    [ glob-tree-ex src : *.cpp ]
     ..//scraps
     gtest
 ;
@@ -18,7 +18,6 @@ unit-test run : scraps-tests ;
 explicit run ;
 
 lib scraps-tests-android :
-    src/android.cpp
     scraps-tests-common/<link>static
     $(NEEDS_PATH)//jshackle
 :

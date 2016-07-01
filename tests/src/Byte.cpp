@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/Byte.h"
+
+#include <gtest/gtest.h>
 
 #include <gsl.h>
 

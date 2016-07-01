@@ -1,7 +1,7 @@
 #include "scraps/Version.h"
 
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace scraps {
 

@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/SlidingBuffer.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 

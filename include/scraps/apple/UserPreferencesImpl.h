@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scraps/config.h"
-#include "scraps/platform.h"
 
 #if SCRAPS_APPLE
 
@@ -75,4 +74,4 @@ private:
 
 } // namespace scraps
 
-#endif
+#endif // SCRAPS_APPLE

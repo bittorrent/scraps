@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/AverageRate.h"
+
+#include <gtest/gtest.h>
 
 #include <chrono>
 

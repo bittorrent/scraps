@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/UserPreferences.h"
+
+#include <gtest/gtest.h>
 
 #if SCRAPS_APPLE
 

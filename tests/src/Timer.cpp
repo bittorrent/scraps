@@ -1,8 +1,7 @@
-#include "gtest/gtest.h"
-
-#include "scraps/config.h"
 #include "scraps/Timer.h"
 #include "scraps/thread.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 

@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/array.h"
+
+#include <gtest/gtest.h>
 
 #include <type_traits>
 

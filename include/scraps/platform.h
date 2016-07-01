@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scraps/config.h"
+
 #if __APPLE__
     #include "Availability.h"
     #include "TargetConditionals.h"
@@ -59,8 +61,6 @@
     #endif
 
 #elif __ANDROID__
-    #include "scraps/android.h"
-
     #define SCRAPS_MOBILE 1
     #define SCRAPS_ANDROID 1
     #define SCRAPS_UNIX_LIKE 1

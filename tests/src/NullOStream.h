@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scraps/config.h"
+
 #include <iostream>
 
 class NullStreambuf : public std::streambuf {

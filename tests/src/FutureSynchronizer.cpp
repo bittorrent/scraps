@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/FutureSynchronizer.h"
+
+#include <gtest/gtest.h>
 
 #include <future>
 #include <set>

@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/bitfield.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 

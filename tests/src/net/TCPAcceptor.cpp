@@ -1,7 +1,7 @@
-#include "gtest/gtest.h"
-
 #include "scraps/net/TCPAcceptor.h"
 #include "scraps/net/TCPService.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 using namespace scraps::net;

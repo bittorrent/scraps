@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/TreeNode.h"
+
+#include <gtest/gtest.h>
 
 #include <list>
 

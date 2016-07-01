@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/net/HTTPRequest.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 using namespace scraps::net;

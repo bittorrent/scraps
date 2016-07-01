@@ -1,8 +1,8 @@
-#include "gtest/gtest.h"
-
 #include "NullOStream.h"
 
 #include "scraps/Application.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 

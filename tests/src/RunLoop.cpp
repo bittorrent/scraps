@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/RunLoop.h"
+
+#include <gtest/gtest.h>
 
 #include <thread>
 #include <sys/socket.h>

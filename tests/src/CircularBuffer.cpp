@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "scraps/CircularBuffer.h"
+
+#include <gtest/gtest.h>
 
 using namespace scraps;
 

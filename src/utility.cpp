@@ -2,7 +2,7 @@
 
 #include "scraps/format.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <fstream>
 #include <iomanip>
 #include <iostream>

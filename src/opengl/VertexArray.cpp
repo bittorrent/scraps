@@ -2,13 +2,13 @@
 
 namespace scraps {
 namespace opengl {
-    
+
 #if SCRAPS_IOS || SCRAPS_TVOS
 #define glGenVertexArrays glGenVertexArraysOES
 #define glDeleteVertexArrays glDeleteVertexArraysOES
 #define glBindVertexArray glBindVertexArrayOES
 #endif
-    
+
 VertexArray::VertexArray() {
 #if !SCRAPS_EMULATE_VERTEX_ARRAY
     glGenVertexArrays(1, &_object);
