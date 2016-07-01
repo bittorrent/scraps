@@ -25,6 +25,11 @@ bool UserPreferencesImpl::has(const std::string& key) const {
     return nsValue != nil;
 }
 
+void UserPreferencesImpl::unset(const std::string& key) {
+    NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
+    [_userDefaults removeObjectForKey:nsKey];
+}
+
 std::string UserPreferencesImpl::getString(const std::string& key) const {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     NSString* nsValue = [_userDefaults objectForKey:nsKey];

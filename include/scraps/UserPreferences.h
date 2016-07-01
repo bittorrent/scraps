@@ -43,6 +43,11 @@ public:
     bool has(const std::string& key) const;
 
     /**
+     * Unsets the given key.
+     */
+    void unset(const std::string& key);
+
+    /**
      * Convert the raw type to T. If not found, the default value is returned.
      */
     template <typename T, typename U = typename std::remove_reference<typename std::remove_cv<T>::type>::type>
@@ -136,6 +141,7 @@ U UserPreferences::get(const std::string& key, T defaultValue) const {
 }
 
 inline bool UserPreferences::has(const std::string& key) const { return UserPreferencesImpl::has(key); }
+inline void UserPreferences::unset(const std::string& key) { return UserPreferencesImpl::unset(key); }
 
 template <>
 inline std::string UserPreferences::_get<std::string>(const std::string& key, std::string defaultValue) const {

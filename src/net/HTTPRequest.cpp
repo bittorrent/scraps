@@ -40,6 +40,10 @@ void HTTPRequest::initiate(const std::string& url, const void* body, size_t body
         curl_easy_setopt(_curl, CURLOPT_HTTPHEADER, _curlHeaderList);
     }
 
+    if (_disablePeerVerification) {
+        curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYPEER, 0);
+    }
+
     if (body) {
         curl_easy_setopt(_curl, CURLOPT_POST, 1);
 
@@ -73,6 +77,9 @@ void HTTPRequest::initiate(const std::string& url, const void* body, size_t body
 
     curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, &CURLWriteCallback);
     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, this);
+
+    curl_easy_setopt(_curl, CURLOPT_HEADERFUNCTION, &CURLHeaderWriteCallback);
+    curl_easy_setopt(_curl, CURLOPT_HEADERDATA, this);
 
     curl_multi_add_handle(_curlMultiHandle, _curl);
 
@@ -138,29 +145,40 @@ void HTTPRequest::abort() {
     wait();
 }
 
-bool HTTPRequest::error() {
+bool HTTPRequest::error() const {
     std::lock_guard<std::mutex> lock{_mutex};
     return _error;
 }
 
-bool HTTPRequest::isComplete() {
+bool HTTPRequest::isComplete() const {
     std::lock_guard<std::mutex> lock{_mutex};
     return _isComplete;
 }
 
-unsigned int HTTPRequest::responseStatus() {
+unsigned int HTTPRequest::responseStatus() const {
     std::lock_guard<std::mutex> lock{_mutex};
     return _responseStatus;
 }
 
-std::string HTTPRequest::responseBody() {
+std::string HTTPRequest::responseBody() const {
     std::lock_guard<std::mutex> lock{_mutex};
     return _responseBody;
+}
+
+std::vector<std::string> HTTPRequest::responseHeaders() const {
+    std::lock_guard<std::mutex> lock{_mutex};
+    return _responseHeaders;
 }
 
 size_t HTTPRequest::CURLWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata) {
     auto request = reinterpret_cast<HTTPRequest*>(userdata);
     request->_responseBody.append(ptr, size * nmemb);
+    return size * nmemb;
+}
+
+size_t HTTPRequest::CURLHeaderWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    auto request = reinterpret_cast<HTTPRequest*>(userdata);
+    request->_responseHeaders.emplace_back(ptr, size * nmemb);
     return size * nmemb;
 }
 

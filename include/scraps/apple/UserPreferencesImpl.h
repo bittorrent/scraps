@@ -29,6 +29,11 @@ public:
     bool has(const std::string& key) const;
 
     /**
+     * Unsets the given key.
+     */
+    void unset(const std::string& key);
+
+    /**
      * Return a string value for the given key. If not found, the default value is returned.
      */
     std::string getString(const std::string& key) const;

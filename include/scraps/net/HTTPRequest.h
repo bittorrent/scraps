@@ -48,6 +48,11 @@ public:
     void setPinnedKey(std::string pinnedKey) { _pinnedKey = std::move(pinnedKey); }
 
     /**
+    * For debugging / testing only. Never use this in production.
+    */
+    void disablePeerVerification() { _disablePeerVerification = true; }
+
+    /**
     * @param url the url to request
     * @param body the optional request body. if given, the request will be a POST request
     * @param bodyLength the length of the body. if omitted, body is assumed to be a null-terminated string
@@ -71,22 +76,27 @@ public:
     /**
     * @return true if the request encountered an error
     */
-    bool error();
+    bool error() const;
 
     /**
     * @return true if the request is complete
     */
-    bool isComplete();
+    bool isComplete() const;
 
     /**
     * @return the response status code if the request is complete
     */
-    unsigned int responseStatus();
+    unsigned int responseStatus() const;
 
     /**
     * @return the response body if the request is complete
     */
-    std::string responseBody();
+    std::string responseBody() const;
+
+    /**
+    * @return the response headers if the request is complete
+    */
+    std::vector<std::string> responseHeaders() const;
 
 private:
     // no copying
@@ -95,6 +105,7 @@ private:
 
     std::string _caBundlePath;
     std::string _pinnedKey;
+    bool _disablePeerVerification = false;
 
     mutable std::mutex _mutex;
     std::condition_variable _condition;
@@ -111,8 +122,10 @@ private:
     bool _error         = false;
     int _responseStatus = 0;
     std::string _responseBody;
+    std::vector<std::string> _responseHeaders;
 
     static size_t CURLWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata);
+    static size_t CURLHeaderWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata);
 };
 
 }} // namespace scraps::net
