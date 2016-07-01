@@ -114,6 +114,7 @@ alias scraps_deps :
     objc
 : : :
     <include>include
+    <cxxflags>"-std=c++1y"
 
     <target-os>darwin:<framework>Foundation
     <target-os>darwin:<framework>CoreServices
