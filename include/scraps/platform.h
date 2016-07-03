@@ -110,4 +110,10 @@ constexpr bool kIsWindows = true;
 constexpr bool kIsWindows = false;
 #endif
 
+#if SCRAPS_OS_X || SCRAPS_WINDOWS
+constexpr bool kIsDesktop = true;
+#else
+constexpr bool kIsDesktop = false;
+#endif
+
 } } // namespace scraps::platform
