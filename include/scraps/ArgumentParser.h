@@ -3,9 +3,10 @@
 #include "scraps/config.h"
 
 SCRAPS_IGNORE_WARNINGS_PUSH
-#include <boost/optional.hpp>
 #include <boost/program_options.hpp>
 SCRAPS_IGNORE_WARNINGS_POP
+
+#include "scraps/stdts/optional.h"
 
 #include <unordered_map>
 
@@ -61,16 +62,16 @@ public:
      */
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value, void>::type
-        addArgument(const std::string& name, const std::string& description, T* destination,           const boost::optional<T>& defaultValue);
-    void addArgument(const std::string& name, const std::string& description, std::string* destination, const boost::optional<std::string>& defaultValue);
+        addArgument(const std::string& name, const std::string& description, T* destination,           const stdts::optional<T>& defaultValue);
+    void addArgument(const std::string& name, const std::string& description, std::string* destination, const stdts::optional<std::string>& defaultValue);
 
     /**
      * Add an argument and specify a callback to be called when the values are parsed.
      */
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value, void>::type
-        addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback,                  const boost::optional<T>& defaultValue = boost::none);
-    void addArgument(const std::string& name, const std::string& description, std::function<void(const std::string&)> callback, const boost::optional<std::string>& defaultValue = boost::none);
+        addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback,                  const stdts::optional<T>& defaultValue = {});
+    void addArgument(const std::string& name, const std::string& description, std::function<void(const std::string&)> callback, const stdts::optional<std::string>& defaultValue = {});
 
     /**
     * @param args pairs of string representations and their corresponding enum values
@@ -105,7 +106,7 @@ private:
     }
 
     template <typename T, typename U = typename std::remove_reference<typename std::remove_cv<T>::type>::type>
-    void _addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback, const boost::optional<U>& defaultValue);
+    void _addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback, const stdts::optional<U>& defaultValue);
 
     template <typename T>
     std::unordered_map<std::string, std::function<void(T)>>& _data();
@@ -145,7 +146,7 @@ struct CommonArguments {
 };
 
 template <typename T, typename U>
-void ArgumentParser::_addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback, const boost::optional<U>& defaultValue) {
+void ArgumentParser::_addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback, const stdts::optional<U>& defaultValue) {
     auto value = boost::program_options::value<U>();
     if (defaultValue) {
         value->default_value(*defaultValue);
@@ -157,28 +158,28 @@ void ArgumentParser::_addArgument(const std::string& name, const std::string& de
 template <typename T>
 inline typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value, void>::type ArgumentParser::addArgument(const std::string& name, const std::string& description, T* destination) {
     using U = typename std::remove_reference<typename std::remove_cv<T>::type>::type;
-    _addArgument<T>(name, description, [=] (T value) { *destination = value; }, boost::optional<U>{*destination});
+    _addArgument<T>(name, description, [=] (T value) { *destination = value; }, stdts::optional<U>{*destination});
 }
 
 template <typename T>
-inline typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value, void>::type ArgumentParser::addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback, const boost::optional<T>& defaultValue) {
+inline typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value, void>::type ArgumentParser::addArgument(const std::string& name, const std::string& description, std::function<void(T)> callback, const stdts::optional<T>& defaultValue) {
     _addArgument<T>(name, description, callback, defaultValue);
 }
 
 template <typename T>
-inline typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value, void>::type ArgumentParser::addArgument(const std::string& name, const std::string& description, T* destination, const boost::optional<T>& defaultValue) {
+inline typename std::enable_if<std::is_integral<T>::value || std::is_floating_point<T>::value, void>::type ArgumentParser::addArgument(const std::string& name, const std::string& description, T* destination, const stdts::optional<T>& defaultValue) {
     _addArgument<T>(name, description, [=] (T value) { *destination = value; }, defaultValue);
 }
 
 inline void ArgumentParser::addArgument(const std::string& name, const std::string& description, std::string* destination) {
-    _addArgument<const std::string&>(name, description, [=] (const std::string& value) { *destination = value; }, boost::optional<std::string>{*destination});
+    _addArgument<const std::string&>(name, description, [=] (const std::string& value) { *destination = value; }, stdts::optional<std::string>{*destination});
 }
 
-inline void ArgumentParser::addArgument(const std::string& name, const std::string& description, std::string* destination, const boost::optional<std::string>& defaultValue) {
+inline void ArgumentParser::addArgument(const std::string& name, const std::string& description, std::string* destination, const stdts::optional<std::string>& defaultValue) {
     _addArgument<const std::string&>(name, description, [=] (const std::string& value) { *destination = value; }, defaultValue);
 }
 
-inline void ArgumentParser::addArgument(const std::string& name, const std::string& description, std::function<void(const std::string&)> callback, const boost::optional<std::string>& defaultValue) {
+inline void ArgumentParser::addArgument(const std::string& name, const std::string& description, std::function<void(const std::string&)> callback, const stdts::optional<std::string>& defaultValue) {
     _addArgument<const std::string&>(name, description, callback, defaultValue);
 }
 

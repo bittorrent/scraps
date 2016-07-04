@@ -5,10 +5,6 @@
 #include <vector>
 #include <string>
 
-SCRAPS_IGNORE_WARNINGS_PUSH
-#include <boost/range.hpp>
-SCRAPS_IGNORE_WARNINGS_POP
-
 namespace scraps {
 
 /**
@@ -101,7 +97,7 @@ T EliasOmegaDecode(InputIterator begin, InputIterator end, InputIterator* next =
 */
 template <typename T, typename U = uint64_t>
 U EliasOmegaDecode(const T& code) {
-    return EliasOmegaDecode<U>(boost::begin(code), boost::end(code));
+    return EliasOmegaDecode<U>(std::begin(code), std::end(code));
 }
 
 /**
@@ -169,7 +165,7 @@ std::string BitfieldEncode(InputIterator begin, InputIterator end) {
 */
 template <typename T>
 std::string BitfieldEncode(const T& bitfield) {
-    return BitfieldEncode(boost::begin(bitfield), boost::end(bitfield));
+    return BitfieldEncode(std::begin(bitfield), std::end(bitfield));
 }
 
 /**
