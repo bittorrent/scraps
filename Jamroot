@@ -139,5 +139,31 @@ lib scraps :
 ;
 
 import package ;
-package.install install : <install-source-root>include : : scraps : [ glob-tree-ex include : *.h ] ;
-explicit install ;
+
+package.install install-lib : <install-source-root>include : : scraps : [ glob-tree-ex include : *.h ] ;
+
+path-constant PREFIX : [ option.get prefix ] ;
+path-constant LIB : [ option.get libdir : $(PREFIX)/lib ] ;
+path-constant PKG_CONFIG : $(LIB)/pkgconfig ;
+
+make scraps.pc : Jamroot : @pkgconfig ;
+actions pkgconfig {
+cat > $(<) <<- EOM
+prefix=$(PREFIX)
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${exec_prefix}/include
+
+Name: scraps
+Version: 0
+Description: Random scraps of C++
+Requires: openssl, fmt, boost_program_options, boost_system, boost_filesystem, gsl, libsodium, mnmlstc
+Libs: -L\${libdir} -lscraps
+Cflags: -I\${includedir}
+EOM
+}
+
+install install-pkgconfig : scraps.pc : <location>$(PKG_CONFIG) ;
+
+alias install : install-lib install-pkgconfig ;
+explicit install install-lib install-pkgconfig ;
