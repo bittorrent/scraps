@@ -37,7 +37,8 @@
     #endif
 
     #if !SCRAPS_IOS && !SCRAPS_TVOS && !SCRAPS_WATCHOS
-        #define SCRAPS_OS_X 1 // the name is just "OS X" now
+        #define SCRAPS_MACOS 1 // Because Apple can't make up their mind.
+        #define SCRAPS_OS_X 1
         #define SCRAPS_MAC_OS_X 1
         #define SCRAPS_APPLE_SDK "macosx"
     #endif
