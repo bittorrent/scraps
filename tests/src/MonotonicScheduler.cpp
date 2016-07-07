@@ -7,16 +7,6 @@
 
 using namespace scraps;
 
-/**
- * Spinlock instead of sleeping for higher accuracy and guarantee that we wake after now + d.
- */
-template<typename Rep, typename Period>
-void SpinSleep(std::chrono::duration<Rep, Period> d) {
-    auto now = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() < now + d);
-}
-
-
 // Durations are offsets from now.
 // time to sleep, schedule time point, expected output, will reset
 void MonotonicSchedulerTests(std::chrono::steady_clock::duration threshold, std::vector<std::tuple<std::chrono::steady_clock::duration, std::chrono::steady_clock::duration, std::chrono::steady_clock::duration, bool>> tps) {
@@ -26,6 +16,9 @@ void MonotonicSchedulerTests(std::chrono::steady_clock::duration threshold, std:
     MonotonicScheduler a(threshold * kTestScaleFactor, [&](auto){ didReset = true; });
 
     const auto start = std::chrono::steady_clock::now();
+    auto now = start;
+
+    a.mockSteadyClock([&]{ return now; });
 
     auto prevSleepTp = start;
 
@@ -33,10 +26,10 @@ void MonotonicSchedulerTests(std::chrono::steady_clock::duration threshold, std:
         auto sleepTarget = start + std::get<0>(t) * kTestScaleFactor;
         auto sleepDuration = sleepTarget - prevSleepTp;
         prevSleepTp = sleepTarget;
-        SpinSleep(sleepDuration);
+        now += sleepDuration;
 
         auto tp = a.schedule(start + std::get<1>(t) * kTestScaleFactor);
-        EXPECT_NEAR(MillisecondCount(tp - start), MillisecondCount(std::get<2>(t) * kTestScaleFactor), 100 * kTestScaleFactor);
+        EXPECT_EQ(MillisecondCount(tp - start), MillisecondCount(std::get<2>(t) * kTestScaleFactor));
         EXPECT_EQ(didReset, std::get<3>(t));
         didReset = false;
     }
@@ -218,6 +211,10 @@ TEST(MonotonicScheduler, synchronization) {
     MonotonicScheduler b(300ms, [&](auto) { didReset = true; });
 
     const auto start = std::chrono::steady_clock::now();
+    auto now = start;
+    a.mockSteadyClock([&]{ return now; });
+    b.mockSteadyClock([&]{ return now; });
+
     EXPECT_FALSE(didReset);
 
     auto first = a.schedule(start + 500ms);
@@ -225,7 +222,7 @@ TEST(MonotonicScheduler, synchronization) {
     EXPECT_NEAR(MillisecondCount(a.offset()), -500, 20); // first = 100. 500 - 400 = 100
     EXPECT_FALSE(didReset);
 
-    SpinSleep(200ms);
+    now += 200ms;
 
     b.synchronizeWith(a);
     EXPECT_EQ(a.offset(), b.offset());

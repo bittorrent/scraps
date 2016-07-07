@@ -58,6 +58,11 @@ public:
         , _threshold{threshold}
     {}
 
+    /**
+    * For testing, you can provide a mock steady clock here.
+    */
+    void mockSteadyClock(std::function<std::chrono::steady_clock::time_point()> mockSteadyClock) { _mockSteadyClock = std::move(mockSteadyClock); }
+
     std::chrono::steady_clock::time_point schedule(std::chrono::steady_clock::time_point remoteTimePoint) noexcept;
 
     /**
@@ -96,6 +101,7 @@ private:
     std::chrono::steady_clock::duration                    _threshold           = {};
     std::chrono::steady_clock::duration                    _remoteToLocalOffset = {};
     stdts::optional<std::chrono::steady_clock::time_point> _lastLocalTimePoint;
+    std::function<std::chrono::steady_clock::time_point()> _mockSteadyClock;
 
     void _initializeTime() noexcept;
 };

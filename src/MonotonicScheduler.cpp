@@ -5,7 +5,7 @@ namespace scraps {
 constexpr std::chrono::steady_clock::duration MonotonicScheduler::kDefaultResetOffset;
 
 std::chrono::steady_clock::time_point MonotonicScheduler::schedule(std::chrono::steady_clock::time_point remoteTimePoint) noexcept {
-    auto now = std::chrono::steady_clock::now();
+    auto now = _mockSteadyClock ? _mockSteadyClock() : std::chrono::steady_clock::now();
     auto localTimePoint = remoteTimePoint + _remoteToLocalOffset;
 
     _initializeTime();
@@ -50,7 +50,7 @@ void MonotonicScheduler::synchronizeWith(const MonotonicScheduler& other) noexce
 
 void MonotonicScheduler::_initializeTime() noexcept {
     if (!_lastLocalTimePoint) {
-        _lastLocalTimePoint = std::chrono::steady_clock::now();
+        _lastLocalTimePoint = _mockSteadyClock ? _mockSteadyClock() : std::chrono::steady_clock::now();
     }
 }
 
