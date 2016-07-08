@@ -142,7 +142,7 @@ import package ;
 
 package.install install-lib : <install-source-root>include : : scraps : [ glob-tree-ex include : *.h ] ;
 
-path-constant PREFIX : [ option.get prefix ] ;
+path-constant PREFIX : [ option.get prefix : "/usr/local" ] ;
 path-constant LIB : [ option.get libdir : $(PREFIX)/lib ] ;
 path-constant PKG_CONFIG : $(LIB)/pkgconfig ;
 
