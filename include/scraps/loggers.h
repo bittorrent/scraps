@@ -7,7 +7,7 @@
 #include "scraps/thread.h"
 #include "scraps/utility.h"
 #include "scraps/net/UDPSocket.h"
-#include "scraps/AverageRate.h"
+#include "scraps/TimeValueSamples.h"
 #include "scraps/TaskThread.h"
 
 #include <mutex>

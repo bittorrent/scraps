@@ -1,3 +1,4 @@
+#include "scraps/AverageRate.h"
 #include "scraps/loggers.h"
 
 #if SCRAPS_APPLE
