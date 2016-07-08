@@ -10,8 +10,7 @@ namespace scraps {
 
 /**
  * Container for storing timepoints and values for those timepoints. If a maximum size is specified,
- * the container will never exceed that size and the oldest samples (in order of insertion) will be
- * removed.
+ * the container will never exceed that size and the oldest samples (by time point) will be removed.
  */
 template <typename ValueType, typename TimePointType = std::chrono::steady_clock::time_point>
 class TimeValueSamples {
