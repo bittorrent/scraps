@@ -1,0 +1,5 @@
+actions:
+  - ./configure --bootstrap-b2
+  - live c++-analysis ./b2 toolset=darwin --build-dir=./bin/analysis
+  - ./b2 -d+2 toolset=darwin
+  - ./b2 tests//run toolset=darwin
