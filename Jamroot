@@ -157,7 +157,7 @@ includedir=\${exec_prefix}/include
 Name: scraps
 Version: 0
 Description: Random scraps of C++
-Requires: openssl, fmt, boost_program_options, boost_system, boost_filesystem, gsl, libsodium, mnmlstc
+Requires: curl, openssl, fmt, boost_program_options, boost_system, boost_filesystem, gsl, libsodium, mnmlstc
 Libs: -L\${libdir} -lscraps
 Cflags: -I\${includedir}
 EOM
