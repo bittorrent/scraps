@@ -2,35 +2,17 @@
 
 #include "scraps/config.h"
 
-#include "scraps/platform.h"
-
-#if SCRAPS_APPLE
-#include "scraps/apple/UserPreferencesImpl.h"
-#elif SCRAPS_ANDROID || SCRAPS_LINUX
-// TODO: implement for android, linux
-#include "scraps/standins/DummyUserPreferencesImpl.h"
-#else
-#error Not implemented for this platform.
-#endif
-
 namespace scraps {
-
-#if SCRAPS_ANDROID || SCRAPS_LINUX
-using UserPreferencesImpl = standins::DummyUserPreferencesImpl;
-#endif
 
 /**
 * Not thread-safe.
 *
 * Store user preferences in an OS-specific way. (e.g. UserDefaults for Mac)
 */
-class UserPreferences : private UserPreferencesImpl {
+class UserPreferences {
 public:
-    /**
-    * @param suiteName if given, constructs preferences that are shared by a suite of applications
-    *                  otherwise, constructs preferences for the current application only
-    */
-    UserPreferences(std::string suiteName = "");
+    UserPreferences() {}
+    virtual ~UserPreferences() {}
 
     UserPreferences(const UserPreferences&) = delete;
     UserPreferences& operator=(const UserPreferences&) = delete;
@@ -40,12 +22,12 @@ public:
     /**
      * Return true if the given key exists.
      */
-    bool has(const std::string& key) const;
+    virtual bool has(const std::string& key) const = 0;
 
     /**
      * Unsets the given key.
      */
-    void unset(const std::string& key);
+    virtual void unset(const std::string& key) = 0;
 
     /**
      * Convert the raw type to T. If not found, the default value is returned.
@@ -56,58 +38,78 @@ public:
     /**
      * Set a bool value for the given key.
      */
-    void set(const std::string& key, bool value);
+    virtual void set(const std::string& key, bool value) = 0;
 
     /**
      * Set an int value for the given key.
      */
-    void set(const std::string& key, int value);
+    virtual void set(const std::string& key, int value) = 0;
 
     /**
      * Set an int value for the given key.
      */
-    void set(const std::string& key, unsigned value);
+    virtual void set(const std::string& key, unsigned value);
 
     /**
      * Set an int value for the given key.
      */
-    void set(const std::string& key, long long value);
+    virtual void set(const std::string& key, long long value);
 
     /**
      * Set an int value for the given key.
      */
-    void set(const std::string& key, unsigned long long value);
+    virtual void set(const std::string& key, unsigned long long value);
 
     /**
      * Set an int value for the given key.
      */
-    void set(const std::string& key, long value);
+    virtual void set(const std::string& key, long value);
 
     /**
      * Set an int value for the given key.
      */
-    void set(const std::string& key, unsigned long value);
+    virtual void set(const std::string& key, unsigned long value);
 
     /**
      * Set a double value for the given key.
      */
-    void set(const std::string& key, float value);
+    virtual void set(const std::string& key, float value) = 0;
 
     /**
      * Set a double value for the given key.
      */
-    void set(const std::string& key, double value);
+    virtual void set(const std::string& key, double value);
 
     /**
      * Set a double value for the given key.
      */
-    void set(const std::string& key, long double value);
+    virtual void set(const std::string& key, long double value);
 
     /**
      * Set a string value for the given key.
      */
-    void set(const std::string& key, const std::string& value);
+    virtual void set(const std::string& key, const std::string& value) = 0;
 
+protected:
+    /**
+     * Return a string value for the given key.
+     */
+    virtual std::string getString(const std::string& key) const = 0;
+
+    /**
+     * Return an int value for the given key.
+     */
+    virtual int getInt(const std::string& key) const = 0;
+
+    /**
+     * Return a bool value for the given key.
+     */
+    virtual bool getBool(const std::string& key) const = 0;
+
+    /**
+     * Return a float value for the given key.
+     */
+    virtual float getFloat(const std::string& key) const = 0;
 
 private:
     template <typename T>
@@ -121,12 +123,12 @@ private:
     /**
      * Return an int value for the given key. If not found, then a zero value is returned.
      */
-    long long _getInt(const std::string& key, long long defaultValue = 0) const;
+    int _getInt(const std::string& key, int defaultValue = 0) const;
 
     /**
      * Return a double value for the given key. If not found, then a zero value is returned.
      */
-    long double _getDouble(const std::string& key, long double defaultValue = 0.0) const;
+    float _getFloat(const std::string& key, float defaultValue = 0.0) const;
 
     /**
      * Return a bool value for the given key. If not found, then false is returned.
@@ -139,9 +141,6 @@ template <typename T, typename U>
 U UserPreferences::get(const std::string& key, T defaultValue) const {
     return _get<U>(key, std::move(defaultValue));
 }
-
-inline bool UserPreferences::has(const std::string& key) const { return UserPreferencesImpl::has(key); }
-inline void UserPreferences::unset(const std::string& key) { return UserPreferencesImpl::unset(key); }
 
 template <>
 inline std::string UserPreferences::_get<std::string>(const std::string& key, std::string defaultValue) const {
@@ -175,12 +174,12 @@ inline short UserPreferences::_get<short>(const std::string& key, short defaultV
 
 template <>
 inline int UserPreferences::_get<int>(const std::string& key, int defaultValue) const {
-    return static_cast<int>(_getInt(key, defaultValue));
+    return _getInt(key, defaultValue);
 }
 
 template <>
 inline long UserPreferences::_get<long>(const std::string& key, long defaultValue) const {
-    return static_cast<long>(_getInt(key, defaultValue));
+    return _getInt(key, defaultValue);
 }
 
 template <>
@@ -211,89 +210,73 @@ inline unsigned long long UserPreferences::_get<unsigned long long>(const std::s
 
 template <>
 inline float UserPreferences::_get<float>(const std::string& key, float defaultValue) const {
-    return static_cast<float>(_getDouble(key, defaultValue));
+    return _getFloat(key, defaultValue);
 }
 
 template <>
 inline double UserPreferences::_get<double>(const std::string& key, double defaultValue) const {
-    return static_cast<double>(_getDouble(key, defaultValue));
+    return static_cast<double>(_getFloat(key, defaultValue));
 }
 
 template <>
 inline long double UserPreferences::_get<long double>(const std::string& key, long double defaultValue) const {
-    return _getDouble(key, defaultValue);
+    return static_cast<double>(_getFloat(key, defaultValue));
 }
 
 inline std::string UserPreferences::_getString(const std::string& key, const std::string& defaultValue) const {
     if (!has(key)) {
         return defaultValue;
     }
-    return UserPreferencesImpl::getString(key);
+    return getString(key);
 }
 
-inline long long UserPreferences::_getInt(const std::string& key, long long defaultValue) const {
+inline int UserPreferences::_getInt(const std::string& key, int defaultValue) const {
     if (!has(key)) {
         return defaultValue;
     }
-    return UserPreferencesImpl::getInt(key);
+    return getInt(key);
 }
 
-inline long double UserPreferences::_getDouble(const std::string& key, long double defaultValue) const {
+inline float UserPreferences::_getFloat(const std::string& key, float defaultValue) const {
     if (!has(key)) {
         return defaultValue;
     }
-    return UserPreferencesImpl::getDouble(key);
+    return getFloat(key);
 }
 
 inline bool UserPreferences::_getBool(const std::string& key, bool defaultValue) const {
     if (!has(key)) {
         return defaultValue;
     }
-    return UserPreferencesImpl::getBool(key);
-}
-
-inline void UserPreferences::set(const std::string& key, const std::string& value) {
-    return UserPreferencesImpl::setString(key, value);
+    return getBool(key);
 }
 
 inline void UserPreferences::set(const std::string& key, long long value) {
-    return UserPreferencesImpl::setInt(key, value);
+    set(key, static_cast<int>(value));
 }
 
 inline void UserPreferences::set(const std::string& key, unsigned long long value) {
-    return UserPreferencesImpl::setInt(key, value);
+    set(key, static_cast<int>(value));
 }
 
 inline void UserPreferences::set(const std::string& key, long value) {
-    return UserPreferencesImpl::setInt(key, value);
+    set(key, static_cast<int>(value));
 }
 
 inline void UserPreferences::set(const std::string& key, unsigned long value) {
-    return UserPreferencesImpl::setInt(key, value);
-}
-
-inline void UserPreferences::set(const std::string& key, int value) {
-    return UserPreferencesImpl::setInt(key, value);
+    set(key, static_cast<int>(value));
 }
 
 inline void UserPreferences::set(const std::string& key, unsigned value) {
-    return UserPreferencesImpl::setInt(key, value);
-}
-
-inline void UserPreferences::set(const std::string& key, float value) {
-    return UserPreferencesImpl::setDouble(key, value);
+    set(key, static_cast<int>(value));
 }
 
 inline void UserPreferences::set(const std::string& key, double value) {
-    return UserPreferencesImpl::setDouble(key, value);
+    set(key, static_cast<float>(value));
 }
 
 inline void UserPreferences::set(const std::string& key, long double value) {
-    return UserPreferencesImpl::setDouble(key, value);
-}
-
-inline void UserPreferences::set(const std::string& key, bool value) {
-    return UserPreferencesImpl::setBool(key, value);
+    set(key, static_cast<float>(value));
 }
 
 } // namespace scraps

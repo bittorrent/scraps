@@ -1,4 +1,4 @@
-#include "scraps/platform.h"
+#include "scraps/apple/UserPreferencesImpl.h"
 
 #if SCRAPS_APPLE
 
@@ -36,28 +36,28 @@ std::string UserPreferencesImpl::getString(const std::string& key) const {
     return nsValue ? [nsValue UTF8String] : "";
 }
 
-void UserPreferencesImpl::setString(const std::string& key, const std::string& value) {
+void UserPreferencesImpl::set(const std::string& key, const std::string& value) {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     NSString* nsValue = [NSString stringWithUTF8String:value.c_str()];
     [_userDefaults setObject:nsValue forKey:nsKey];
 }
 
-long long UserPreferencesImpl::getInt(const std::string& key) const {
+int UserPreferencesImpl::getInt(const std::string& key) const {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     return [_userDefaults integerForKey:nsKey];
 }
 
-void UserPreferencesImpl::setInt(const std::string& key, long long value) {
+void UserPreferencesImpl::set(const std::string& key, int value) {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     [_userDefaults setInteger:value forKey:nsKey];
 }
 
-long double UserPreferencesImpl::getDouble(const std::string& key) const {
+float UserPreferencesImpl::getFloat(const std::string& key) const {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
-    return [_userDefaults doubleForKey:nsKey];
+    return static_cast<float>([_userDefaults doubleForKey:nsKey]);
 }
 
-void UserPreferencesImpl::setDouble(const std::string& key, long double value) {
+void UserPreferencesImpl::set(const std::string& key, float value) {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     [_userDefaults setDouble:value forKey:nsKey];
 }
@@ -67,7 +67,7 @@ bool UserPreferencesImpl::getBool(const std::string& key) const {
     return [_userDefaults boolForKey:nsKey];
 }
 
-void UserPreferencesImpl::setBool(const std::string& key, bool value) {
+void UserPreferencesImpl::set(const std::string& key, bool value) {
     NSString* nsKey = [NSString stringWithUTF8String:key.c_str()];
     [_userDefaults setBool:value forKey:nsKey];
 }
