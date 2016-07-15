@@ -3,23 +3,30 @@ project scraps ;
 path-constant NEEDS_PATH : needs ;
 
 rule clang-defaults ( properties * ) {
-    if <toolset>darwin in $(properties) || <toolset>clang in $(properties) {
-        local result ;
-        result += <cflags>-fdiagnostics-show-note-include-stack ;
-        result += <cflags>-fmacro-backtrace-limit=0 ;
-        result += <cflags>-fmessage-length=0 ;
-        result += <cflags>-fstrict-aliasing ;
+    local result ;
+    if <toolset>darwin in $(properties) {
         result += <cflags>-Wbool-conversion ;
         result += <cflags>-Wconditional-uninitialized ;
         result += <cflags>-Wconstant-conversion ;
-        result += <cflags>-Wdeprecated-declarations ;
         result += <cflags>-Wduplicate-method-match ;
-        result += <cflags>-Wempty-body ;
         result += <cflags>-Wenum-conversion ;
+        result += <cflags>-Wint-conversion ;
+        result += <cflags>-fdiagnostics-show-note-include-stack ;
+        result += <cflags>-fmacro-backtrace-limit=0 ;
         result += <cflags>-Werror=deprecated-objc-isa-usage ;
         result += <cflags>-Werror=objc-root-class ;
+        result += <cflags>-Wno-missing-prototypes ;
+        result += <cflags>-Wno-selector ;
+        result += <cflags>-Wno-strict-selector-match ;
+        result += <cflags>-Wprotocol ;
+        result += <cflags>-Wundeclared-selector ;
+    }
+    if <toolset>darwin in $(properties) || <toolset>clang in $(properties) {
+        result += <cflags>-fmessage-length=0 ;
+        result += <cflags>-fstrict-aliasing ;
+        result += <cflags>-Wdeprecated-declarations ;
+        result += <cflags>-Wempty-body ;
         result += <cflags>-Werror=return-type ;
-        result += <cflags>-Wint-conversion ;
         result += <cflags>-Winvalid-offsetof ;
         result += <cflags>-Wno-arc-repeated-use-of-weak ;
         result += <cflags>-Wno-c++11-extensions ;
@@ -32,29 +39,24 @@ rule clang-defaults ( properties * ) {
         result += <cflags>-Wno-implicit-atomic-properties ;
         result += <cflags>-Wno-missing-braces ;
         result += <cflags>-Wno-missing-field-initializers ;
-        result += <cflags>-Wno-missing-prototypes ;
         result += <cflags>-Wno-newline-eof ;
         result += <cflags>-Wno-non-virtual-dtor ;
         result += <cflags>-Wno-overloaded-virtual ;
         result += <cflags>-Wno-receiver-is-weak ;
-        result += <cflags>-Wno-selector ;
         result += <cflags>-Wno-shadow ;
         result += <cflags>-Wno-sign-conversion ;
-        result += <cflags>-Wno-strict-selector-match ;
         result += <cflags>-Wno-unknown-pragmas ;
         result += <cflags>-Wno-unused-label ;
         result += <cflags>-Wno-unused-local-typedef ;
         result += <cflags>-Wno-unused-parameter ;
         result += <cflags>-Wparentheses ;
-        result += <cflags>-Wprotocol ;
         result += <cflags>-Wswitch ;
-        result += <cflags>-Wundeclared-selector ;
         result += <cflags>-Wunreachable-code ;
         result += <cflags>-Wunused-function ;
         result += <cflags>-Wunused-value ;
         result += <cflags>-Wunused-variable ;
-        return $(result) ;
     }
+    return $(result) ;
 }
 
 alias project_defaults : : : :

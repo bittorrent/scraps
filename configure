@@ -24,8 +24,10 @@ def bootstrap_b2():
     os.chmod(b2, os.stat(b2).st_mode | stat.S_IEXEC)
 
 
-def generate_needs_jamfile():
-    subprocess.check_call([needy, 'generate', 'jamfile', '--satisfy-args="-j {}"'.format(multiprocessing.cpu_count())])
+def generate_needs_jamfile(args):
+    subprocess.check_call([needy, 'generate', 'jamfile', '--satisfy-args="{}"'.format(
+        ' '.join(['-j', str(multiprocessing.cpu_count()), '--android-toolchain='+args.android_toolchain])
+    )])
 
 
 def generate_project_config():
@@ -34,12 +36,13 @@ def generate_project_config():
 
 parser = argparse.ArgumentParser(description='Configures Scraps.')
 parser.add_argument('--bootstrap-b2', action='store_true', help='bootstrap b2')
+parser.add_argument('--android-toolchain', help='the android toolchain to use')
 args = parser.parse_args()
 
 if args.bootstrap_b2:
     bootstrap_b2()
 
-generate_needs_jamfile()
+generate_needs_jamfile(args)
 generate_project_config()
 
 print('Configuration complete. You may now build via ' + ('./b2' if args.bootstrap_b2 else 'b2') + '.')

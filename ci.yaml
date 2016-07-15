@@ -1,6 +1,6 @@
 script:
-    - ./configure --bootstrap-b2
-    - live b2-config --target={{ target }} >> project-config.jam
+    - ./configure --bootstrap-b2 --android-toolchain=$ANDROID_TOOLCHAIN
+    - live b2-config --target={{ target }} --android-toolchain=$ANDROID_TOOLCHAIN >> project-config.jam
     - ./b2 -d+2
     {% if target in ['macosx', 'linux'] %}
     - ./b2 tests//run
