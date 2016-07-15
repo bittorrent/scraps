@@ -1,4 +1,7 @@
 script:
+    {% if target == 'linux' %}
+    - export CXXFLAGS=-stdlib=libc++; export LDFLAGS=-stdlib=libc++;
+    {% endif %}
     - ./configure --bootstrap-b2 --android-toolchain=$ANDROID_TOOLCHAIN
     - live b2-config --target={{ target }} --android-toolchain=$ANDROID_TOOLCHAIN >> project-config.jam
     - ./b2 -d+2

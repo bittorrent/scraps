@@ -70,7 +70,6 @@ alias project_defaults : : : :
     <toolset>gcc:<cflags>-Wno-sign-compare
 
     <define>STATICLIB
-    <cflags>-U__STRICT_ANSI__
 ;
 
 alias objc : : : :
