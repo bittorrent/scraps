@@ -27,6 +27,11 @@ def bootstrap_b2():
 def generate_needs_jamfile():
     subprocess.check_call([needy, 'generate', 'jamfile', '--satisfy-args="-j {}"'.format(multiprocessing.cpu_count())])
 
+
+def generate_project_config():
+    with open('project-config.jam', 'w') as f:
+        f.write('PKG_CONFIG_PATH = "{}" ;\n'.format(os.environ['PKG_CONFIG_PATH'] if 'PKG_CONFIG_PATH' in os.environ else ''))
+
 parser = argparse.ArgumentParser(description='Configures Scraps.')
 parser.add_argument('--bootstrap-b2', action='store_true', help='bootstrap b2')
 args = parser.parse_args()
@@ -35,5 +40,6 @@ if args.bootstrap_b2:
     bootstrap_b2()
 
 generate_needs_jamfile()
+generate_project_config()
 
 print('Configuration complete. You may now build via ' + ('./b2' if args.bootstrap_b2 else 'b2') + '.')
