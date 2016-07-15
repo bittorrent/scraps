@@ -1,4 +1,4 @@
-actions:
+script:
     - ./configure --bootstrap-b2
     - live b2-config --target={{ target }} >> project-config.jam
     - ./b2 -d+2
