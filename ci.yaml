@@ -8,4 +8,4 @@ script:
     {% if target in ['macosx', 'linux'] %}
     - ./b2 tests//run
     {% endif %}
-    - live c++-analysis ./b2 --build-dir=./bin/analysis -a
+    - live c++-analysis ./b2 --build-dir=./bin/analysis

@@ -26,7 +26,7 @@ def bootstrap_b2():
 
 def generate_needs_jamfile(args):
     subprocess.check_call([needy, 'generate', 'jamfile', '--satisfy-args="{}"'.format(
-        ' '.join(['-j', str(multiprocessing.cpu_count()), '--android-toolchain='+args.android_toolchain])
+        ' '.join(['-j', str(multiprocessing.cpu_count())] + ['--android-toolchain='+args.android_toolchain] if args.android_toolchain else [])
     )])
 
 
