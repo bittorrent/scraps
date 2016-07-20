@@ -155,7 +155,7 @@ rule pkgconfig ( targets * : sources * : properties * ) {
 }
 actions pkgconfig {
 cat > $(<) <<- EOM
-prefix=$(PREFIX)
+prefix=\${pcfiledir}/../..
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${exec_prefix}/include
@@ -172,5 +172,19 @@ EOM
 
 install install-pkgconfig : scraps.pc : <location>$(PKG_CONFIG) ;
 
-alias install : install-lib install-pkgconfig ;
+alias install :
+    install-lib
+    install-pkgconfig
+    $(NEEDS_PATH)//install-openssl
+    $(NEEDS_PATH)//install-openssl
+    $(NEEDS_PATH)//install-curl
+    $(NEEDS_PATH)//install-fmtlib
+    $(NEEDS_PATH)//install-libsodium
+    $(NEEDS_PATH)//install-gsl
+    $(NEEDS_PATH)//install-boost
+    $(NEEDS_PATH)//install-boost
+    $(NEEDS_PATH)//install-boost
+    $(NEEDS_PATH)//install-mnmlstc
+;
+
 explicit install install-lib install-pkgconfig ;
