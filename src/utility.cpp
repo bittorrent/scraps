@@ -15,6 +15,10 @@
 #include <unistd.h>
 #endif
 
+#if __clang__ || __GNUC__
+#include <cxxabi.h>
+#endif
+
 #include <fcntl.h>
 
 namespace scraps {
@@ -248,6 +252,18 @@ bool SetBlocking(int fd, bool blocking) {
     }
     return !fcntl(fd, F_SETFL, blocking ? flags & ~O_NONBLOCK : flags | O_NONBLOCK);
 #endif
+}
+
+std::string Demangle(const char* mangled) {
+#if __clang__ || __GNUC__
+    struct FreeDeleter { void operator()(char* p) const { std::free(p); } };
+    int status = 0;
+    auto demangled = std::unique_ptr<char, FreeDeleter>{abi::__cxa_demangle(mangled, nullptr, nullptr, &status)};
+    if (status == 0) {
+        return demangled.get();
+    }
+#endif
+    return mangled;
 }
 
 } // namespace scraps

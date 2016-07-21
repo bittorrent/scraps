@@ -217,4 +217,10 @@ stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path);
 */
 bool SetBlocking(int fd, bool blocking = true);
 
+
+/**
+* Returns a demangled symbol name. If demangling is not supported, returns original mangled name.
+*/
+std::string Demangle(const char* name);
+
 } // namespace scraps
