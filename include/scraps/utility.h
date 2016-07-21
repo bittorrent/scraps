@@ -19,8 +19,12 @@ namespace scraps {
 
 namespace {
 
-constexpr uint64_t FNV1A64(const char* str, size_t length, uint64_t hash = 0xcbf29ce484222325) {
-    return length > 0 ? FNV1A64(str + 1, length - 1, (hash ^ (*str & 0xff)) * 0x100000001b3) : hash;
+constexpr uint64_t FNV1A64(const char* str, size_t length) {
+    uint64_t hash = 0xcbf29ce484222325;
+    for (; length > 0; ++str, --length) {
+        hash = (hash ^ (*str & 0xff)) * 0x100000001b3ull;
+    }
+    return hash;
 }
 
 inline namespace literals {
