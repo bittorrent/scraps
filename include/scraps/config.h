@@ -22,5 +22,9 @@
 #include "scraps/stdts/optional.h"
 
 namespace scraps {
+
+inline namespace literals {}
+
 using namespace std::literals;
+
 } // namespace scraps
