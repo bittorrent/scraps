@@ -2,52 +2,40 @@
 
 #include "scraps/config.h"
 
-#include <type_traits>
+#include "scraps/Endian.h"
 
 namespace scraps {
 
-template <typename T, bool little>
+#pragma pack(push, 1)
+
+template <typename T, Endian endian>
 class FixedEndian {
 public:
-    FixedEndian() {}
-    FixedEndian(const T& unfixed) : _fixed(_fix(unfixed)) {}
-    operator T() const { return _fix(_fixed); }
-
     static_assert(std::is_integral<T>::value, "FixedEndian can only be used for integers");
 
+    constexpr FixedEndian(T value = T{}) noexcept;
+    constexpr operator T() const noexcept;
+
 private:
-    T _fixed;
-
-    union EndiannessTest {
-        int32_t i;
-        char c[4];
-
-        EndiannessTest() : i(1) {}
-        bool isLittle() const { return c[0] != 0; }
-    };
-
-    static T _fix(const T& unfixed) {
-        EndiannessTest endianness;
-        if (endianness.isLittle() == little) {
-            return unfixed;
-        }
-
-        T ret;
-
-        char* src = (char*)&unfixed;
-        char* dst = (char*)&ret + sizeof(T) - 1;
-
-        for (size_t i = 0; i < sizeof(T); ++i, ++src, --dst) {
-            *dst = *src;
-        }
-
-        return ret;
-    }
+    T _value;
 };
 
-template <typename T>
-using LittleEndian = FixedEndian<T, true>;
+#pragma pack(pop)
+
+template <typename T, Endian endian>
+constexpr FixedEndian<T, endian>::FixedEndian(T value) noexcept
+    : _value{detail::MaybeByteSwap(value, std::integral_constant<bool, Endian::kNative != endian>{})}
+{}
+
+template <typename T, Endian endian>
+constexpr FixedEndian<T, endian>::operator T() const noexcept {
+    return detail::MaybeByteSwap(_value, std::integral_constant<bool, Endian::kNative != endian>{});
+}
 
 template <typename T>
-using BigEndian = FixedEndian<T, false>;
+using LittleEndian = FixedEndian<T, Endian::kLittle>;
+
+template <typename T>
+using BigEndian = FixedEndian<T, Endian::kBig>;
+
 } // namespace scraps
