@@ -3,6 +3,7 @@
 #include "scraps/chrono.h"
 #include "scraps/logging.h"
 #include "scraps/utility.h"
+#include "scraps/URL.h"
 #include "scraps/net/utility.h"
 
 #include <unistd.h>
@@ -118,7 +119,7 @@ int HTTPConnection::ParseRequest(const std::string& request, HTTPConnection::Req
             }
             // successfully read, fill in the rest of the field
             size_t q    = parsed->resource.find('?');
-            parsed->get = ParseQueryString(
+            parsed->get = URL::ParseQuery(
                 q == std::string::npos || q + 1 >= parsed->resource.size() ? "" : parsed->resource.substr(q + 1));
             parsed->path = q == std::string::npos ? parsed->resource : parsed->resource.substr(0, q);
             return 0;
@@ -172,36 +173,6 @@ int HTTPConnection::ParseRequest(const std::string& request, HTTPConnection::Req
     }
 
     return -1;
-}
-
-std::unordered_map<std::string, std::string> HTTPConnection::ParseQueryString(const std::string& queryString) {
-    std::unordered_map<std::string, std::string> ret;
-
-    size_t begin = 0;
-
-    while (begin < queryString.size()) {
-        size_t end = queryString.find('&', begin);
-
-        std::string assignment = queryString.substr(begin, end == std::string::npos ? end : end - begin);
-
-        if (!assignment.empty()) {
-            size_t equals = assignment.find('=');
-            if (equals == std::string::npos) {
-                ret[URLDecode(assignment)]; // create but don't assign
-            } else if (equals) {
-                ret[URLDecode(assignment.substr(0, equals))] =
-                    equals + 1 < assignment.size() ? URLDecode(assignment.substr(equals + 1)) : "";
-            }
-        }
-
-        if (end == std::string::npos) {
-            break;
-        }
-
-        begin = end + 1;
-    }
-
-    return ret;
 }
 
 }} // namespace scraps::net

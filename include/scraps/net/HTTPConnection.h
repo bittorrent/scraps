@@ -77,8 +77,6 @@ private:
     * @return 0 if the request was successfully parsed, -1 if the request is malformed, 1 if the request is incomplete
     */
     static int ParseRequest(const std::string& request, Request* parsed);
-
-    static std::unordered_map<std::string, std::string> ParseQueryString(const std::string& queryString);
 };
 
 }} // namespace scraps::net
