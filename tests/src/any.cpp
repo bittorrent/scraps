@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-using namespace scraps;
-
 TEST(any, basicOperation) {
     int i = 5;
     stdts::any a{i};
