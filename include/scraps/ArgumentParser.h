@@ -6,7 +6,7 @@ SCRAPS_IGNORE_WARNINGS_PUSH
 #include <boost/program_options.hpp>
 SCRAPS_IGNORE_WARNINGS_POP
 
-#include "scraps/stdts/optional.h"
+#include "stdts/optional.h"
 
 #include <unordered_map>
 

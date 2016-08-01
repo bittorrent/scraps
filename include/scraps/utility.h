@@ -6,6 +6,7 @@
 #include "scraps/Byte.h"
 #include "scraps/hex.h"
 #include "scraps/Temp.h"
+#include "stdts/optional.h"
 
 #include <gsl.h>
 

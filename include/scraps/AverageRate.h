@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scraps/config.h"
-#include "scraps/stdts/optional.h"
+#include "stdts/optional.h"
 
 #include <algorithm>
 #include <chrono>
