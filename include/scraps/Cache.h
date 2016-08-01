@@ -52,7 +52,7 @@ public:
             return it->second.entry;
         }
 
-        _removeExpired();
+        _removeUnreferenced();
 
         _entries[hash] = {entry, policy};
         return entry;
@@ -87,6 +87,14 @@ public:
     }
 
     /**
+    * Removed unreferenced cache entires with the kRemoveUnreferenced policy
+    */
+    void removeUnreferenced() {
+        std::lock_guard<std::mutex> l(_mutex);
+        _removeUnreferenced();
+    }
+
+    /**
     * Returns the number of entries currently in the cache.
     */
     size_t size() const {
@@ -100,7 +108,7 @@ private:
         Policy policy;
     };
 
-    void _removeExpired() {
+    void _removeUnreferenced() {
         for (auto it = _entries.begin(); it != _entries.end();) {
             if (it->second.entry.unique() && it->second.policy == kRemoveUnreferenced) {
                 it = _entries.erase(it);

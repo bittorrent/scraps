@@ -21,6 +21,13 @@ class UDPSocket : public UDPSender {
 public:
     using Protocol = Address::Protocol;
 
+    static constexpr size_t kEthernetMTU = 1500;
+    static constexpr size_t kIPv4HeaderSize = 20;
+    static constexpr size_t kIPv6HeaderSize = 40;
+    static constexpr size_t kUDPHeaderSize = 8;
+    static constexpr size_t kMaxIPv4UDPPayloadSize = kEthernetMTU - kIPv4HeaderSize - kUDPHeaderSize;
+    static constexpr size_t kMaxIPv6UDPPayloadSize = kEthernetMTU - kIPv6HeaderSize - kUDPHeaderSize;
+
     /**
     * Creates a new UDP socket.
     *

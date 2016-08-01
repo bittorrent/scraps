@@ -9,6 +9,13 @@
 namespace scraps {
 namespace net {
 
+constexpr size_t UDPSocket::kEthernetMTU;
+constexpr size_t UDPSocket::kIPv4HeaderSize;
+constexpr size_t UDPSocket::kIPv6HeaderSize;
+constexpr size_t UDPSocket::kUDPHeaderSize;
+constexpr size_t UDPSocket::kMaxIPv4UDPPayloadSize;
+constexpr size_t UDPSocket::kMaxIPv6UDPPayloadSize;
+
 UDPSocket::UDPSocket(Protocol protocol, std::weak_ptr<UDPReceiver> receiver)
     : _socket{::socket(protocol == Protocol::kIPv4 ? AF_INET : AF_INET6, SOCK_DGRAM, 0)}
     , _protocol{protocol}
@@ -95,10 +102,13 @@ bool UDPSocket::send(const Endpoint& destination, const void* data, size_t lengt
 
     if (sent < 0) {
         SCRAPS_LOG_ERROR("udp socket send error (errno = {})", static_cast<int>(errno));
+    } else if (sent != length) {
+        SCRAPS_LOG_WARNING("udp socket sent != length ({} != {})", sent, length);
     }
 
-    if (sent != length) {
-        SCRAPS_LOG_WARNING("udp socket sent != length ({} != {})", sent, length);
+    if ((destination.address().is_v4() && sent > kMaxIPv4UDPPayloadSize) ||
+        (destination.address().is_v6() && sent > kMaxIPv6UDPPayloadSize)) {
+        SCRAPS_LOG_WARNING("udp socket sent {} bytes, which is over the max udp payload size", sent);
     }
 
     _totalSentBytes += sent;
