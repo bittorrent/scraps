@@ -3,6 +3,16 @@
 {% else %}
 {% set common_cxx_flags = '-fvisibility=hidden -stdlib=libc++' %}
 {% endif %}
+
+{% if platform == 'ios' %}
+{% set xcrun_platform = 'iphoneos' %}
+{% elif platform == 'iossimulator' %}
+{% set xcrun_platform = 'iphonesimulator' %}
+{% elif platform == 'tvos' %}
+{% set xcrun_platform = 'appletvos' %}
+{% elif platform == 'tvossimulator' %}
+{% set xcrun_platform = 'appletvsimulator' %}
+{% endif %}
 libraries:
     boost:
         download: https://s3.amazonaws.com/live-dev-deps/boost_1_59_0.tar.bz2
@@ -49,22 +59,13 @@ libraries:
                 - sh ./Configure darwin64-x86_64-cc {{openssl_flags}}
                 {% elif platform == 'android' %}
                 - sh ./Configure android {{openssl_flags}}
-                {% elif platform == 'ios' %}
+                {% elif platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator'] %}
                 - sh ./Configure iphoneos-cross {{openssl_flags}}
-                {% set cross_args = 'CROSS_TOP=`xcode-select -p`/Platforms/iPhoneOS.platform/Developer CROSS_SDK=iPhoneOS.sdk' %}
-                {% elif platform == 'iossimulator' %}
-                - sh ./Configure iphoneos-cross  -D__STRICT_ANSI__=1 no-asm {{openssl_flags}}
-                {% set cross_args = 'CROSS_TOP=`xcode-select -p`/Platforms/iPhoneSimulator.platform/Developer CROSS_SDK=iPhoneSimulator.sdk' %}
-                {% elif platform == 'tvos' %}
-                - sh ./Configure iphoneos-cross  -DHAVE_FORK=0 {{openssl_flags}}
-                {% set cross_args = 'CROSS_TOP=`xcode-select -p`/Platforms/AppleTVOS.platform/Developer CROSS_SDK=AppleTVOS.sdk' %}
-                {% elif platform == 'tvossimulator' %}
-                - sh ./Configure iphoneos-cross  -D__STRICT_ANSI__=1 -DHAVE_FORK=0 no-asm {{openssl_flags}}
-                {% set cross_args = 'CROSS_TOP=`xcode-select -p`/Platforms/AppleTVSimulator.platform/Developer CROSS_SDK=AppleTVSimulator.sdk' %}
+                {% set cross_args = 'CROSS_TOP=$(xcrun --sdk ' + xcrun_platform + ' --show-sdk-platform-path)/Developer CROSS_SDK=$(basename $(xcrun --sdk ' + xcrun_platform + ' --show-sdk-path))' %}
                 {% elif platform == host_platform %}
                 - sh ./config {{openssl_flags}}
                 {% endif %}
-                - sh -c 'make depend {{cross_args}}'
+                - make depend
                 - sh -c 'make install {{cross_args}}'
             post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
     curl:
