@@ -55,13 +55,20 @@ libraries:
         project:
             build-steps:
                 {% set openssl_flags = ' --prefix={build_directory} no-weak-ssl-ciphers' %}
+                {% if platform in ['tvos', 'tvossimulator'] %}
+                {% set openssl_flags = openssl_flags ~ ' -DHAVE_FORK=0' %}
+                {% endif %}
+                {% if platform in ['iossimulator', 'tvossimulator'] %}
+                {% set openssl_flags = openssl_flags ~ ' -D__STRICT_ANSI__=1 no-asm' %}
+                {% endif %}
+
                 {% if platform == 'osx' %}
                 - sh ./Configure darwin64-x86_64-cc {{openssl_flags}}
                 {% elif platform == 'android' %}
                 - sh ./Configure android {{openssl_flags}}
                 {% elif platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator'] %}
+                {% set cross_args = 'CROSS_TOP=$(xcrun --sdk ' ~ xcrun_platform ~ ' --show-sdk-platform-path)/Developer CROSS_SDK=$(basename $(xcrun --sdk ' ~ xcrun_platform ~ ' --show-sdk-path))' %}
                 - sh ./Configure iphoneos-cross {{openssl_flags}}
-                {% set cross_args = 'CROSS_TOP=$(xcrun --sdk ' + xcrun_platform + ' --show-sdk-platform-path)/Developer CROSS_SDK=$(basename $(xcrun --sdk ' + xcrun_platform + ' --show-sdk-path))' %}
                 {% elif platform == host_platform %}
                 - sh ./config {{openssl_flags}}
                 {% endif %}
