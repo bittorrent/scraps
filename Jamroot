@@ -166,7 +166,7 @@ Description: Random scraps of C++
 Requires: libcurl, openssl, fmt, boost_program_options, boost_system, boost_filesystem, gsl, libsodium, mnmlstc
 Libs: -L\${libdir} -lscraps
 Libs.private: $(PRIVATE_LIBS)
-Cflags: -I\${includedir}
+Cflags: -I\${includedir} -fvisibility=hidden
 EOM
 }
 
@@ -176,13 +176,10 @@ alias install :
     install-lib
     install-pkgconfig
     $(NEEDS_PATH)//install-openssl
-    $(NEEDS_PATH)//install-openssl
     $(NEEDS_PATH)//install-curl
     $(NEEDS_PATH)//install-fmtlib
     $(NEEDS_PATH)//install-libsodium
     $(NEEDS_PATH)//install-gsl
-    $(NEEDS_PATH)//install-boost
-    $(NEEDS_PATH)//install-boost
     $(NEEDS_PATH)//install-boost
     $(NEEDS_PATH)//install-mnmlstc
 ;
