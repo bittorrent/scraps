@@ -115,28 +115,62 @@ inline void LogImpl(LogLevel level, std::chrono::system_clock::time_point time, 
 * Formats a log message and sends it to the current logger.
 */
 template <typename... Args>
-void Logf(LogLevel level, const char* file, unsigned int line, const char* format, Args&&... args) {
+void Log(LogLevel level, const char* file, unsigned int line, const char* format, Args&&... args) {
     if (level < _gLogLevel) { return; }
-    detail::LogImpl(level, std::chrono::system_clock::now(), file, line, Formatf(format, std::forward<Args>(args)...));
+    detail::LogImpl(level, std::chrono::system_clock::now(), file, line, Format(format, std::forward<Args>(args)...));
 }
 
 /**
 * Formats a log message and sends it to the current logger.
 */
 template <typename... Args>
-void Log(LogLevel level, const char* file, unsigned int line, const char* format, Args&&... args) {
+void Logf(LogLevel level, const char* file, unsigned int line, const char* format, Args&&... args) {
     if (level < _gLogLevel) { return; }
-    detail::LogImpl(level, std::chrono::system_clock::now(), file, line, Format(format, std::forward<Args>(args)...));
+    detail::LogImpl(level, std::chrono::system_clock::now(), file, line, Formatf(format, std::forward<Args>(args)...));
 }
 
-#define SCRAPS_LOG(LEVEL, ...)   scraps::Log(LEVEL, __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOG_DEBUG(...)    scraps::Log(scraps::LogLevel::kDebug,    __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOGF_DEBUG(...)   scraps::Logf(scraps::LogLevel::kDebug,   __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOG_INFO(...)     scraps::Log(scraps::LogLevel::kInfo,     __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOGF_INFO(...)    scraps::Logf(scraps::LogLevel::kInfo,    __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOG_WARNING(...)  scraps::Log(scraps::LogLevel::kWarning,  __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOGF_WARNING(...) scraps::Logf(scraps::LogLevel::kWarning, __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOG_ERROR(...)    scraps::Log(scraps::LogLevel::kError,    __FILE__, __LINE__, __VA_ARGS__)
-#define SCRAPS_LOGF_ERROR(...)   scraps::Logf(scraps::LogLevel::kError,   __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOG(LEVEL, ...)   ::scraps::Log(LEVEL,                         __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOGF(LEVEL, ...)  ::scraps::Logf(LEVEL,                        __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOG_DEBUG(...)    ::scraps::Log(::scraps::LogLevel::kDebug,    __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOGF_DEBUG(...)   ::scraps::Logf(::scraps::LogLevel::kDebug,   __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOG_INFO(...)     ::scraps::Log(::scraps::LogLevel::kInfo,     __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOGF_INFO(...)    ::scraps::Logf(::scraps::LogLevel::kInfo,    __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOG_WARNING(...)  ::scraps::Log(::scraps::LogLevel::kWarning,  __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOGF_WARNING(...) ::scraps::Logf(::scraps::LogLevel::kWarning, __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOG_ERROR(...)    ::scraps::Log(::scraps::LogLevel::kError,    __FILE__, __LINE__, __VA_ARGS__)
+#define SCRAPS_LOGF_ERROR(...)   ::scraps::Logf(::scraps::LogLevel::kError,   __FILE__, __LINE__, __VA_ARGS__)
+
+#define SCRAPS_LOG_RATE_LIMITED(LEVEL, INTERVAL, ...)                                  \
+    {                                                                                  \
+        if ((LEVEL) >= ::scraps::_gLogLevel) {                                         \
+            static ::std::atomic<::std::chrono::steady_clock::time_point> prev;        \
+            auto now = ::std::chrono::steady_clock::now();                             \
+            auto last = prev.load(::std::memory_order_acquire);                        \
+            if (now - last >= (INTERVAL) && prev.compare_exchange_strong(last, now)) { \
+                SCRAPS_LOG(LEVEL, __VA_ARGS__);                                        \
+            }                                                                          \
+        }                                                                              \
+    }
+
+#define SCRAPS_LOGF_RATE_LIMITED(LEVEL, INTERVAL, ...)                                 \
+    {                                                                                  \
+        if ((LEVEL) >= ::scraps::_gLogLevel) {                                         \
+            static ::std::atomic<::std::chrono::steady_clock::time_point> prev;        \
+            auto now = ::std::chrono::steady_clock::now();                             \
+            auto last = prev.load(::std::memory_order_acquire);                        \
+            if (now - last >= (INTERVAL) && prev.compare_exchange_strong(last, now)) { \
+                SCRAPS_LOGF(LEVEL, __VA_ARGS__);                                       \
+            }                                                                          \
+        }                                                                              \
+    }
+
+#define SCRAPS_LOG_RATE_LIMITED_DEBUG(INTERVAL, ...)    SCRAPS_LOG_RATE_LIMITED(::scraps::LogLevel::kDebug,    INTERVAL, __VA_ARGS__)
+#define SCRAPS_LOGF_RATE_LIMITED_DEBUG(INTERVAL, ...)   SCRAPS_LOGF_RATE_LIMITED(::scraps::LogLevel::kDebug,   INTERVAL, __VA_ARGS__)
+#define SCRAPS_LOG_RATE_LIMITED_INFO(INTERVAL, ...)     SCRAPS_LOG_RATE_LIMITED(::scraps::LogLevel::kInfo,     INTERVAL, __VA_ARGS__)
+#define SCRAPS_LOGF_RATE_LIMITED_INFO(INTERVAL, ...)    SCRAPS_LOGF_RATE_LIMITED(::scraps::LogLevel::kInfo,    INTERVAL, __VA_ARGS__)
+#define SCRAPS_LOG_RATE_LIMITED_WARNING(INTERVAL, ...)  SCRAPS_LOG_RATE_LIMITED(::scraps::LogLevel::kWarning,  INTERVAL, __VA_ARGS__)
+#define SCRAPS_LOGF_RATE_LIMITED_WARNING(INTERVAL, ...) SCRAPS_LOGF_RATE_LIMITED(::scraps::LogLevel::kWarning, INTERVAL, __VA_ARGS__)
+#define SCRAPS_LOG_RATE_LIMITED_ERROR(INTERVAL, ...)    SCRAPS_LOG_RATE_LIMITED(::scraps::LogLevel::kError,    INTERVAL, __VA_ARGS__)
+#define SCRAPS_LOGF_RATE_LIMITED_ERROR(INTERVAL, ...)   SCRAPS_LOGF_RATE_LIMITED(::scraps::LogLevel::kError,   INTERVAL, __VA_ARGS__)
 
 } // namespace scraps

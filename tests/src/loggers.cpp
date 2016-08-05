@@ -1,11 +1,15 @@
 #include "scraps/loggers.h"
 
+#include "scraps/Timer.h"
+
 #include <gtest/gtest.h>
 
-using namespace scraps;
+#include <mutex>
+
+using namespace std::literals;
 
 TEST(loggers, DefaultLogPath) {
-    const auto actual = FileLogger::DefaultLogPath("test");
+    const auto actual = scraps::FileLogger::DefaultLogPath("test");
 #if SCRAPS_MAC_OS_X
     EXPECT_NE(actual.find("/Library/Logs/test/"), std::string::npos);
 #elif SCRAPS_LINUX
@@ -15,27 +19,29 @@ TEST(loggers, DefaultLogPath) {
 #endif
 }
 
-class TestLogger : public Logger {
+class TestLogger : public scraps::Logger {
 public:
-    virtual void log(LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override {
-        log(level, Formatf("%s %s:%u %s", LogLevelString(level), file, line, message));
+    virtual void log(scraps::LogLevel level, std::chrono::system_clock::time_point time, const char* file, unsigned int line, const std::string& message) override {
+        log(level, scraps::Formatf("%s %s:%u %s", scraps::LogLevelString(level), file, line, message));
     }
 
-    virtual void log(LogLevel level, const std::string& message) override {
+    virtual void log(scraps::LogLevel level, const std::string& message) override {
+        std::lock_guard<std::mutex> l{mutex};
         messages.push_back(message);
     }
 
+    std::mutex mutex;
     std::vector<std::string> messages;
 };
 
 TEST(RateLimitedLogger, basicUsage){
     auto dest = std::make_shared<TestLogger>();
-    RateLimitedLogger logger{dest, 2, 2s, 1s};
+    scraps::RateLimitedLogger logger{dest, 2, 2s, 1s};
 
     auto start = std::chrono::steady_clock::now();
 
     while (std::chrono::steady_clock::now() < start + 5s) {
-        logger.log(LogLevel::kDebug, std::chrono::system_clock::now(), "foo.c", 1, "foo");
+        logger.log(scraps::LogLevel::kDebug, std::chrono::system_clock::now(), "foo.c", 1, "foo");
         std::this_thread::sleep_for(100ms); // ~10 per second
     }
 
@@ -48,7 +54,7 @@ TEST(RateLimitedLogger, basicUsage){
 
     std::this_thread::sleep_for(3s); // enough time to reset
 
-    logger.log(LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 1, "bar");
+    logger.log(scraps::LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 1, "bar");
 
     ASSERT_GT(dest->messages.size(), 0);
     EXPECT_EQ(dest->messages.back(), "DEBUG bar.c:1 bar"); // reset successful
@@ -58,7 +64,7 @@ TEST(RateLimitedLogger, basicUsage){
     auto start2 = std::chrono::steady_clock::now();
 
     while (std::chrono::steady_clock::now() < start2 + 6s) {
-        logger.log(LogLevel::kDebug, std::chrono::system_clock::now(), "foo.c", 1, "foo");
+        logger.log(scraps::LogLevel::kDebug, std::chrono::system_clock::now(), "foo.c", 1, "foo");
         std::this_thread::sleep_for(800ms); // <2 per second
     }
 
@@ -67,13 +73,13 @@ TEST(RateLimitedLogger, basicUsage){
 
 TEST(RateLimitedLogger, limitsLogMessagesByFileAndLine){
     auto dest = std::make_shared<TestLogger>();
-    RateLimitedLogger logger{dest, 2, 2s, 1s};
+    scraps::RateLimitedLogger logger{dest, 2, 2s, 1s};
 
     auto start = std::chrono::steady_clock::now();
 
     while (std::chrono::steady_clock::now() < start + 5s) {
-        logger.log(LogLevel::kInfo, std::chrono::system_clock::now(), "foo.c", 1, "foo");
-        logger.log(LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 1, "foo");
+        logger.log(scraps::LogLevel::kInfo, std::chrono::system_clock::now(), "foo.c", 1, "foo");
+        logger.log(scraps::LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 1, "foo");
         std::this_thread::sleep_for(100ms); // ~10 per second
     }
 
@@ -84,14 +90,14 @@ TEST(RateLimitedLogger, limitsLogMessagesByFileAndLine){
     // probably means that burst messages aren't working.
     EXPECT_NEAR(dest->messages.size(), 11 * 2, 3 * 2);
 
-    logger.log(LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 1, "bar");
-    logger.log(LogLevel::kWarning, std::chrono::system_clock::now(), "bar.c", 1, "bar");
-    logger.log(LogLevel::kError, std::chrono::system_clock::now(), "bar.c", 1, "bar");
-    logger.log(LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 1, "bar");
+    logger.log(scraps::LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 1, "bar");
+    logger.log(scraps::LogLevel::kWarning, std::chrono::system_clock::now(), "bar.c", 1, "bar");
+    logger.log(scraps::LogLevel::kError, std::chrono::system_clock::now(), "bar.c", 1, "bar");
+    logger.log(scraps::LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 1, "bar");
 
     std::this_thread::sleep_for(3s); // enough time to reset
 
-    logger.log(LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 1, "bar");
+    logger.log(scraps::LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 1, "bar");
 
     ASSERT_GT(dest->messages.size(), 0);
     EXPECT_EQ(dest->messages.back(), "INFO bar.c:1 bar"); // reset successful
@@ -100,12 +106,12 @@ TEST(RateLimitedLogger, limitsLogMessagesByFileAndLine){
 
     // overload messages from foo.c:1
     for (auto i = 0; i < 10; ++i) {
-        logger.log(LogLevel::kInfo, std::chrono::system_clock::now(), "foo.c", 1, "foo");
+        logger.log(scraps::LogLevel::kInfo, std::chrono::system_clock::now(), "foo.c", 1, "foo");
     }
 
     // calm pace for bar.c:1
     while (std::chrono::steady_clock::now() < start2 + 6s) {
-        logger.log(LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 2, "bar");
+        logger.log(scraps::LogLevel::kInfo, std::chrono::system_clock::now(), "bar.c", 2, "bar");
         EXPECT_EQ(dest->messages.back(), "INFO bar.c:2 bar"); // reset successful
         std::this_thread::sleep_for(800ms); // <2 per second
     }
@@ -113,11 +119,41 @@ TEST(RateLimitedLogger, limitsLogMessagesByFileAndLine){
 
 TEST(FilterLogger, basicUsage) {
     auto dest = std::make_shared<TestLogger>();
-    FilterLogger filter{dest, [](LogLevel level, auto...){ return level == LogLevel::kDebug; }};
+    scraps::FilterLogger filter{dest, [](scraps::LogLevel level, auto...){ return level == scraps::LogLevel::kDebug; }};
 
-    filter.log(LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 2, "bar");
+    filter.log(scraps::LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 2, "bar");
     EXPECT_EQ(dest->messages.size(), 1);
     EXPECT_EQ(dest->messages.back(), "DEBUG bar.c:2 bar");
-    filter.log(LogLevel::kError, std::chrono::system_clock::now(), "bar.c", 2, "bar");
+    filter.log(scraps::LogLevel::kError, std::chrono::system_clock::now(), "bar.c", 2, "bar");
     EXPECT_EQ(dest->messages.size(), 1);
+}
+
+TEST(LogRateLimitedMacros, basicUsage) {
+    auto testLogger = std::make_shared<TestLogger>();
+    SetLogger(testLogger);
+    SetLogLevel(scraps::LogLevel::kDebug);
+    auto threadFunc = []{
+        scraps::SteadyTimer timer;
+        timer.start();
+        while (timer.elapsed() < 2s) {
+            SCRAPS_LOG_RATE_LIMITED_DEBUG(200ms, "test message {}", 123);
+            SCRAPS_LOGF_RATE_LIMITED_DEBUG(200ms, "test message %d", 123);
+            SCRAPS_LOG_RATE_LIMITED_INFO(200ms, "test message {}", 123);
+            SCRAPS_LOGF_RATE_LIMITED_INFO(200ms, "test message %d", 123);
+            SCRAPS_LOG_RATE_LIMITED_WARNING(200ms, "test message {}", 123);
+            SCRAPS_LOGF_RATE_LIMITED_WARNING(200ms, "test message %d", 123);
+            SCRAPS_LOG_RATE_LIMITED_ERROR(200ms, "test message {}", 123);
+            SCRAPS_LOGF_RATE_LIMITED_ERROR(200ms, "test message %d", 123);
+        }
+    };
+
+    std::thread t1{threadFunc};
+    std::thread t2{threadFunc};
+    std::thread t3{threadFunc};
+
+    t1.join();
+    t2.join();
+    t3.join();
+
+    EXPECT_NEAR(testLogger->messages.size(), 80, 8);
 }
