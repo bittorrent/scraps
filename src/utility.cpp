@@ -20,6 +20,7 @@
 #endif
 
 #include <fcntl.h>
+#include <sys/sysctl.h>
 
 namespace scraps {
 
@@ -216,9 +217,15 @@ std::string GetPasswordFromStdin() {
 }
 
 size_t PhysicalMemory() {
+#if SCRAPS_MACOS
+    uint64_t mem = 0;
+    size_t len = sizeof(mem);
+    return sysctlbyname("hw.memsize", &mem, &len, NULL, 0) == 0 ? mem : 0;
+#else
     auto pages = sysconf(_SC_PHYS_PAGES);
     auto pageSize = sysconf(_SC_PAGE_SIZE);
     return (pages > 0 && pageSize > 0) ? pages * pageSize : 0;
+#endif
 }
 
 stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path) {

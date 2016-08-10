@@ -4,6 +4,10 @@
 
 #include <array>
 
+#if SCRAPS_MACOS
+#import <Foundation/NSProcessInfo.h>
+#endif
+
 using namespace scraps;
 
 static_assert("test"_fnv1a64 == 0xf9e6e6ef197c2b25ull, "fnv1a64 should produce reference hash");
@@ -157,8 +161,8 @@ TEST(utility, NRandomElements) {
 TEST(utility, ToBytes) {
     {
         std::string str{"AB"};
-        std::array<Byte, 1> expected = {{Byte{0xAB}}};
-        std::array<Byte, 1> actual{};
+        std::array<scraps::Byte, 1> expected = {{scraps::Byte{0xAB}}};
+        std::array<scraps::Byte, 1> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
         EXPECT_EQ(expected, actual);
@@ -166,8 +170,8 @@ TEST(utility, ToBytes) {
 
     {
         std::string str{"0xAB"};
-        std::array<Byte, 1> expected = {{Byte{0xAB}}};
-        std::array<Byte, 1> actual{};
+        std::array<scraps::Byte, 1> expected = {{scraps::Byte{0xAB}}};
+        std::array<scraps::Byte, 1> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
         EXPECT_EQ(expected, actual);
@@ -176,7 +180,7 @@ TEST(utility, ToBytes) {
     {
         // differing sizes
         std::string str{"ABCDEF"};
-        std::array<Byte, 2> actual{};
+        std::array<scraps::Byte, 2> actual{};
 
         EXPECT_FALSE(ToBytes(str, actual));
     }
@@ -184,7 +188,7 @@ TEST(utility, ToBytes) {
     {
         // invalid characters
         std::string str{"hello world!"};
-        std::array<Byte, 6> actual{};
+        std::array<scraps::Byte, 6> actual{};
 
         EXPECT_FALSE(ToBytes(str, actual));
     }
@@ -192,8 +196,8 @@ TEST(utility, ToBytes) {
     {
         // zero length
         std::string str{};
-        std::array<Byte, 0> expected{};
-        std::array<Byte, 0> actual{};
+        std::array<scraps::Byte, 0> expected{};
+        std::array<scraps::Byte, 0> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
         EXPECT_EQ(expected, actual);
@@ -201,8 +205,8 @@ TEST(utility, ToBytes) {
 }
 
 TEST(utility, ToHex) {
-    std::array<Byte, 8> bytes = {
-        {Byte{0x01}, Byte{0x23}, Byte{0x45}, Byte{0x67}, Byte{0x89}, Byte{0xAB}, Byte{0xCD}, Byte{0xEF}}};
+    std::array<scraps::Byte, 8> bytes = {
+        {scraps::Byte{0x01}, scraps::Byte{0x23}, scraps::Byte{0x45}, scraps::Byte{0x67}, scraps::Byte{0x89}, scraps::Byte{0xAB}, scraps::Byte{0xCD}, scraps::Byte{0xEF}}};
 
     EXPECT_EQ(ToHex(bytes), "0123456789abcdef");
 
@@ -215,14 +219,12 @@ TEST(utility, ToHex) {
     EXPECT_EQ(ToHex(gsl::as_span(dynDims, 3)), "0123456789abcdef01");
 }
 
-#if SCRAPS_OS_X
-#import <Foundation/NSProcessInfo.h>
-
 TEST(utility, PhysicalMemory) {
+#if SCRAPS_MACOS
     EXPECT_EQ(PhysicalMemory(), [NSProcessInfo processInfo].physicalMemory);
-}
-
 #endif
+    EXPECT_GT(PhysicalMemory(), 0);
+}
 
 TEST(utility, NonatomicIteration) {
     std::vector<int> numbers = {1, 2, 3, 4};

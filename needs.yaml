@@ -1,8 +1,4 @@
-{% if platform == 'android' %}
-{% set common_cxx_flags = '-fvisibility=hidden' %}
-{% else %}
-{% set common_cxx_flags = '-fvisibility=hidden -stdlib=libc++' %}
-{% endif %}
+{% set common_cxx_flags = '$CXXFLAGS -fvisibility=hidden' %}
 
 {% if platform == 'ios' %}
 {% set xcrun_platform = 'iphoneos' %}
@@ -80,13 +76,16 @@ libraries:
         checksum: 4dc36d2f3310585cc1f9211b5f5c71327c86fb61
         dependencies: openssl
         project:
+            environment:
+                # dl is required to link statically to openssl
+                LIBS: -ldl
             configure-args:
                 - --disable-ldap
                 - --without-libidn
                 - --without-librtmp
                 - --disable-ntlm-wb
                 - --disable-shared
-                - --with-ssl={build_directory}/../../../../openssl/build/{platform}/{architecture}
+                - --with-ssl={{ build_directory('openssl') }}
             post-build: xxd -i COPYING {build_directory}/include/curl/license.c
     gsl:
         repository: git@github.com:Microsoft/GSL.git
