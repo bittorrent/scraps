@@ -20,7 +20,11 @@
 #endif
 
 #include <fcntl.h>
+
+#if SCRAPS_MACOS
+// for sysctlbyname
 #include <sys/sysctl.h>
+#endif
 
 namespace scraps {
 
