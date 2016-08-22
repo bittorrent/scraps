@@ -4,10 +4,9 @@
 
 #include "scraps/Temp.h"
 #include "scraps/type-traits.h"
+#include "scraps/utility.h"
 
 SCRAPS_IGNORE_WARNINGS_PUSH
-#include <boost/functional/hash.hpp>
-
 #include <gsl.h>
 SCRAPS_IGNORE_WARNINGS_POP
 
@@ -54,7 +53,7 @@ using CArray = typename RemoveCVRType<ArrayT>::value_type[std::tuple_size<Remove
 struct ArrayHasher {
     template <typename T, size_t N>
     size_t operator()(const std::array<T, N>& arr) const {
-        return boost::hash_range(arr.begin(), arr.end());
+        return HashRange(arr.begin(), arr.end());
     }
 };
 

@@ -81,20 +81,34 @@ alias objc : : : :
     <target-os>appletv:<cflags>-fobjc-arc
 ;
 
-lib ssl       : $(NEEDS_PATH)//openssl : <name>ssl ;
-lib crypto    : $(NEEDS_PATH)//openssl : <name>crypto ;
-alias openssl : ssl crypto ;
+local PKG_CONFIG_PATH = [ modules.peek project-config : PKG_CONFIG_PATH ] ;
+local PKG_CONFIG_DEPENDENCIES = [ modules.peek project-config : PKG_CONFIG_DEPENDENCIES ] ;
+local OWNED_DEPENDENCIES = [ modules.peek project-config : OWNED_DEPENDENCIES ] ;
 
-lib curl   : $(NEEDS_PATH)//curl : <name>curl ;
-lib fmt    : $(NEEDS_PATH)//fmtlib : <name>fmt ;
-lib sodium : $(NEEDS_PATH)//libsodium : <name>sodium ;
-alias gsl  : $(NEEDS_PATH)//gsl ;
+rule dep ( name : packages * ) {
+    if ! $(packages) {
+        packages = $(name) ;
+    }
+    if $(packages) in $(PKG_CONFIG_DEPENDENCIES) {
+        local cflags = [ SHELL "PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(packages:J= ) --cflags | tr -d '\n'" ] ;
+        local ldflags = [ SHELL "PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(packages:J= ) --libs --static | tr -d '\n'" ] ;
+        alias $(name) : : : : <cflags>$(cflags) <linkflags>$(ldflags) ;
+    }
+    if $(packages) in $(OWNED_DEPENDENCIES) {
+        alias install-$(name)-if-owned : $(NEEDS_PATH)//install-$(name) ;
+    } else {
+        alias install-$(name)-if-owned ;
+    }
+    explicit install-$(name)-if-owned ;
+}
 
-lib boost_system          : $(NEEDS_PATH)//boost : <name>boost_system ;
-lib boost_filesystem      : $(NEEDS_PATH)//boost : <name>boost_filesystem ;
-lib boost_program_options : $(NEEDS_PATH)//boost : <name>boost_program_options ;
-
-alias mnmlstc : $(NEEDS_PATH)//mnmlstc ;
+dep openssl : libssl libcrypto ;
+dep curl : libcurl ;
+dep fmtlib ;
+dep libsodium ;
+dep gsl ;
+dep asio ;
+dep mnmlstc ;
 
 lib GLESv2 : : <link>shared ;
 lib z : : <link>shared ;
@@ -104,18 +118,17 @@ lib pthread : : <link>shared ;
 alias scraps_deps :
     openssl
     curl
-    fmt
-    sodium
+    fmtlib
+    libsodium
     gsl
-    boost_system
-    boost_filesystem
-    boost_program_options
+    asio
     mnmlstc
     project_defaults
     objc
 : : :
     <include>include
     <cxxflags>"-std=c++1y -fvisibility=hidden"
+    <define>ASIO_STANDALONE=1
 
     <target-os>darwin:<framework>Foundation
     <target-os>darwin:<framework>CoreServices
@@ -163,10 +176,10 @@ includedir=\${exec_prefix}/include
 Name: scraps
 Version: 0
 Description: Random scraps of C++
-Requires: libcurl, openssl, fmt, boost_program_options, boost_system, boost_filesystem, gsl, libsodium, mnmlstc
+Requires: libcurl, openssl, fmt, asio, gsl, libsodium, mnmlstc
 Libs: -L\${libdir} -lscraps
 Libs.private: $(PRIVATE_LIBS)
-Cflags: -I\${includedir} -fvisibility=hidden
+Cflags: -I\${includedir} -DASIO_STANDALONE=1 -fvisibility=hidden
 EOM
 }
 
@@ -175,13 +188,13 @@ install install-pkgconfig : scraps.pc : <location>$(PKG_CONFIG) ;
 alias install :
     install-lib
     install-pkgconfig
-    $(NEEDS_PATH)//install-openssl
-    $(NEEDS_PATH)//install-curl
-    $(NEEDS_PATH)//install-fmtlib
-    $(NEEDS_PATH)//install-libsodium
-    $(NEEDS_PATH)//install-gsl
-    $(NEEDS_PATH)//install-boost
-    $(NEEDS_PATH)//install-mnmlstc
+    install-openssl-if-owned
+    install-curl-if-owned
+    install-fmt-if-owned
+    install-sodium-if-owned
+    install-gsl-if-owned
+    install-asio-if-owned
+    install-mnmlstc-if-owned
 ;
 
 explicit install install-lib install-pkgconfig ;

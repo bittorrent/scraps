@@ -3,8 +3,8 @@
 namespace scraps {
 
 namespace {
-    namespace boost {
-        #include <boost/license.c>
+    namespace asio {
+        #include <asio/license.c>
     }
     namespace sodium {
         #include <sodium/license.c>
@@ -28,7 +28,7 @@ namespace {
 
 std::unordered_map<std::string, std::string> ThirdPartyLicenses() {
     static std::unordered_map<std::string, std::string> ret{{
-        {"boost", {reinterpret_cast<char*>(boost::LICENSE_1_0_txt), boost::LICENSE_1_0_txt_len}},
+        {"asio", {reinterpret_cast<char*>(asio::asio_LICENSE_1_0_txt), asio::asio_LICENSE_1_0_txt_len}},
         {"sodium", {reinterpret_cast<char*>(sodium::LICENSE), sodium::LICENSE_len}},
         {"openssl", {reinterpret_cast<char*>(openssl::LICENSE), openssl::LICENSE_len}},
         {"curl", {reinterpret_cast<char*>(curl::COPYING), curl::COPYING_len}},

@@ -11,6 +11,7 @@
 #include <gsl.h>
 
 #include <cerrno>
+#include <functional>
 #include <vector>
 #include <iterator>
 #include <random>
@@ -218,10 +219,30 @@ stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path);
 */
 bool SetBlocking(int fd, bool blocking = true);
 
-
 /**
 * Returns a demangled symbol name. If demangling is not supported, returns original mangled name.
 */
 std::string Demangle(const char* name);
+
+/**
+* Combines hashes. Implementation is effectively that of boost::hash_combine.
+*/
+template <class T>
+inline void CombineHash(std::size_t& seed, const T& v) {
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+/**
+* Hashes a range of elements.
+*/
+template <typename It>
+inline std::size_t HashRange(It begin, It end) {
+    std::size_t seed = 0;
+    for (; begin != end; ++begin) {
+        CombineHash(seed, *begin);
+    }
+    return seed;
+}
 
 } // namespace scraps

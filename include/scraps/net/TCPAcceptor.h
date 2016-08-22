@@ -11,11 +11,8 @@
 #include <unistd.h>
 
 SCRAPS_IGNORE_WARNINGS_PUSH
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/placeholders.hpp>
-
-#include <boost/bind.hpp>
+#include <asio/ip/tcp.hpp>
+#include <asio/io_service.hpp>
 SCRAPS_IGNORE_WARNINGS_POP
 
 #include <condition_variable>
@@ -54,23 +51,23 @@ public:
         _isCancelled = false;
 
         try {
-            _acceptor.open(address.is_v6() ? boost::asio::ip::tcp::v6() : boost::asio::ip::tcp::v4());
-            _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
-            _acceptor.bind(boost::asio::ip::tcp::endpoint(address, port));
+            _acceptor.open(address.is_v6() ? asio::ip::tcp::v6() : asio::ip::tcp::v4());
+            _acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+            _acceptor.bind(asio::ip::tcp::endpoint(address, port));
             _acceptor.listen();
         } catch (std::exception& e) {
             SCRAPS_LOGF_ERROR("exception opening tcp server acceptor: %s", e.what());
             return false;
         }
 
-        _work = std::make_unique<boost::asio::io_service::work>(_service);
+        _work = std::make_unique<asio::io_service::work>(_service);
 
         _serviceThread = std::thread([&] {
             SCRAPS_LOGF_INFO("starting tcp server worker thread");
             while (!_isCancelled) {
                 try {
                     // TODO: this should just be `_service.run()`, but that currently breaks android compilation
-                    const_cast<boost::asio::io_service&>(_service).run();
+                    const_cast<asio::io_service&>(_service).run();
                     break;
                 } catch (std::exception& e) {
                     SCRAPS_LOGF_ERROR("exception in tcp server worker thread: %s", e.what());
@@ -97,7 +94,7 @@ public:
         });
 
         _acceptor.async_accept(
-            _socket, boost::bind(ArgsHelper<sizeof...(Args)>::AcceptHandler(), this, boost::asio::placeholders::error));
+            _socket, std::bind(ArgsHelper<sizeof...(Args)>::AcceptHandler(), this, std::placeholders::_1));
 
         return true;
     }
@@ -134,12 +131,12 @@ private:
 
     std::tuple<Args...> _args;
 
-    boost::asio::io_service _service;
-    std::unique_ptr<boost::asio::io_service::work> _work;
+    asio::io_service _service;
+    std::unique_ptr<asio::io_service::work> _work;
     std::thread _serviceThread;
 
-    boost::asio::ip::tcp::acceptor _acceptor;
-    boost::asio::ip::tcp::socket _socket;
+    asio::ip::tcp::acceptor _acceptor;
+    asio::ip::tcp::socket _socket;
 
     struct Connection {
         ~Connection() {
@@ -165,7 +162,7 @@ private:
 
     template <int... S>
     struct ArgsHelper<0, S...> {
-        typedef void (TCPAcceptor::*AcceptHandlerPointer)(const boost::system::error_code&);
+        typedef void (TCPAcceptor::*AcceptHandlerPointer)(const asio::error_code&);
         static constexpr AcceptHandlerPointer AcceptHandler() { return &TCPAcceptor::_acceptHandler<S...>; }
     };
 
@@ -193,9 +190,9 @@ private:
     }
 
     template <int... ArgIndices>
-    void _acceptHandler(const boost::system::error_code& error) {
+    void _acceptHandler(const asio::error_code& error) {
         if (error) {
-            if (error != boost::asio::error::operation_aborted) {
+            if (error != asio::error::operation_aborted) {
                 SCRAPS_LOGF_ERROR("tcp server error: %s", error.message().c_str());
             }
             return;
@@ -240,7 +237,7 @@ private:
         std::lock_guard<std::mutex> lock{_mutex};
         _connections.emplace(connectionClass.get(), connection);
         _acceptor.async_accept(
-            _socket, boost::bind(&TCPAcceptor::_acceptHandler<ArgIndices...>, this, boost::asio::placeholders::error));
+            _socket, std::bind(&TCPAcceptor::_acceptHandler<ArgIndices...>, this, std::placeholders::_1));
     }
 };
 

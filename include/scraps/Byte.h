@@ -89,7 +89,6 @@ protected:
 
 static_assert(std::is_pod<GenericByte>::value, "GenericByte must be a pod type.");
 
-// for boost::hash
 inline std::size_t hash_value(const Byte& b) {
     return b.value();
 }

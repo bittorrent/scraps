@@ -10,18 +10,12 @@
 {% set xcrun_platform = 'appletvsimulator' %}
 {% endif %}
 libraries:
-    boost:
-        download: https://s3.amazonaws.com/live-dev-deps/boost_1_59_0.tar.bz2
-        checksum: b94de47108b2cdb0f931833a7a9834c2dd3ca46e
+    asio:
+        repository: git@github.com:chriskohlhoff/asio.git
+        commit: asio-1-10-6
         project:
-            pre-build: PATH=$HOST_PATH CC=clang ./bootstrap.sh
-            b2-args:
-                - --with-system
-                - --with-program_options
-                - --with-filesystem
-                - link=static
-                - cxxflags={{common_cxx_flags}}
-            post-build: xxd -i LICENSE_1_0.txt {build_directory}/include/boost/license.c
+            header-directory: asio/include
+            post-build: xxd -i asio/LICENSE_1_0.txt {build_directory}/include/asio/license.c
     boost-build:
         download: https://github.com/boostorg/build/archive/2016.03.tar.gz
         checksum: 0e6936337c25fc87d2aff8ea6c63019e9c1e319a
@@ -47,7 +41,7 @@ libraries:
             post-build: xxd -i LICENSE {build_directory}/include/sodium/license.c
     openssl:
         repository: git@github.com:openssl/openssl.git
-        commit: OpenSSL_1_0_1p
+        commit: OpenSSL_1_0_1t
         project:
             build-steps:
                 {% set openssl_flags = ' --prefix={build_directory} no-weak-ssl-ciphers' %}
@@ -69,7 +63,8 @@ libraries:
                 - sh ./config {{openssl_flags}}
                 {% endif %}
                 - make depend
-                - sh -c 'make install {{cross_args}}'
+                - sh -c 'make build_libs {{cross_args}} -j{{ parameters.concurrency if parameters.concurrency else '' }}'
+                - sh -c 'make install_sw DIRS="crypto ssl engines"'
             post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
     curl:
         download: http://curl.haxx.se/download/curl-7.44.0.tar.gz
@@ -86,6 +81,18 @@ libraries:
                 - --disable-ntlm-wb
                 - --disable-shared
                 - --with-ssl={{ build_directory('openssl') }}
+                - --enable-optimize
+                - --disable-dependency-tracking
+                - --disable-imap
+                - --disable-smtp
+                - --disable-pop3
+                - --disable-telnet
+                - --disable-rtsp
+                - --disable-ldap
+                - --disable-ldaps
+                - --disable-proxy
+                - --disable-smb
+                - --disable-gopher
             post-build: xxd -i COPYING {build_directory}/include/curl/license.c
     gsl:
         repository: git@github.com:Microsoft/GSL.git

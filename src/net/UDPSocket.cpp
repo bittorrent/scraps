@@ -143,10 +143,10 @@ void UDPSocket::receive() {
 
         if (senderStorage.ss_family == AF_INET && senderStorageLength == sizeof(sockaddr_in)) {
             auto sa = reinterpret_cast<sockaddr_in*>(&senderStorage);
-            sender = Endpoint(boost::asio::ip::address_v4(*reinterpret_cast<boost::asio::ip::address_v4::bytes_type*>(&sa->sin_addr)), ntohs(sa->sin_port));
+            sender = Endpoint(asio::ip::address_v4(*reinterpret_cast<asio::ip::address_v4::bytes_type*>(&sa->sin_addr)), ntohs(sa->sin_port));
         } else if (senderStorage.ss_family == AF_INET6 && senderStorageLength == sizeof(sockaddr_in6)) {
             auto sa = reinterpret_cast<sockaddr_in6*>(&senderStorage);
-            sender = Endpoint(boost::asio::ip::address_v6(*reinterpret_cast<boost::asio::ip::address_v6::bytes_type*>(&sa->sin6_addr), ntohl(sa->sin6_scope_id)), ntohs(sa->sin6_port));
+            sender = Endpoint(asio::ip::address_v6(*reinterpret_cast<asio::ip::address_v6::bytes_type*>(&sa->sin6_addr), ntohl(sa->sin6_scope_id)), ntohs(sa->sin6_port));
         } else {
             SCRAPS_ASSERT(false);
         }

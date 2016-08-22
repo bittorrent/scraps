@@ -1,24 +1,12 @@
 .DS_Store
-.needy_lock
+
 bin
-dist
-needs
-b2
+/bootstrap
+/dist
+/needs
+/b2
+/project-config.jam
 
 # doxygen
 /docs
 /doxygen-warnings.log
-
-*.xcworkspace
-xcuserdata/
-
-# ci-tacklebox
-.arcconfig
-.configure/
-/build
-configure.tackle
-dependencies
-project-config.jam
-test-reports
-tests/scraps-tests.xcconfig
-scraps.xcconfig

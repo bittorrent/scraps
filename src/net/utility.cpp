@@ -42,19 +42,19 @@ bool IsLocal(const Address& address) {
     auto addr = address.to_v4().to_ulong();
 
     //               127.0.0.1                             10.x.x.x                          192.168.x.x
-    //               172.16.0.0   ->   172.31.255.255
     return (addr == 0x7f000001 || (addr & 0xff000000) == 0x0a000000 || (addr & 0xffff0000) == 0xc0a80000 ||
+    //               172.16.0.0   ->   172.31.255.255
             (addr >= 0xac100000 && addr <= 0xac1fffff));
 }
 
 std::vector<Address> Resolve(const std::string& host) {
-    boost::asio::io_service service;
-    boost::asio::ip::udp::resolver resolver(service);
-    boost::asio::ip::udp::resolver::query query(host, "");
+    asio::io_service service;
+    asio::ip::udp::resolver resolver(service);
+    asio::ip::udp::resolver::query query(host, "");
 
     std::vector<Address> ret;
-    boost::system::error_code ec;
-    for (auto it = resolver.resolve(query, ec); !ec && it != boost::asio::ip::udp::resolver::iterator(); ++it) {
+    asio::error_code ec;
+    for (auto it = resolver.resolve(query, ec); !ec && it != asio::ip::udp::resolver::iterator(); ++it) {
         ret.emplace_back(it->endpoint().address());
     }
 
@@ -91,11 +91,11 @@ stdts::optional<Endpoint> ResolveRandomIPv4Endpoint(const std::string& hostPortP
 }
 
 Address DefaultInterface(bool ipv6) {
-    boost::asio::io_service service;
+    asio::io_service service;
     auto thread = std::thread([&] { service.run(); });
     Address localAddress;
     try {
-        boost::asio::ip::udp::socket testSocket(service);
+        asio::ip::udp::socket testSocket(service);
         testSocket.connect(Endpoint(Address::from_string(ipv6 ? "2001:4860:4860::8888" : "8.8.8.8"), 9));
         localAddress = testSocket.local_endpoint().address();
     } catch (...) {

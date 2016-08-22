@@ -1,9 +1,7 @@
 #pragma once
 #include "scraps/config.h"
 
-SCRAPS_IGNORE_WARNINGS_PUSH
-#include <boost/functional/hash.hpp>
-SCRAPS_IGNORE_WARNINGS_POP
+#include "scraps/utility.h"
 
 #include <ostream>
 
@@ -66,7 +64,7 @@ template <int N>
 struct hash<scraps::ByteArray<N>> {
     size_t operator()(const scraps::ByteArray<N>& array) const {
         auto data = (unsigned char*)&array;
-        return boost::hash_range(data, data + sizeof(array));
+        return scraps::HashRange(data, data + sizeof(array));
     }
 };
 } // namespace std

@@ -1,10 +1,7 @@
 #include "scraps/logging.h"
 
+#include "scraps/filesystem.h"
 #include "scraps/loggers.h"
-
-SCRAPS_IGNORE_WARNINGS_PUSH
-#include <boost/filesystem.hpp>
-SCRAPS_IGNORE_WARNINGS_POP
 
 #if SCRAPS_APPLE
 #import <Foundation/Foundation.h>
@@ -20,9 +17,11 @@ std::shared_ptr<Logger> CreateDefaultFileLogger(const std::string& appName, size
 #if SCRAPS_APPLE || SCRAPS_LINUX || SCRAPS_WINDOWS
     SCRAPS_ASSERT(!appName.empty());
     std::string logPath = FileLogger::DefaultLogPath(appName);
-    boost::system::error_code error;
-    boost::filesystem::create_directories(logPath, error);
-    if (boost::filesystem::exists(logPath)) {
+    CreateDirectory(logPath, true);
+    if (IsDirectory(logPath)) {
+        if (logPath.back() != '/') {
+            logPath += '/';
+        }
         logPath += appName + ".log";
         return std::make_shared<FileLogger>(logPath.c_str(), rotateSize, maxFiles);
     }

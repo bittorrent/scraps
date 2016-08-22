@@ -59,12 +59,12 @@ TEST(HTTPConnection, timeout) {
     ASSERT_TRUE(httpServer->start(Address::from_string(host), httpPort));
 
     {
-        boost::asio::io_service service;
+        asio::io_service service;
 
-        boost::asio::ip::tcp::endpoint endpoint(Address::from_string(host), httpPort);
+        asio::ip::tcp::endpoint endpoint(Address::from_string(host), httpPort);
 
-        boost::asio::ip::tcp::socket socket(service);
-        socket.open(boost::asio::ip::tcp::v4());
+        asio::ip::tcp::socket socket(service);
+        socket.open(asio::ip::tcp::v4());
         socket.connect(endpoint);
 
         // don't send anything to simulate a timeout
@@ -85,12 +85,12 @@ TEST(HTTPConnection, abort) {
     ASSERT_TRUE(httpServer->start(Address::from_string(host), httpPort));
 
     {
-        boost::asio::io_service service;
+        asio::io_service service;
 
-        boost::asio::ip::tcp::endpoint endpoint(Address::from_string(host), httpPort);
+        asio::ip::tcp::endpoint endpoint(Address::from_string(host), httpPort);
 
-        boost::asio::ip::tcp::socket socket(service);
-        socket.open(boost::asio::ip::tcp::v4());
+        asio::ip::tcp::socket socket(service);
+        socket.open(asio::ip::tcp::v4());
         socket.connect(endpoint);
 
         std::this_thread::sleep_for(200ms);

@@ -1,16 +1,16 @@
 #pragma once
 
 #include "scraps/config.h"
+#include "scraps/utility.h"
 
 SCRAPS_IGNORE_WARNINGS_PUSH
-#include <boost/asio/ip/udp.hpp>
-#include <boost/functional/hash.hpp>
+#include <asio/ip/udp.hpp>
 SCRAPS_IGNORE_WARNINGS_POP
 
 namespace scraps {
 namespace net {
 
-class Address : public boost::asio::ip::address {
+class Address : public asio::ip::address {
 public:
     enum class Protocol {
         kIPv4,
@@ -18,7 +18,7 @@ public:
     };
 
     template <typename... Args>
-    Address(Args&&... args) : boost::asio::ip::address(std::forward<Args>(args)...) {}
+    Address(Args&&... args) : asio::ip::address(std::forward<Args>(args)...) {}
 
     Protocol protocol() const { return is_v4() ? Protocol::kIPv4 : Protocol::kIPv6; }
 };
@@ -31,7 +31,7 @@ template <>
 struct hash<scraps::net::Address> {
     size_t operator()(const scraps::net::Address& address) const {
         auto data = (unsigned char*)&address;
-        return boost::hash_range(data, data + sizeof(address));
+        return scraps::HashRange(data, data + sizeof(address));
     }
 };
 
