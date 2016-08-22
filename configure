@@ -2,10 +2,8 @@
 
 import argparse
 import logging
-import multiprocessing
 import os
 import subprocess
-import sys
 import textwrap
 
 project_root = os.path.dirname(os.path.abspath(__file__))
