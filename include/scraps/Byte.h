@@ -89,10 +89,6 @@ protected:
 
 static_assert(std::is_pod<GenericByte>::value, "GenericByte must be a pod type.");
 
-inline std::size_t hash_value(const Byte& b) {
-    return b.value();
-}
-
 namespace detail {
 
 /**
@@ -189,6 +185,13 @@ namespace std {
     template <>
     struct hash<scraps::Byte> {
         constexpr size_t operator()(const scraps::Byte& byte) const {
+            return byte.value();
+        }
+    };
+
+    template <typename Tag>
+    struct hash<scraps::StrongByte<Tag>> {
+        constexpr size_t operator()(const scraps::StrongByte<Tag>& byte) const {
             return byte.value();
         }
     };
