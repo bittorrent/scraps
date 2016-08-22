@@ -25,6 +25,11 @@ bool RemoveDirectory(const std::string& path);
 bool IsDirectory(const std::string& path);
 
 /**
+* @return true if the given path exists and could be opened
+*/
+bool IterateDirectory(const std::string& path, const std::function<void(const char* name, bool isFile, bool isDirectory)>& callback);
+
+/**
 * Returns the parent directory of a path. This is a simple string operation, and functions similarly
 * to Python's os.path.dirname.
 *

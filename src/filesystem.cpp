@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -27,6 +28,16 @@ bool IsDirectory(const std::string& path) {
     struct stat info;
     if (stat(path.c_str(), &info)) { return false; }
     return S_ISDIR(info.st_mode);
+}
+
+bool IterateDirectory(const std::string& path, const std::function<void(const char* name, bool isFile, bool isDirectory)>& callback) {
+    auto dir = opendir(path.c_str());
+    if (!dir) { return false; }
+    while (auto entry = readdir(dir)) {
+        callback(entry->d_name, entry->d_type & DT_REG, entry->d_type & DT_DIR);
+    }
+    closedir(dir);
+    return true;
 }
 
 stdts::optional<std::string> ParentDirectory(const std::string& path) {

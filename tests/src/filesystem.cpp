@@ -19,7 +19,16 @@ TEST(filesystem, creatingAndRemoving) {
     }
     EXPECT_FALSE(IsDirectory(path));
     EXPECT_TRUE(CreateDirectory(path + "/sub", true));
+    bool iterated = false;
     EXPECT_TRUE(IsDirectory(path + "/sub"));
+    EXPECT_TRUE(IterateDirectory(path, [&](const char* name, bool isFile, bool isDirectory) {
+        if (name[0] == '.') { return; }
+        EXPECT_FALSE(isFile);
+        EXPECT_TRUE(isDirectory);
+        EXPECT_EQ(name, "sub"s);
+        iterated = true;
+    }));
+    EXPECT_TRUE(iterated);
     EXPECT_TRUE(RemoveDirectory(path + "/sub"));
     EXPECT_TRUE(RemoveDirectory(path));
     EXPECT_FALSE(IsDirectory(path));
