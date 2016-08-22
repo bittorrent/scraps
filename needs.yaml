@@ -131,21 +131,3 @@ libraries:
         project:
             header-directory: include
 
-universal-binaries:
-    macosx:
-        osx:
-            - x86_64
-    iphoneos:
-        ios:
-            - armv7
-            - arm64
-    iphonesimulator:
-        iossimulator:
-            - i386
-            - x86_64
-    appletvos:
-        tvos:
-            - arm64
-    appletvsimulator:
-        tvossimulator:
-            - x86_64

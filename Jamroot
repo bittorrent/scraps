@@ -190,8 +190,8 @@ alias install :
     install-pkgconfig
     install-openssl-if-owned
     install-curl-if-owned
-    install-fmt-if-owned
-    install-sodium-if-owned
+    install-fmtlib-if-owned
+    install-libsodium-if-owned
     install-gsl-if-owned
     install-asio-if-owned
     install-mnmlstc-if-owned
