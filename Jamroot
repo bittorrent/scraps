@@ -1,7 +1,5 @@
 project scraps ;
 
-path-constant NEEDS_PATH : needs ;
-
 rule clang-defaults ( properties * ) {
     local result ;
     if <toolset>darwin in $(properties) {
@@ -81,34 +79,14 @@ alias objc : : : :
     <target-os>appletv:<cflags>-fobjc-arc
 ;
 
-local PKG_CONFIG_PATH = [ modules.peek project-config : PKG_CONFIG_PATH ] ;
-local PKG_CONFIG_DEPENDENCIES = [ modules.peek project-config : PKG_CONFIG_DEPENDENCIES ] ;
-local OWNED_DEPENDENCIES = [ modules.peek project-config : OWNED_DEPENDENCIES ] ;
-
-rule dep ( name : packages * ) {
-    if ! $(packages) {
-        packages = $(name) ;
-    }
-    if $(packages) in $(PKG_CONFIG_DEPENDENCIES) {
-        local cflags = [ SHELL "PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(packages:J= ) --cflags | tr -d '\n'" ] ;
-        local ldflags = [ SHELL "PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config $(packages:J= ) --libs --static | tr -d '\n'" ] ;
-        alias $(name) : : : : <cflags>$(cflags) <linkflags>$(ldflags) ;
-    }
-    if $(packages) in $(OWNED_DEPENDENCIES) {
-        alias install-$(name)-if-owned : $(NEEDS_PATH)//install-$(name) ;
-    } else {
-        alias install-$(name)-if-owned ;
-    }
-    explicit install-$(name)-if-owned ;
-}
-
-dep openssl : libssl libcrypto ;
-dep curl : libcurl ;
-dep fmtlib ;
-dep libsodium ;
-dep gsl ;
-dep asio ;
-dep mnmlstc ;
+import needs/pkgconfig.jam ;
+pkgconfig.dependency openssl : libssl libcrypto ;
+pkgconfig.dependency curl : libcurl ;
+pkgconfig.dependency fmtlib ;
+pkgconfig.dependency libsodium ;
+pkgconfig.dependency gsl ;
+pkgconfig.dependency asio ;
+pkgconfig.dependency mnmlstc ;
 
 lib GLESv2 : : <link>shared ;
 lib z : : <link>shared ;
