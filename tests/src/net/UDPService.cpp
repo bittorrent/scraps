@@ -106,7 +106,15 @@ TEST(UDPService, ipv4) {
 };
 
 TEST(UDPService, ipv6) {
-    BasicTest(UDPSocket::Protocol::kIPv6);
+    if (DefaultIPv6Interface().is_loopback()) {
+        fprintf(stderr,
+            "*************************************************\n"
+            "* Warning! No IPv6 connectivity. Skipping test. *\n"
+            "*************************************************\n"
+        );
+    } else {
+        BasicTest(UDPSocket::Protocol::kIPv6);
+    }
 };
 
 static void MulticastTest(UDPSocket::Protocol protocol) {

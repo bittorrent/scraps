@@ -1,17 +1,28 @@
 # Scraps
 
-Useful scraps of C++ code. This contains whatever functionality we find to be generally useful across our codebases.
+Useful scraps of C++ code. This isn't intended for widespread use, and we don't recommend that it be used directly. By open-sourcing it, we aim to...
+
+* Promote transparency.
+* Facilitate community involvement regarding issues.
+* Publish code with broad application under a permissive enough license that it can be re-used elsewhere.
+* Enable open sourcing of other internal projects that depend on Scraps.
+* Further motivate ourselves to remain conscious of and maintain a higher standard of code quality.
+
+Because this library isn't intended for widespread use as a whole, we will not be entertaining requests for new features that don't benefit our other projects.
 
 ## Building
 
 ### Prerequisites
 
-You'll need to install these yourself if they aren't already.
+You'll need to install these yourself if you don't have them already.
 
 * The **pyyaml** and **jinja2** Python packages are used by Needy for our dependency configuration.
 * **git** is used to retrieve several of our dependencies.
 * **pkg-config** is used to integrate our dependencies.
 * **makedepend** is required by OpenSSL.
+* **clang** and **libc++** are required to compile.
+* **libz** is required by Curl.
+* **OpenGL** is required by Scraps.
 
 These things must be installed before continuing.
 
@@ -24,3 +35,7 @@ You can override any of our dependencies by placing them in your `PKG_CONFIG_PAT
 ### Compiling
 
 `b2` will compile the library for you. You can also use `b2 install --prefix=myinstalldir` to install it, along with all of the dependencies that you did not provide during the configure step.
+
+## License
+
+Scraps is provided under the Apache License, which can be found in the *LICENSE* file.

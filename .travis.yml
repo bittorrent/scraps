@@ -1,0 +1,13 @@
+language: cpp
+dist: trusty
+sudo: required
+compiler: clang
+install:
+    - pip install --user jinja2 pyyaml
+    - sudo apt-get update
+    - sudo apt-get install -y clang-3.8 libc++-dev libc++abi-dev xutils-dev
+script:
+    - export CXX=clang++-3.8
+    - export CXXFLAGS=-stdlib=libc++
+    - "echo 'using clang : : $CXX : <cxxflags>$CXXFLAGS <linkflags>$CXXFLAGS ;' > project-config.jam"
+    - ./build-deps --bootstrap-b2 --configure && ./b2 tests//run
