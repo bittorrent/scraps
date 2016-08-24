@@ -1,4 +1,4 @@
-# Scraps [![Build Status](https://travis-ci.com/bittorrent/scraps.svg?token=qNZpQ37RsPih5TkYecTG&branch=master)](https://travis-ci.com/bittorrent/scraps) [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/bittorrent/scraps/master/LICENSE)
+# Scraps [![Build Status](https://travis-ci.com/bittorrent/scraps.svg?token=qNZpQ37RsPih5TkYecTG&branch=master)](https://travis-ci.com/bittorrent/scraps) [![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/bittorrent/scraps/master/LICENSE)
 
 Useful scraps of C++ code. This isn't intended for widespread use, and we don't recommend that it be used directly. By open-sourcing it, we aim to...
 
