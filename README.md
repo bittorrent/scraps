@@ -1,4 +1,4 @@
-# Scraps
+# Scraps [![Build Status](https://travis-ci.com/bittorrent/scraps.svg?token=qNZpQ37RsPih5TkYecTG&branch=master)](https://travis-ci.com/bittorrent/scraps) [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/bittorrent/scraps/master/LICENSE)
 
 Useful scraps of C++ code. This isn't intended for widespread use, and we don't recommend that it be used directly. By open-sourcing it, we aim to...
 
@@ -9,6 +9,13 @@ Useful scraps of C++ code. This isn't intended for widespread use, and we don't 
 * Further motivate ourselves to remain conscious of and maintain a higher standard of code quality.
 
 Because this library isn't intended for widespread use as a whole, we will not be entertaining requests for new features that don't benefit our other projects.
+
+# Status
+
+| Branch | Status | Description |
+| --- | --- | --- |
+| master | [![Build Status](https://travis-ci.com/bittorrent/scraps.svg?token=qNZpQ37RsPih5TkYecTG&branch=master)](https://travis-ci.com/bittorrent/scraps) | This is the most stable branch, with merges generally coinciding with releases. |
+| develop | [![Build Status](https://travis-ci.com/bittorrent/scraps.svg?token=qNZpQ37RsPih5TkYecTG&branch=develop)](https://travis-ci.com/bittorrent/scraps) | This is the most cutting edge branch, which we do day-to-day development in. |
 
 ## Building
 
