@@ -25,3 +25,21 @@ TEST(Version, basicOperation) {
 
     EXPECT_EQ(Version("1.2.3.4"), version);
 }
+
+
+TEST(Version, stringConstruction) {
+    Version version{"1"};
+    EXPECT_EQ("1.0", version.toString());
+
+    version = Version{"1.0"};
+    EXPECT_EQ("1.0", version.toString());
+
+    version = Version{"1.2"};
+    EXPECT_EQ("1.2", version.toString());
+
+    version = Version{"1.2.3"};
+    EXPECT_EQ("1.2.3", version.toString());
+
+    version = Version{"1.2.3.4"};
+    EXPECT_EQ("1.2.3.4", version.toString());
+}

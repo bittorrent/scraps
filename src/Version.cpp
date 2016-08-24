@@ -1,8 +1,5 @@
 #include "scraps/Version.h"
 
-#include <sstream>
-#include <cstdlib>
-
 namespace scraps {
 
 Version::Version(uint64_t versionInt) {
@@ -18,24 +15,24 @@ Version::Version(uint64_t versionInt) {
 Version::Version(const std::string& versionStr) {
     size_t start = 0, last = versionStr.find('.');
 
+    major = atoi(versionStr.substr(start, last == std::string::npos ? last : last - start).c_str());
     if (last == std::string::npos) {
         return;
     }
-    major = atoi(versionStr.substr(start, last - start).c_str());
     start = last + 1;
     last  = versionStr.find('.', start);
 
+    minor = atoi(versionStr.substr(start, last == std::string::npos ? last : last - start).c_str());
     if (last == std::string::npos) {
         return;
     }
-    minor = atoi(versionStr.substr(start, last - start).c_str());
     start = last + 1;
     last  = versionStr.find('.', start);
 
+    revision = atoi(versionStr.substr(start, last == std::string::npos ? last : last - start).c_str());
     if (last == std::string::npos) {
         return;
     }
-    revision = atoi(versionStr.substr(start, last - start).c_str());
     start    = last + 1;
 
     if (start >= versionStr.size()) {
@@ -56,9 +53,15 @@ uint64_t Version::toInteger() const {
 }
 
 std::string Version::toString() const {
-    std::ostringstream os;
-    os << static_cast<unsigned>(major) << "." << static_cast<unsigned>(minor) << "." << revision << "." << build;
-    return os.str();
+    std::string result;
+    result += std::to_string(major) + "." + std::to_string(minor);
+    if (revision || build) {
+        result += "." + std::to_string(revision);
+    }
+    if (build) {
+        result += "." + std::to_string(build);
+    }
+    return result;
 }
 
 } // namespace scraps
