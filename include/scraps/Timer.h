@@ -17,56 +17,67 @@
 
 #include "scraps/config.h"
 
+#include <chrono>
+
 namespace scraps {
 
 template <typename Clock>
 class Timer {
 public:
-    using clock    = Clock;
-    using duration = typename clock::duration;
+    using clock      = Clock;
+    using duration   = typename clock::duration;
+    using time_point = typename clock::time_point;
 
-    void start() noexcept {
-        if (_stopped) {
-            _start   = clock::now();
-            _stopped = false;
-        }
-    }
+    void     start() noexcept;
+    void     stop() noexcept;
+    void     restart() noexcept;
+    void     reset() noexcept;
 
-    void stop() noexcept {
-        if (!_stopped) {
-            _elapsed += clock::now() - _start;
-            _stopped = true;
-        }
-    }
-
-    void reset() noexcept {
-        _elapsed = duration::zero();
-        _stopped = true;
-    }
-
-    void restart() noexcept {
-        _start   = clock::now();
-        _elapsed = duration::zero();
-        _stopped = false;
-    }
-
-    duration elapsed() const noexcept {
-        if (_stopped) {
-            return _elapsed;
-        }
-        return _elapsed + clock::now() - _start;
-    }
-
-    bool stopped() const noexcept { return _stopped; }
+    duration elapsed() const noexcept;
+    bool     stopped() const noexcept { return _stopped; }
 
 private:
-    typename clock::time_point _start;
-    duration _elapsed = duration::zero();
-    bool _stopped = true;
+    time_point _start;
+    duration   _elapsed = duration::zero();
+    bool       _stopped = true;
 };
 
 using SystemTimer  = Timer<std::chrono::system_clock>;
 using SteadyTimer  = Timer<std::chrono::steady_clock>;
 using HighResTimer = Timer<std::chrono::high_resolution_clock>;
+
+template <typename Clock>
+void Timer<Clock>::start() noexcept {
+    _start   = clock::now();
+    _stopped = false;
+}
+
+template <typename Clock>
+void Timer<Clock>::stop() noexcept {
+    if (!_stopped) {
+        _elapsed += clock::now() - _start;
+        _stopped = true;
+    }
+}
+
+template <typename Clock>
+void Timer<Clock>::restart() noexcept {
+    _start   = clock::now();
+    _elapsed = duration::zero();
+    _stopped = false;
+}
+
+template <typename Clock>
+void Timer<Clock>::reset() noexcept {
+    _elapsed = duration::zero();
+    _stopped = true;
+}
+
+template <typename Clock>
+typename Timer<Clock>::duration Timer<Clock>::elapsed() const noexcept {
+    if (_stopped)
+        return _elapsed;
+    return _elapsed + clock::now() - _start;
+}
 
 } // namespace scraps

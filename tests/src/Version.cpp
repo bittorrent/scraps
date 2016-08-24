@@ -39,6 +39,13 @@ TEST(Version, basicOperation) {
     EXPECT_LT(version, version3);
 
     EXPECT_EQ(Version("1.2.3.4"), version);
+
+    Version version4{0x0102000300000004u};
+
+    EXPECT_EQ(version4.major, 1);
+    EXPECT_EQ(version4.minor, 2);
+    EXPECT_EQ(version4.revision, 3);
+    EXPECT_EQ(version4.build, 4);
 }
 
 

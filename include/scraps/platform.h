@@ -27,6 +27,11 @@
 
     #if TARGET_OS_IOS
         #define SCRAPS_IOS 1
+        #if SCRAPS_SIMULATOR
+            #define SCRAPS_APPLE_SDK "iphonesimulator"
+        #else
+            #define SCRAPS_APPLE_SDK "iphoneos"
+        #endif
     #endif
 
     #if TARGET_OS_WATCH
@@ -36,10 +41,6 @@
         #else
             #define SCRAPS_APPLE_SDK "watchos"
         #endif
-    #endif
-
-    #if SCRAPS_IOS || SCRAPS_WATCHOS
-        #define SCRAPS_MOBILE 1
     #endif
 
     #if TARGET_OS_TV
@@ -52,21 +53,10 @@
     #endif
 
     #if !SCRAPS_IOS && !SCRAPS_TVOS && !SCRAPS_WATCHOS
-        #define SCRAPS_MACOS 1 // Because Apple can't make up their mind.
-        #define SCRAPS_OS_X 1
-        #define SCRAPS_MAC_OS_X 1
+        #define SCRAPS_MACOS 1
         #define SCRAPS_APPLE_SDK "macosx"
+        #define SCRAPS_MAC_OS_X_AT_LEAST(version) (MAC_OS_X_VERSION_ ## version and MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_ ## version)
     #endif
-
-    #if SCRAPS_IOS && !SCRAPS_WATCHOS && !SCRAPS_TVOS
-        #if SCRAPS_SIMULATOR
-            #define SCRAPS_APPLE_SDK "iphonesimulator"
-        #else
-            #define SCRAPS_APPLE_SDK "iphoneos"
-        #endif
-    #endif
-
-    #define SCRAPS_MAC_OS_X_AT_LEAST(version) (MAC_OS_X_VERSION_ ## version and MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_ ## version)
 
     #define SCRAPS_APPLE 1
     #define SCRAPS_UNIX_LIKE 1
@@ -75,9 +65,7 @@
     #if __OBJC__ && !__has_feature(objc_arc)
         #error Please enable ARC support with -fobjc-arc.
     #endif
-
 #elif __ANDROID__
-    #define SCRAPS_MOBILE 1
     #define SCRAPS_ANDROID 1
     #define SCRAPS_UNIX_LIKE 1
 #elif defined(linux) || defined(__linux) || defined(__linux__)
@@ -91,45 +79,39 @@ namespace scraps {
 namespace platform {
 
 #if SCRAPS_ANDROID
-constexpr bool kIsAndroid = true;
+    constexpr bool kIsAndroid = true;
 #else
-constexpr bool kIsAndroid = false;
+    constexpr bool kIsAndroid = false;
 #endif
 
 #if SCRAPS_IOS
-constexpr bool kIsIOS = true;
+    constexpr bool kIsIOS = true;
 #else
-constexpr bool kIsIOS = false;
+    constexpr bool kIsIOS = false;
+#endif
+
+#if SCRAPS_WATCHOS
+    constexpr bool kIsWatchOS = true;
+#else
+    constexpr bool kIsWatchOS = false;
 #endif
 
 #if SCRAPS_TVOS
-constexpr bool kIsTVOS = true;
+    constexpr bool kIsTVOS = true;
 #else
-constexpr bool kIsTVOS = false;
+    constexpr bool kIsTVOS = false;
 #endif
 
-#if SCRAPS_MAC_OS_X
-constexpr bool kIsMacOSX = true;
+#if SCRAPS_MACOS
+    constexpr bool kIsMacOS = true;
 #else
-constexpr bool kIsMacOSX = false;
-#endif
-
-#if SCRAPS_MOBILE
-constexpr bool kIsMobile = true;
-#else
-constexpr bool kIsMobile = false;
+    constexpr bool kIsMacOS = false;
 #endif
 
 #if SCRAPS_WINDOWS
-constexpr bool kIsWindows = true;
+    constexpr bool kIsWindows = true;
 #else
-constexpr bool kIsWindows = false;
-#endif
-
-#if SCRAPS_OS_X || SCRAPS_WINDOWS
-constexpr bool kIsDesktop = true;
-#else
-constexpr bool kIsDesktop = false;
+    constexpr bool kIsWindows = false;
 #endif
 
 } } // namespace scraps::platform

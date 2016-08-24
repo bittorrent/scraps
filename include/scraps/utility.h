@@ -21,12 +21,13 @@
 #include "scraps/Byte.h"
 #include "scraps/hex.h"
 #include "scraps/Temp.h"
+#include "scraps/random.h"
+#include "scraps/hash.h"
 #include "stdts/optional.h"
 
 #include <gsl.h>
 
 #include <cerrno>
-#include <functional>
 #include <vector>
 #include <iterator>
 #include <random>
@@ -34,97 +35,7 @@
 
 namespace scraps {
 
-namespace {
-
-constexpr uint64_t FNV1A64(const char* str, size_t length) {
-    uint64_t hash = 0xcbf29ce484222325;
-    for (; length > 0; ++str, --length) {
-        hash = (hash ^ (*str & 0xff)) * 0x100000001b3ull;
-    }
-    return hash;
-}
-
-inline namespace literals {
-    constexpr uint64_t operator "" _fnv1a64(const char* str, size_t length) {
-        return FNV1A64(str, length);
-    }
-}
-
-} // anonymous namespace
-
 constexpr double kPi = 3.1415926535897932385;
-
-/**
-* Helper function to generate a random integral type within a range
-*/
-template <class T, class U = T, class Generator>
-typename std::enable_if<std::is_integral<T>::value && std::is_integral<U>::value,
-                        typename std::common_type<T, U>::type>::type
-UniformDistribution(Generator& g, T min = 0, U max = std::numeric_limits<U>::max()) {
-    return std::uniform_int_distribution<typename std::common_type<T, U>::type>(min, max)(g);
-}
-
-/**
-* Helper function to generate a random real type within a range
-*/
-template <class T, class U = T, class Generator>
-typename std::enable_if<std::is_floating_point<T>::value && std::is_floating_point<U>::value,
-                        typename std::common_type<T, U>::type>::type
-UniformDistribution(Generator& g, T min = 0.0, U max = 1.0) {
-    return std::uniform_real_distribution<typename std::common_type<T, U>::type>(min, max)(g);
-}
-
-/**
-* Helper function to generate a random chrono::duration within a range
-*/
-template <class Rep1, class Period1, class Rep2, class Period2, class Generator>
-typename std::common_type<std::chrono::duration<Rep1, Period1>, std::chrono::duration<Rep2, Period2>>::type
-UniformDistribution(Generator& g,
-                    const std::chrono::duration<Rep1, Period1>& min,
-                    const std::chrono::duration<Rep2, Period2>& max) {
-    using CommonType =
-        typename std::common_type<std::chrono::duration<Rep1, Period1>, std::chrono::duration<Rep2, Period2>>::type;
-    return CommonType{UniformDistribution(g, CommonType(min).count(), CommonType(max).count())};
-}
-
-/**
-* Returns a vector with n random non-duplicate iterators to elements in the input range, with
-* uniform probability, in O(n) time. n must be smaller than the input range length.
-*
-* Only the chosen elements is random, and the order in which they are returned is *not*
-* random. For example, choosing n random elements from an n-sized set will always return the
-* elements in the same order.
-*/
-template <class InputIt, class Generator>
-std::vector<InputIt> NRandomElements(InputIt inFirst, InputIt inLast, size_t n, Generator& g) {
-    auto result = std::vector<InputIt>(n);
-
-    for (auto& outIt : result) {
-        outIt = inFirst++;
-    }
-
-    for (auto count = n; inFirst != inLast; ++inFirst, ++count) {
-        auto index = UniformDistribution(g, 0, count);
-        if (index < n) {
-            result[index] = inFirst;
-        }
-    }
-
-    return result;
-}
-
-/**
- * Generate a sequence of random bytes.
- */
-template <class Generator>
-std::vector<uint8_t> RandomBytes(size_t n, Generator& g) {
-    std::vector<uint8_t> result(n);
-    for (size_t i = 0; i < n; ++i) {
-        result[i] = static_cast<uint8_t>(UniformDistribution(g, 0, 255));
-    }
-
-    return result;
-}
 
 /**
 * Returns a string escaped according to RFC 4627.
@@ -164,7 +75,7 @@ std::string Basename(const std::string& path);
  */
 template <typename T, typename MinT, typename MaxT>
 constexpr auto Clamp(const T& value, const MinT& min, const MaxT& max) {
-  return std::max<std::common_type_t<T, MinT, MaxT>>(min, std::min<std::common_type_t<T, MinT, MaxT>>(value, max));
+    return std::max<std::common_type_t<T, MinT, MaxT>>(min, std::min<std::common_type_t<T, MinT, MaxT>>(value, max));
 }
 
 
@@ -238,26 +149,5 @@ bool SetBlocking(int fd, bool blocking = true);
 * Returns a demangled symbol name. If demangling is not supported, returns original mangled name.
 */
 std::string Demangle(const char* name);
-
-/**
-* Combines hashes. Implementation is effectively that of boost::hash_combine.
-*/
-template <class T>
-inline void CombineHash(std::size_t& seed, const T& v) {
-    std::hash<T> hasher;
-    seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-}
-
-/**
-* Hashes a range of elements.
-*/
-template <typename It>
-inline std::size_t HashRange(It begin, It end) {
-    std::size_t seed = 0;
-    for (; begin != end; ++begin) {
-        CombineHash(seed, *begin);
-    }
-    return seed;
-}
 
 } // namespace scraps

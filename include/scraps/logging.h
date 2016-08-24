@@ -36,12 +36,12 @@ enum class LogLevel {
 
 extern std::atomic<LogLevel> _gLogLevel;
 
-inline constexpr const char* LogLevelString(LogLevel level) {
+constexpr const char* LogLevelString(LogLevel level) {
     switch (level) {
-        case LogLevel::kDebug: return "DEBUG";
-        case LogLevel::kInfo: return "INFO";
+        case LogLevel::kDebug:   return "DEBUG";
+        case LogLevel::kInfo:    return "INFO";
         case LogLevel::kWarning: return "WARNING";
-        case LogLevel::kError: return "ERROR";
+        case LogLevel::kError:   return "ERROR";
     }
     return "???";
 }

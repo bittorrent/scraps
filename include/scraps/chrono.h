@@ -29,13 +29,6 @@ std::chrono::duration<Rep, Period> abs(std::chrono::duration<Rep, Period> d) {
 }
 
 template<typename Rep, typename Period>
-std::chrono::steady_clock::duration TimedSleep(const std::chrono::duration<Rep, Period>& d) {
-    auto now = std::chrono::steady_clock::now();
-    std::this_thread::sleep_for(d);
-    return std::chrono::steady_clock::now() - now;
-}
-
-template<typename Rep, typename Period>
 auto MillisecondCount(std::chrono::duration<Rep, Period> d) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
 }

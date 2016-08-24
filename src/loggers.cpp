@@ -62,7 +62,7 @@ void FileLogger::log(LogLevel level, const std::string& message) {
 }
 
 std::string FileLogger::DefaultLogPath(const std::string& appName) {
-#if SCRAPS_MAC_OS_X
+#if SCRAPS_MACOS
     return [[NSString stringWithFormat:@"%@/Library/Logs/%s/", NSHomeDirectory(), appName.c_str()] UTF8String];
 #elif SCRAPS_IOS || SCRAPS_TVOS
     return [NSTemporaryDirectory() UTF8String];

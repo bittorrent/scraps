@@ -37,7 +37,6 @@ stdts::optional<ResultType> AverageRate(const std::map<TimePointType, ValueType>
 template <typename Resolution, typename IteratorType>
 auto AverageRate(IteratorType begin, IteratorType end) -> stdts::optional<decltype(begin->second / 1.0)>;
 
-
 /**
  * Convenience overloads for template deduction.
  */

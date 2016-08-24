@@ -39,4 +39,11 @@ inline void SetThreadName(const char* name) {
 
 inline void SetThreadName(const std::string& name) { SetThreadName(name.c_str()); }
 
+template<typename Rep, typename Period>
+std::chrono::steady_clock::duration TimedSleep(const std::chrono::duration<Rep, Period>& d) {
+    auto now = std::chrono::steady_clock::now();
+    std::this_thread::sleep_for(d);
+    return std::chrono::steady_clock::now() - now;
+}
+
 } // namespace scraps
