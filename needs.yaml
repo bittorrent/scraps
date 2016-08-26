@@ -1,4 +1,4 @@
-{% set common_cxx_flags = '$CXXFLAGS -fvisibility=hidden' %}
+{% set common_cxx_flags = env['CXXFLAGS'] ~ ' -fvisibility=hidden' %}
 
 {% if platform == 'ios' %}
 {% set xcrun_platform = 'iphoneos' %}
@@ -125,9 +125,16 @@ libraries:
                 - cp -R googletest/include {build_directory}
                 - $CXX -std=c++11 {{common_cxx_flags}} -c googletest/src/gtest-all.cc -isystem googletest/include -I googletest -o googletest/src/gtest-all.o
                 - ar -rv {build_directory}/lib/libgtest.a googletest/src/gtest-all.o
+    benchmark:
+        repository: https://github.com/google/benchmark.git
+        commit: 577baa0dbdc6ea6d916db0f12ed2dcc5cee19b99
+        project:
+            environment:
+                CXXFLAGS: {{common_cxx_flags}}
+            cmake-options:
+                CMAKE_BUILD_TYPE: Release
     jshackle:
         repository: git@github.com:bittorrent/jshackle.git
         commit: fa34cb3f85d9358bb93ab747dbd7105e97fc4216
         project:
             header-directory: include
-
