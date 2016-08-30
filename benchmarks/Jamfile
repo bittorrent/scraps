@@ -1,0 +1,16 @@
+path-constant NEEDS_PATH : ../needs ;
+
+lib benchmark : $(NEEDS_PATH)//benchmark : <name>benchmark ;
+
+exe scraps-benchmark :
+    [ glob-tree-ex src : *.cpp ]
+    ..//scraps/<variant>release/<debug-symbols>on
+    benchmark
+:
+    <variant>release
+    <debug-symbols>on
+;
+
+import testing ;
+unit-test run : scraps-benchmark ;
+explicit run ;

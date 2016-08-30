@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,27 +31,54 @@ TEST(bitfield, BitIterator) {
 };
 
 TEST(bitfield, EliasOmegaEncode) {
-    auto code       = EliasOmegaEncode(1000000);
-    bool expected[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
-    EXPECT_EQ(code.size(), sizeof(expected));
-    EXPECT_TRUE(std::equal(code.begin(), code.end(), expected));
+    auto code1       = EliasOmegaEncode(1000000);
+    bool expected1[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
+    EXPECT_EQ(code1.size(), sizeof(expected1));
+    EXPECT_TRUE(std::equal(code1.begin(), code1.end(), expected1));
+
+    auto code2       = EliasOmegaEncode(32767);
+    bool expected2[] = {1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
+    EXPECT_EQ(code2.size(), sizeof(expected2));
+    EXPECT_TRUE(std::equal(code2.begin(), code2.end(), expected2));
+
+    auto code3       = EliasOmegaEncode(1048575);
+    bool expected3[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
+    EXPECT_EQ(code3.size(), sizeof(expected3));
+    EXPECT_TRUE(std::equal(code3.begin(), code3.end(), expected3));
 };
 
 TEST(bitfield, EliasOmegaDecode) {
-    bool code[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
-    EXPECT_EQ(EliasOmegaDecode(code), 1000000);
+    bool code1[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
+    EXPECT_EQ(EliasOmegaDecode(code1), 1000000);
+
+    bool code2[] = {1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
+    EXPECT_EQ(EliasOmegaDecode(code2), 32767);
+
+    bool code3[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
+    EXPECT_EQ(EliasOmegaDecode(code3), 1048575);
 };
 
 TEST(bitfield, BitfieldEncode) {
-    bool bitfield[] = {1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1};
-    auto encoded = BitfieldEncode(bitfield);
-    EXPECT_EQ(encoded, "\xb4\x55\x07");
+    bool bitfield1[] = {1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1};
+    auto encoded1 = BitfieldEncode(bitfield1);
+    EXPECT_EQ(encoded1, "\xb4\x55\x07");
+
+    bool bitfield2[] = {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    auto encoded2 = BitfieldEncode(bitfield2);
+    EXPECT_EQ(encoded2, "\x51\x4A\x3F");
 };
 
 TEST(bitfield, BitfieldDecode) {
-    std::string encoded("\xb4\x55\x07");
-    auto bitfield   = BitfieldDecode(encoded.data(), encoded.size());
-    bool expected[] = {1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1};
-    EXPECT_EQ(bitfield.size(), sizeof(expected));
-    EXPECT_TRUE(std::equal(bitfield.begin(), bitfield.end(), expected));
+    std::string encoded1("\xb4\x55\x07");
+    auto bitfield1   = BitfieldDecode(encoded1.data(), encoded1.size());
+    bool expected1[] = {1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1};
+    EXPECT_EQ(bitfield1.size(), sizeof(expected1));
+    EXPECT_TRUE(std::equal(bitfield1.begin(), bitfield1.end(), expected1));
+
+    std::string encoded2("\x51\x4A\x3F");
+    auto bitfield2   = BitfieldDecode(encoded2.data(), encoded2.size());
+    bool expected2[] = {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    EXPECT_EQ(bitfield2.size(), sizeof(expected2));
+
+    EXPECT_TRUE(std::equal(bitfield2.begin(), bitfield2.end(), expected2));
 };
