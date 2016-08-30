@@ -11,7 +11,7 @@
 {% endif %}
 libraries:
     asio:
-        repository: git@github.com:chriskohlhoff/asio.git
+        repository: https://github.com/chriskohlhoff/asio.git
         commit: asio-1-10-6
         project:
             header-directory: asio/include
@@ -40,7 +40,7 @@ libraries:
             {% endif %}
             post-build: xxd -i LICENSE {build_directory}/include/sodium/license.c
     openssl:
-        repository: git@github.com:openssl/openssl.git
+        repository: https://github.com/openssl/openssl.git
         commit: OpenSSL_1_0_1t
         project:
             build-steps:
@@ -95,19 +95,19 @@ libraries:
                 - --disable-gopher
             post-build: xxd -i COPYING {build_directory}/include/curl/license.c
     gsl:
-        repository: git@github.com:Microsoft/GSL.git
+        repository: https://github.com/Microsoft/GSL.git
         commit: 0be53d99ef9b6ac0c7d6d995cb94c0dce14fe1f8
         project:
             header-directory: include
             post-build: xxd -i LICENSE {build_directory}/include/gsl_license.c
     mnmlstc:
-        repository: git@github.com:bittorrent/mnmlstc-core.git
+        repository: https://github.com/bittorrent/mnmlstc-core.git
         commit: 477ad177db1bed75c5f251b1a1976787cc769c00
         project:
             header-directory: include
             post-build: xxd -i License.rst {build_directory}/include/core/license.c
     fmtlib:
-        repository: git@github.com:fmtlib/fmt.git
+        repository: https://github.com/fmtlib/fmt.git
         commit: 3.0.0
         project:
             build-steps:
@@ -118,7 +118,7 @@ libraries:
                 - ar -rv {build_directory}/lib/libfmt.a fmt/format.o
             post-build: xxd -i LICENSE.rst {build_directory}/include/fmt/license.c
     googletest:
-        repository: git@github.com:google/googletest.git
+        repository: https://github.com/google/googletest.git
         commit: 43359642a1c16ad3f4fc575c7edd0cb935810815
         project:
             build-steps:
