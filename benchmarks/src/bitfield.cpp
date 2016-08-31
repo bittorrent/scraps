@@ -16,6 +16,7 @@
 
 #include "scraps/bitfield.h"
 #include "scraps/random.h"
+#include "complexity.h"
 
 #include <benchmark/benchmark.h>
 #include <iostream>
@@ -49,6 +50,7 @@ static void BitfieldEncodeComplexity(benchmark::State& state) {
 }
 
 BENCHMARK(BitfieldEncodeComplexity)->RangeMultiplier(4)->Range(256, 1<<12)->Complexity();
+EXPECT_COMPLEXITY_LE(BitfieldEncodeComplexity, benchmark::oN);
 
 static void BitfieldDecodeComplexity(benchmark::State& state) {
     while (state.KeepRunning()) {
@@ -64,3 +66,4 @@ static void BitfieldDecodeComplexity(benchmark::State& state) {
 }
 
 BENCHMARK(BitfieldDecodeComplexity)->RangeMultiplier(4)->Range(256, 1<<12)->Complexity();
+EXPECT_COMPLEXITY_LE(BitfieldDecodeComplexity, benchmark::oN);

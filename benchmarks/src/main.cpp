@@ -14,6 +14,6 @@
 * limitations under the License.
 */
 
-#include <benchmark/benchmark.h>
+#include "complexity.h"
 
-BENCHMARK_MAIN();
+COMPLEXITY_ASSERTION_MAIN();
