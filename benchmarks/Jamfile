@@ -4,11 +4,10 @@ lib benchmark : $(NEEDS_PATH)//benchmark : <name>benchmark ;
 
 exe scraps-benchmark :
     [ glob-tree-ex src : *.cpp ]
-    ..//scraps/<variant>release/<debug-symbols>on
+    ..//scraps/<variant>release
     benchmark
 :
     <variant>release
-    <debug-symbols>on
 ;
 
 import testing ;
