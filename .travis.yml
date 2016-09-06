@@ -10,4 +10,6 @@ script:
     - export CXX=clang++-3.8
     - export CXXFLAGS=-stdlib=libc++
     - "echo 'using clang : : $CXX : <cxxflags>$CXXFLAGS <linkflags>$CXXFLAGS ;' > project-config.jam"
-    - ./build-deps --bootstrap-b2 --configure && ./b2 tests//run -j2
+    - ./build-deps --bootstrap-b2 --configure && ./b2 tests//run -j2 cxxflags="-coverage" linkflags="-lgcov"
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
