@@ -63,7 +63,7 @@ libraries:
                 - sh ./config {{openssl_flags}}
                 {% endif %}
                 - make depend
-                - sh -c 'make build_libs {{cross_args}} -j{{ parameters.concurrency if parameters.concurrency else '' }}'
+                - sh -c 'make build_libs {{cross_args}} -j{build_concurrency}'
                 - sh -c 'make install_sw DIRS="crypto ssl engines"'
             post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
     curl:
