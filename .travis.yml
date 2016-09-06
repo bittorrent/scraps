@@ -12,4 +12,4 @@ script:
     - "echo 'using clang : : $CXX : <cxxflags>$CXXFLAGS <linkflags>$CXXFLAGS ;' > project-config.jam"
     - ./build-deps --bootstrap-b2 --configure && ./b2 tests//run -j2 cxxflags="-coverage" linkflags=`find /usr/lib*/llvm-3.8/lib/ -name "libclang_rt.profile*.a"`
 after_success:
-    - bash <(curl -s https://codecov.io/bash)
+    - bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
