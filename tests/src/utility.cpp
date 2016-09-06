@@ -193,3 +193,34 @@ TEST(utility, URLDecode) {
     EXPECT_EQ("großpösna", URLDecode("gro%C3%9Fp%C3%B6sna"));
     EXPECT_EQ("-_. ", URLDecode("-_.+"));
 };
+
+TEST(utility, ParseAddressAndPort) {
+    {
+        auto result = ParseAddressAndPort("google.com:443", 80);
+        EXPECT_EQ(std::get<0>(result), "google.com");
+        EXPECT_EQ(std::get<1>(result), 443);
+    }
+
+    {
+        auto result = ParseAddressAndPort("google.com", 80);
+        EXPECT_EQ(std::get<0>(result), "google.com");
+        EXPECT_EQ(std::get<1>(result), 80);
+    }
+};
+
+TEST(utility, Demangle) {
+    EXPECT_EQ(Demangle(typeid(scraps::GenericByte).name()), "scraps::GenericByte");
+}
+
+TEST(utility, ByteFromFile) {
+    auto path = std::tmpnam(nullptr);
+    FILE* f = fopen(path, "wb");
+    fprintf(f, "test");
+    fclose(f);
+    auto _ = gsl::finally([&] { unlink(path); });
+
+    auto bytes = BytesFromFile(path);
+    ASSERT_TRUE(bytes);
+    EXPECT_EQ(bytes->size(), 4);
+    EXPECT_EQ(memcmp(bytes->data(), "test", std::min<size_t>(bytes->size(), 4)), 0);
+}

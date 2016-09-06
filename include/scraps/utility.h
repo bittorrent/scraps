@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,28 +66,12 @@ std::string URLDecode(const char* str);
 inline std::string URLDecode(const std::string& str) { return URLDecode(str.c_str()); }
 
 /**
-* Returns the basename of a given path.
-*/
-std::string Basename(const std::string& path);
-
-/**
  * Clamp a value between min and max, inclusive.
  */
 template <typename T, typename MinT, typename MaxT>
 constexpr auto Clamp(const T& value, const MinT& min, const MaxT& max) {
     return std::max<std::common_type_t<T, MinT, MaxT>>(min, std::min<std::common_type_t<T, MinT, MaxT>>(value, max));
 }
-
-
-/**
-* Returns the directory name of a given path.
-*/
-std::string Dirname(const std::string& path);
-
-/**
-* Allow user to enter a shadowed password from stdin.
-*/
-std::string GetPasswordFromStdin();
 
 /**
 * Parse out an address and port from the given host string. If a port is not found, the

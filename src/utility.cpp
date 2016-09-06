@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -175,34 +175,6 @@ std::string URLDecode(const char* str) {
     return ret.str();
 }
 
-std::string Basename(const std::string& path) {
-    auto folder = path.rfind('/');
-    #if SCRAPS_WINDOWS
-    if (folder == path.npos) {
-        folder = path.rfind('\\');
-    }
-    #endif
-    if (folder != path.npos) {
-        return path.substr(folder+1);
-    }
-
-    return path;
-}
-
-std::string Dirname(const std::string& path) {
-    auto folder = path.rfind('/');
-    #if SCRAPS_WINDOWS
-    if (folder == path.npos) {
-        folder = path.rfind('\\');
-    }
-    #endif
-    if (folder != path.npos) {
-        return path.substr(0, folder);
-    }
-
-    return path;
-}
-
 std::tuple<std::string, uint16_t> ParseAddressAndPort(const std::string& host,
                                                       uint16_t defaultPort) {
     auto sep = host.find(':');
@@ -213,26 +185,6 @@ std::tuple<std::string, uint16_t> ParseAddressAndPort(const std::string& host,
     const auto address = host.substr(0, sep);
     const auto port = static_cast<uint16_t>(std::atoi(host.substr(sep + 1).c_str()));
     return std::make_tuple(address, port);
-}
-
-std::string GetPasswordFromStdin() {
-#ifdef WIN32
-    HANDLE stdin = GetStdHandle(STD_INPUT_HANDLE);
-    DWORD mode = 0;
-    GetConsoleMode(stdin, &mode);
-    SetConsoleMode(stdin, mode & (~ENABLE_ECHO_INPUT));
-#else
-    termios oldt;
-    tcgetattr(STDIN_FILENO, &oldt);
-    termios newt = oldt;
-    newt.c_lflag &= ~ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-#endif
-
-    std::string password;
-    std::cout << "Password: " << std::flush;
-    std::getline(std::cin, password);
-    return password;
 }
 
 size_t PhysicalMemory() {
