@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 
 #include "scraps/logging.h"
 #include "scraps/thread.h"
+#include "scraps/utility.h"
 #include "scraps/net/curl.h"
 
 #include <gsl.h>
@@ -183,6 +184,21 @@ std::string HTTPRequest::responseBody() const {
 std::vector<std::string> HTTPRequest::responseHeaders() const {
     std::lock_guard<std::mutex> lock{_mutex};
     return _responseHeaders;
+}
+
+std::vector<std::string> HTTPRequest::responseHeaders(const std::string& name) const {
+    std::vector<std::string> ret;
+    for (auto& header : responseHeaders()) {
+        auto it = std::search(header.begin(), header.end(), name.begin(), name.end(), [](char a, char b) { return std::toupper(a) == std::toupper(b); });
+        if (it == header.begin()) {
+            std::advance(it, name.size());
+            if (it == header.end() || *(it++) != ':') { continue; }
+            auto raw = std::string{it, header.end()};
+            auto value = gsl::to_string(Trim(gsl::string_span<>{raw}));
+            ret.emplace_back(std::move(value));
+        }
+    }
+    return ret;
 }
 
 size_t HTTPRequest::CURLWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata) {

@@ -138,3 +138,8 @@ libraries:
         commit: fa34cb3f85d9358bb93ab747dbd7105e97fc4216
         project:
             header-directory: include
+    json:
+        repository: git@github.com:nlohmann/json.git
+        commit: v2.0.3
+        project:
+            header-directory: src
