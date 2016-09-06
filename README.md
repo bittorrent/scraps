@@ -1,4 +1,4 @@
-# Scraps [![Build Status](https://travis-ci.org/bittorrent/scraps.svg?branch=master)](https://travis-ci.org/bittorrent/scraps) [![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/bittorrent/scraps/master/LICENSE)
+# Scraps [![Build Status](https://travis-ci.org/bittorrent/scraps.svg?branch=master)](https://travis-ci.org/bittorrent/scraps) [![codecov](https://codecov.io/gh/bittorrent/scraps/branch/master/graph/badge.svg)](https://codecov.io/gh/bittorrent/scraps) [![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/bittorrent/scraps/master/LICENSE)
 
 Useful scraps of C++ code. This isn't intended for widespread use, and we don't recommend that it be used directly. By open-sourcing it, we aim to...
 
@@ -14,8 +14,8 @@ Because this library isn't intended for widespread use as a whole, we will not b
 
 | Branch | Status | Description |
 | --- | --- | --- |
-| master | [![Build Status](https://travis-ci.org/bittorrent/scraps.svg?branch=master)](https://travis-ci.org/bittorrent/scraps) | This is the most stable branch, with merges generally coinciding with releases. |
-| develop | [![Build Status](https://travis-ci.org/bittorrent/scraps.svg?branch=develop)](https://travis-ci.org/bittorrent/scraps) | This is the most cutting edge branch, which we do day-to-day development in. |
+| master | [![Build Status](https://travis-ci.org/bittorrent/scraps.svg?branch=master)](https://travis-ci.org/bittorrent/scraps) [![codecov](https://codecov.io/gh/bittorrent/scraps/branch/master/graph/badge.svg)](https://codecov.io/gh/bittorrent/scraps) | This is the most stable branch, with merges generally coinciding with releases. |
+| develop | [![Build Status](https://travis-ci.org/bittorrent/scraps.svg?branch=develop)](https://travis-ci.org/bittorrent/scraps) [![codecov](https://codecov.io/gh/bittorrent/scraps/branch/develop/graph/badge.svg)](https://codecov.io/gh/bittorrent/scraps) | This is the most cutting edge branch, which we do day-to-day development in. |
 
 ## Building
 
