@@ -41,11 +41,11 @@ TEST(NetUtility, IsLocal) {
 }
 
 TEST(NetUtility, ResolveRandomEndpoint) {
-    auto first = ResolveRandomEndpoint("google.com", 80);
+    auto first = ResolveRandomEndpoint("amazon.com", 80);
     ASSERT_TRUE(first);
     EXPECT_EQ(first->port(), 80);
     for (int i = 0; i < 20; ++i) {
-        auto next = ResolveRandomEndpoint("google.com", 80);
+        auto next = ResolveRandomEndpoint("amazon.com", 80);
         ASSERT_TRUE(next);
         EXPECT_EQ(next->port(), 80);
         if (*first != *next) {
@@ -56,11 +56,11 @@ TEST(NetUtility, ResolveRandomEndpoint) {
 }
 
 TEST(NetUtility, ResolveRandomIPv4Endpoint) {
-    auto first = ResolveRandomIPv4Endpoint("google.com", 80);
+    auto first = ResolveRandomIPv4Endpoint("amazon.com", 80);
     ASSERT_TRUE(first);
     EXPECT_EQ(first->port(), 80);
     for (int i = 0; i < 20; ++i) {
-        auto next = ResolveRandomIPv4Endpoint("google.com", 80);
+        auto next = ResolveRandomIPv4Endpoint("amazon.com", 80);
         ASSERT_TRUE(next);
         EXPECT_TRUE(next->address().is_v4());
         EXPECT_EQ(next->port(), 80);
