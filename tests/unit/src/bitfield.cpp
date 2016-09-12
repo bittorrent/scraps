@@ -23,10 +23,17 @@ TEST(bitfield, BitIterator) {
     const char* test = "abc";
     bool expected[]  = {0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1};
     size_t counted = 0;
-    for (auto it = BitIterator::Begin(test, strlen(test)); it != BitIterator::End(test, strlen(test));
-         ++counted, ++it) {
+
+    auto begin = BitIterator::Begin(test, strlen(test));
+    auto end = BitIterator::End(test, strlen(test));
+    for (auto it = begin; it != end; ++counted, ++it) {
         EXPECT_EQ(*it, expected[counted]);
+        if (counted) {
+            EXPECT_EQ(*--it, expected[counted - 1]);
+            ++it;
+        }
     }
+    EXPECT_EQ(*--end, 1);
     EXPECT_EQ(counted, strlen(test) * 8);
 };
 
@@ -56,6 +63,9 @@ TEST(bitfield, EliasOmegaDecode) {
 
     bool code3[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
     EXPECT_EQ(EliasOmegaDecode(code3), 1048575);
+
+    bool code4[] = {1, 1, 1, 1, 1, 1, 1, 1};
+    EXPECT_EQ(EliasOmegaDecode(code4), 0);
 };
 
 TEST(bitfield, BitfieldEncode) {
@@ -69,16 +79,40 @@ TEST(bitfield, BitfieldEncode) {
 };
 
 TEST(bitfield, BitfieldDecode) {
-    std::string encoded1("\xb4\x55\x07");
-    auto bitfield1   = BitfieldDecode(encoded1.data(), encoded1.size());
-    bool expected1[] = {1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1};
-    EXPECT_EQ(bitfield1.size(), sizeof(expected1));
-    EXPECT_TRUE(std::equal(bitfield1.begin(), bitfield1.end(), expected1));
+    {
+        std::string encoded("\xb4\x55\x07");
+        auto bitfield   = BitfieldDecode(encoded.data(), encoded.size());
+        bool expected[] = {1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1};
+        EXPECT_EQ(bitfield.size(), sizeof(expected));
+        EXPECT_TRUE(std::equal(bitfield.begin(), bitfield.end(), expected));
+    }
 
-    std::string encoded2("\x51\x4A\x3F");
-    auto bitfield2   = BitfieldDecode(encoded2.data(), encoded2.size());
-    bool expected2[] = {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    EXPECT_EQ(bitfield2.size(), sizeof(expected2));
+    {
+        std::string encoded("\x51\x4A\x3F");
+        auto bitfield   = BitfieldDecode(encoded.data(), encoded.size());
+        bool expected[] = {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        EXPECT_EQ(bitfield.size(), sizeof(expected));
+        EXPECT_TRUE(std::equal(bitfield.begin(), bitfield.end(), expected));
+    }
 
-    EXPECT_TRUE(std::equal(bitfield2.begin(), bitfield2.end(), expected2));
+    {
+        std::string encoded("");
+        auto bitfield   = BitfieldDecode(encoded.data(), encoded.size());
+        EXPECT_EQ(bitfield.size(), 0);
+    }
+
+    {
+        // this is not a valid bitfield
+        std::string encoded("\xff");
+        auto bitfield   = BitfieldDecode(encoded.data(), encoded.size());
+        EXPECT_EQ(bitfield.size(), 0);
+    }
+
+    {
+        // expands to an unreasonable number of bits
+        std::string encoded("\x6a\x85\x74\x8f\x7f\x76\x8f\x74\x8f\x41\x13");
+        auto bitfield   = BitfieldDecode(encoded.data(), encoded.size());
+        EXPECT_EQ(bitfield.size(), 0);
+    }
 };
+

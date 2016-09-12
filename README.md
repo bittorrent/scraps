@@ -1,4 +1,4 @@
-# Scraps [![Build Status](https://travis-ci.org/bittorrent/scraps.svg?branch=master)](https://travis-ci.org/bittorrent/scraps) [![codecov](https://codecov.io/gh/bittorrent/scraps/branch/master/graph/badge.svg)](https://codecov.io/gh/bittorrent/scraps) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/368/badge)](https://bestpractices.coreinfrastructure.org/projects/368) [![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/bittorrent/scraps/master/LICENSE)
+# Scraps [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/368/badge)](https://bestpractices.coreinfrastructure.org/projects/368) [![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/bittorrent/scraps/master/LICENSE)
 
 Useful scraps of C++ code. This isn't intended for widespread use, and we don't recommend that it be used directly. By open-sourcing it, we aim to...
 
@@ -6,9 +6,7 @@ Useful scraps of C++ code. This isn't intended for widespread use, and we don't 
 * Facilitate community involvement regarding issues.
 * Publish code with broad application under a permissive enough license that it can be re-used elsewhere.
 * Enable open sourcing of other internal projects that depend on Scraps.
-* Further motivate ourselves to remain conscious of and maintain a higher standard of code quality.
-
-Because this library isn't intended for widespread use as a whole, we will not be entertaining requests for new features that don't benefit our other projects.
+* Motivate ourselves to remain conscious of and maintain a higher standard of code quality.
 
 # Status
 
@@ -42,6 +40,12 @@ You can override any of our dependencies by placing them in your `PKG_CONFIG_PAT
 ### Compiling
 
 `b2` will compile the library for you. You can also use `b2 install --prefix=myinstalldir` to install it, along with all of the dependencies that you did not provide during the configure step.
+
+# Issues & Requests
+
+If you discover an issue with security implications, we ask that you first disclose it privately by emailing any of the active BitTorrent contributors.
+
+Feature and pull requests are welcome, but because this library isn't intended for widespread use as a whole, we will not be entertaining requests for new features that don't benefit our other projects.
 
 ## License
 

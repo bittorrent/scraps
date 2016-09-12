@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@
 namespace scraps {
 
 /**
-* BitIterator is used to create constant forward input iterators for individual bits
+* BitIterator is used to create constant bidirectional input iterators for individual bits
 */
 struct BitIterator {
     // pod. uses default constructors, destructors, and assignments
@@ -34,6 +34,8 @@ struct BitIterator {
     const bool& operator*() const;
     BitIterator operator++();    // pre
     BitIterator operator++(int); // post
+    BitIterator operator--();    // pre
+    BitIterator operator--(int); // post
     bool operator==(const BitIterator& other);
     bool operator!=(const BitIterator& other);
 
@@ -96,6 +98,10 @@ T EliasOmegaDecode(InputIterator begin, InputIterator end, InputIterator* next =
             group = ((group << 1) | (*it ? 1 : 0));
         }
         n = group;
+
+        if (it == end) {
+            break;
+        }
     }
 
     if (next) {
@@ -188,8 +194,9 @@ std::string BitfieldEncode(const T& bitfield) {
 *
 * @param encoded the encoded string
 * @param len the length of the encoded string
-* @return the decoded bitfield
+* @param maxLength the maximum allowed length of the resulting bitfield
+* @return the decoded bitfield, or an empty bitfield on error
 */
-std::vector<bool> BitfieldDecode(const void* encoded, size_t len);
+std::vector<bool> BitfieldDecode(const void* encoded, size_t len, size_t maxLength = 8 * 1024 * 1024);
 
 } // namespace scraps

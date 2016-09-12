@@ -1,10 +1,10 @@
-path-constant NEEDS_PATH : ../needs ;
+path-constant NEEDS_PATH : ../../needs ;
 
 lib benchmark : $(NEEDS_PATH)//benchmark : <name>benchmark ;
 
 exe scraps-benchmark :
     [ glob-tree-ex src : *.cpp ]
-    ..//scraps/<variant>release
+    ../..//scraps/<variant>release
     benchmark
 :
     <variant>release
