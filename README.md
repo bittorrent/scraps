@@ -8,7 +8,7 @@ Useful scraps of C++ code. This isn't intended for widespread use, and we don't 
 * Enable open sourcing of other internal projects that depend on Scraps.
 * Motivate ourselves to remain conscious of and maintain a higher standard of code quality.
 
-# Status
+## Status
 
 | Branch | Status | Description |
 | --- | --- | --- |
@@ -41,7 +41,7 @@ You can override any of our dependencies by placing them in your `PKG_CONFIG_PAT
 
 `b2` will compile the library for you. You can also use `b2 install --prefix=myinstalldir` to install it, along with all of the dependencies that you did not provide during the configure step.
 
-# Issues & Requests
+## Issues & Requests
 
 If you discover an issue with security implications, we ask that you first disclose it privately by emailing any of the active BitTorrent contributors.
 
