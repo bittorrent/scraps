@@ -53,10 +53,10 @@ struct Vector : VectorComponents<T, N> {
     using VectorComponents<T, N>::components;
     static_assert(sizeof(VectorComponents<T, N>) == sizeof(T) * N, "bad packing");
 
-    Vector() {}
+    constexpr Vector() {}
 
     template <typename First, typename Second, typename... Rem>
-    Vector(First&& first, Second&& second, Rem&&... rem) {
+    constexpr Vector(First&& first, Second&& second, Rem&&... rem) {
         components = std::array<T, N>({{std::forward<First>(first), std::forward<Second>(second), std::forward<Rem>(rem)...}});
     }
 

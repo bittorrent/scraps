@@ -13,69 +13,192 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "gtest/gtest.h"
+#include "../tests.h"
 
 #include "scraps/math/Matrix.h"
 
 using namespace scraps::math;
 
 TEST(Matrix, translation) {
-    auto matrix = Matrix<int, 4, 4>::Translation(2, 3, 4);
+    constexpr auto matrix = Matrix<int, 4, 4>::Translation(2, 3, 4);
 
-    EXPECT_EQ(matrix(0, 0), 1);
-    EXPECT_EQ(matrix(0, 1), 0);
-    EXPECT_EQ(matrix(0, 2), 0);
-    EXPECT_EQ(matrix(0, 3), 2);
-    EXPECT_EQ(matrix(1, 0), 0);
-    EXPECT_EQ(matrix(1, 1), 1);
-    EXPECT_EQ(matrix(1, 2), 0);
-    EXPECT_EQ(matrix(1, 3), 3);
-    EXPECT_EQ(matrix(2, 0), 0);
-    EXPECT_EQ(matrix(2, 1), 0);
-    EXPECT_EQ(matrix(2, 2), 1);
-    EXPECT_EQ(matrix(2, 3), 4);
-    EXPECT_EQ(matrix(3, 0), 0);
-    EXPECT_EQ(matrix(3, 1), 0);
-    EXPECT_EQ(matrix(3, 2), 0);
-    EXPECT_EQ(matrix(3, 3), 1);
+    STATIC_ASSERT_EQ(matrix(0, 0), 1);
+    STATIC_ASSERT_EQ(matrix(0, 1), 0);
+    STATIC_ASSERT_EQ(matrix(0, 2), 0);
+    STATIC_ASSERT_EQ(matrix(0, 3), 2);
+    STATIC_ASSERT_EQ(matrix(1, 0), 0);
+    STATIC_ASSERT_EQ(matrix(1, 1), 1);
+    STATIC_ASSERT_EQ(matrix(1, 2), 0);
+    STATIC_ASSERT_EQ(matrix(1, 3), 3);
+    STATIC_ASSERT_EQ(matrix(2, 0), 0);
+    STATIC_ASSERT_EQ(matrix(2, 1), 0);
+    STATIC_ASSERT_EQ(matrix(2, 2), 1);
+    STATIC_ASSERT_EQ(matrix(2, 3), 4);
+    STATIC_ASSERT_EQ(matrix(3, 0), 0);
+    STATIC_ASSERT_EQ(matrix(3, 1), 0);
+    STATIC_ASSERT_EQ(matrix(3, 2), 0);
+    STATIC_ASSERT_EQ(matrix(3, 3), 1);
 }
 
 TEST(Matrix, construction) {
-    Matrix<int, 3, 3> matrix{
+    constexpr Matrix<int, 3, 3> matrix{
         2, -1, 1,
         0, -2, 1,
         1, -2, 0,
     };
 
-    EXPECT_EQ(matrix(0, 0), 2);
-    EXPECT_EQ(matrix(0, 1), -1);
-    EXPECT_EQ(matrix(0, 2), 1);
-    EXPECT_EQ(matrix(1, 0), 0);
-    EXPECT_EQ(matrix(1, 1), -2);
-    EXPECT_EQ(matrix(1, 2), 1);
-    EXPECT_EQ(matrix(2, 0), 1);
-    EXPECT_EQ(matrix(2, 1), -2);
-    EXPECT_EQ(matrix(2, 2), 0);
+    STATIC_ASSERT_EQ(matrix(0, 0), 2);
+    STATIC_ASSERT_EQ(matrix(0, 1), -1);
+    STATIC_ASSERT_EQ(matrix(0, 2), 1);
+    STATIC_ASSERT_EQ(matrix(1, 0), 0);
+    STATIC_ASSERT_EQ(matrix(1, 1), -2);
+    STATIC_ASSERT_EQ(matrix(1, 2), 1);
+    STATIC_ASSERT_EQ(matrix(2, 0), 1);
+    STATIC_ASSERT_EQ(matrix(2, 1), -2);
+    STATIC_ASSERT_EQ(matrix(2, 2), 0);
 }
 
-TEST(Matrix, multiplication) {
-    Matrix<int, 3, 3> a{
+TEST(Matrix, comparison) {
+    constexpr Matrix<int, 3, 3> a{
         2, -1, 1,
         0, -2, 1,
         1, -2, 0,
     };
 
-    Matrix<int, 3, 3> b{
+    constexpr Matrix<int, 3, 3> b{
         -2,  3,  5,
         -1, -3,  9,
          5,  6, -7,
     };
 
-    Matrix<int, 3, 3> expected{
+    constexpr Matrix<int, 3, 3> c{
+        2, -1, 1,
+        0, -2, 1,
+        1, -2, 0,
+    };
+
+    STATIC_ASSERT_NE(a, b);
+    STATIC_ASSERT_EQ(a, c);
+}
+
+TEST(Matrix, multiplication) {
+    constexpr Matrix<int, 3, 3> a{
+        2, -1, 1,
+        0, -2, 1,
+        1, -2, 0,
+    };
+
+    constexpr Matrix<int, 3, 3> b{
+        -2,  3,  5,
+        -1, -3,  9,
+         5,  6, -7,
+    };
+
+    constexpr Matrix<int, 3, 3> expected{
         2, 15,  -6,
         7, 12, -25,
         0,  9, -13,
     };
 
-    EXPECT_EQ(a * b, expected);
+    STATIC_ASSERT_EQ(a * b, expected);
 }
+
+TEST(Matrix, determinant) {
+    constexpr Matrix<int, 1, 1> a{5};
+    STATIC_ASSERT_EQ(a.determinant(), 5);
+
+    constexpr Matrix<int, 3, 3> b{
+        2, -1, 1,
+        0, 10, 1,
+        1, -2, 0,
+    };
+    STATIC_ASSERT_EQ(b.determinant(), -7);
+
+    constexpr Matrix<int, 2, 2> c{
+        2, 6,
+        3, 0,
+    };
+    STATIC_ASSERT_EQ(c.determinant(), -18);
+}
+
+TEST(Matrix, minor) {
+    constexpr Matrix<int, 3, 3> a{
+        1, 0, 5,
+        2, 1, 6,
+        3, 4, 0,
+    };
+    STATIC_ASSERT_EQ(a.minor(0, 1), -18);
+}
+
+TEST(Matrix, transpose) {
+    constexpr Matrix<int, 2, 3> a{
+        1, 0, 5,
+        2, 1, 6,
+    };
+
+    constexpr Matrix<int, 3, 2> expected{
+        1, 2,
+        0, 1,
+        5, 6,
+    };
+
+    STATIC_ASSERT_EQ(a.transpose(), expected);
+}
+
+TEST(Matrix, cofactor) {
+    constexpr Matrix<int, 3, 3> a{
+        2, -1, 1,
+        0, 10, 1,
+        1, -2, 0,
+    };
+    STATIC_ASSERT_EQ(a.cofactor(0, 1), 1);
+}
+
+TEST(Matrix, cofactorMatrix) {
+    constexpr Matrix<int, 3, 3> a{
+        2, -1, 1,
+        0, 10, 1,
+        1, -2, 0,
+    };
+
+    constexpr Matrix<int, 3, 3> expected{
+          2,  1, -10,
+         -2, -1,   3,
+        -11, -2,  20,
+    };
+
+    STATIC_ASSERT_EQ(a.cofactorMatrix(), expected);
+}
+
+TEST(Matrix, adjugate) {
+    constexpr Matrix<int, 3, 3> a{
+        1, 2, 3,
+        0, 1, 4,
+        5, 6, 0,
+    };
+
+    constexpr Matrix<int, 3, 3> expected{
+        -24,  18,  5,
+         20, -15, -4,
+         -5,   4,  1,
+    };
+
+    STATIC_ASSERT_EQ(a.adjugate(), expected);
+}
+
+TEST(Matrix, inverse) {
+    constexpr Matrix<int, 3, 3> a{
+        3,  3,  1,
+        2,  1,  2,
+        3, -2,  3,
+    };
+
+    constexpr Matrix<double, 3, 3> expected{
+        1.0 / 2.0, -11.0 / 14.0,  5.0 / 14.0,
+              0.0,   3.0 /  7.0, -2.0 /  7.0,
+       -1.0 / 2.0,  15.0 / 14.0, -3.0 / 14.0,
+    };
+
+    STATIC_ASSERT_EQ(a.inverse(), expected);
+}
+

@@ -28,24 +28,27 @@ template <typename T, size_t R, size_t C> struct Matrix;
 template <typename T, size_t R, size_t C>
 class MatrixBase {
 public:
-    MatrixBase() {}
+    constexpr MatrixBase() {}
 
-    MatrixBase(std::initializer_list<T> l) {
+    constexpr MatrixBase(std::initializer_list<T> l) {
         size_t r{0}, c{0};
         for (auto& v : l) {
             (*this)(r, c) = v;
-            if (++c >= R) {
+            if (++c >= C) {
                 c = 0;
                 ++r;
             }
         }
     }
 
-    T& operator()(size_t r, size_t c) { return _columnMajor[c * C + r]; }
-    const T& operator()(size_t r, size_t c) const { return _columnMajor[c * C + r]; }
+    constexpr T& operator()(size_t r, size_t c) { return at(r, c); }
+    constexpr T operator()(size_t r, size_t c) const { return at(r, c); }
+
+    constexpr T& at(size_t r, size_t c) { return _columnMajor[c * R + r]; }
+    constexpr T at(size_t r, size_t c) const { return _columnMajor[c * R + r]; }
 
     template <size_t C2>
-    Matrix<T, R, C2> operator*(const Matrix<T, C, C2>& right) const {
+    constexpr Matrix<T, R, C2> operator*(const Matrix<T, C, C2>& right) const {
         Matrix<T, R, C2> ret;
         for (size_t i = 0; i < R; ++i) {
             for (size_t j = 0; j < C2; ++j) {
@@ -59,7 +62,18 @@ public:
         return ret;
     }
 
-    bool operator==(const Matrix<T, R, C>& other) const {
+    template <typename U>
+    constexpr auto operator/(U divisor) const {
+        Matrix<decltype(at(0, 0) / divisor), R, C> ret;
+        for (size_t i = 0; i < R; ++i) {
+            for (size_t j = 0; j < C; ++j) {
+                ret(i, j) = at(i, j) / divisor;
+            }
+        }
+        return ret;
+    }
+
+    constexpr bool operator==(const Matrix<T, R, C>& other) const {
         for (size_t i = 0; i < R * C; ++i) {
             if (_columnMajor[i] != other._columnMajor[i]) {
                 return false;
@@ -68,8 +82,75 @@ public:
         return true;
     }
 
+    constexpr bool operator!=(const Matrix<T, R, C>& other) const {
+        return !(*this == other);
+    }
+
     const T* columnMajor() const {
         return _columnMajor;
+    }
+
+    template <typename U = T>
+    constexpr std::enable_if_t<R == C && R == 1, U> determinant() const {
+        return at(0, 0);
+    }
+
+    template <typename U = T>
+    constexpr std::enable_if_t<R == C && (R > 1), U> determinant(std::nullptr_t _ = {}) const {
+        U ret = 0;
+        for (size_t n = 0; n < R; ++n) {
+            ret += at(0, n) * cofactor(0, n);
+        }
+        return ret;
+    }
+
+    template <typename U = T>
+    constexpr std::enable_if_t<R == C && (R > 1), U> cofactor(size_t i, size_t j) const {
+        return (((i + j) & 1) ? -1 : 1) * minor(i, j);
+    }
+
+    template <typename U = T>
+    constexpr std::enable_if_t<R == C && (R > 1), U> minor(size_t i, size_t j) const {
+        Matrix<U, R - 1, C - 1> sub;
+        for (size_t si = 0; si < R - 1; ++si) {
+            for (size_t sj = 0; sj < C - 1; ++sj) {
+                sub(si, sj) = at(si >= i ? si + 1 : si, sj >= j ? sj + 1 : sj);
+            }
+        }
+        return sub.determinant();
+    }
+
+    template <typename U = T>
+    constexpr std::enable_if_t<R == C && (R > 1), Matrix<U, R, C>> cofactorMatrix() const {
+        Matrix<U, R, C> ret;
+        for (size_t i = 0; i < R; ++i) {
+            for (size_t j = 0; j < C; ++j) {
+                ret(i, j) = cofactor(i, j);
+            }
+        }
+        return ret;
+    }
+
+    constexpr Matrix<T, C, R> transpose() const {
+        Matrix<T, C, R> ret;
+        for (size_t i = 0; i < R; ++i) {
+            for (size_t j = 0; j < C; ++j) {
+                ret(j, i) = at(i, j);
+            }
+        }
+        return ret;
+    }
+
+    template <typename U = T>
+    constexpr std::enable_if_t<R == C && (R > 1), Matrix<U, R, C>> adjugate() const {
+        return cofactorMatrix().transpose();
+    }
+
+    template <typename DivisorType = double, typename U = T>
+    constexpr auto inverse() const -> std::enable_if_t<R == C && (R > 1), Matrix<decltype(U{} / DivisorType{}), R, C>> {
+        DivisorType det = determinant();
+        assert(det);
+        return adjugate() / det;
     }
 
 protected:
@@ -77,9 +158,9 @@ protected:
 };
 
 #define SCRAPS_MATH_MATRIX_INHERITANCE(rows, cols) \
-    Matrix() : MatrixBase<T, rows, cols>{} {} \
+    constexpr Matrix() : MatrixBase<T, rows, cols>{} {} \
     template <typename... Args> \
-    Matrix(Args&&... args) : MatrixBase<T, rows, cols>{std::forward<Args>(args)...} {}
+    constexpr Matrix(Args&&... args) : MatrixBase<T, rows, cols>{std::forward<Args>(args)...} {}
 
 template <typename T, size_t R, size_t C>
 struct Matrix : MatrixBase<T, R, C> {
@@ -90,7 +171,7 @@ template <typename T>
 struct Matrix<T, 4, 4> : MatrixBase<T, 4, 4> {
     SCRAPS_MATH_MATRIX_INHERITANCE(4, 4)
 
-    static Matrix Frustum(T left, T right, T bottom, T top, T near, T far) {
+    static constexpr Matrix Frustum(T left, T right, T bottom, T top, T near, T far) {
         Matrix ret;
         ret._columnMajor[ 0] = (2 * near) / (right - left);
         ret._columnMajor[ 5] = (2 * near) / (top - bottom);
@@ -102,13 +183,13 @@ struct Matrix<T, 4, 4> : MatrixBase<T, 4, 4> {
         return ret;
     }
 
-    static Matrix Perspective(T fovy, T aspect, T near, T far) {
+    static constexpr Matrix Perspective(T fovy, T aspect, T near, T far) {
         auto top = near * tan(fovy / 360.0 * M_PI);
         auto right = static_cast<T>(top * aspect);
         return Frustum(-right, right, static_cast<T>(-top), static_cast<T>(top), near, far);
     }
 
-    static Matrix Translation(T x, T y, T z) {
+    static constexpr Matrix Translation(T x, T y, T z) {
         Matrix ret;
         ret._columnMajor[ 0] = 1;
         ret._columnMajor[ 5] = 1;
