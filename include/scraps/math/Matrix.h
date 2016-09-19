@@ -20,6 +20,11 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef minor
+// defined on linux in sys/sysmacros.h for backward-compatibility. no one should use this
+#undef minor
+#endif
+
 namespace scraps {
 namespace math {
 
