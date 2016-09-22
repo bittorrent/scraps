@@ -21,6 +21,7 @@
 #include <array>
 #include <cmath>
 #include <functional>
+#include <ostream>
 
 namespace scraps {
 namespace math {
@@ -45,6 +46,7 @@ struct VectorComponents<T, 3> {
     union {
         std::array<T, 3> components{};
         struct { T x, y, z; };
+        struct { T r, g, b; };
     };
 };
 
@@ -60,8 +62,8 @@ struct Vector : VectorComponents<T, N> {
         components = std::array<T, N>({{std::forward<First>(first), std::forward<Second>(second), std::forward<Rem>(rem)...}});
     }
 
-    T& operator[](size_t i) { return components[i]; }
-    const T& operator[](size_t i) const { return components[i]; }
+    constexpr T& operator[](size_t i) { return components[i]; }
+    constexpr T operator[](size_t i) const { return components[i]; }
 
     template <typename U>
     Vector& operator*=(U&& scalar) {
@@ -113,13 +115,13 @@ struct Vector : VectorComponents<T, N> {
         *this /= magnitude();
     }
 
-    Vector normalized() {
+    Vector normalized() const {
         Vector ret{*this};
         ret.normalize();
         return ret;
     }
 
-    T dot(const Vector& other) {
+    T dot(const Vector& other) const {
         T result{};
         auto start = other.components.begin();
         for (auto& component : components) {
@@ -135,6 +137,15 @@ struct Vector : VectorComponents<T, N> {
 
     bool operator!=(const Vector& other) const {
         return components != other.components;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vector& v) {
+        os << '(';
+        for (size_t i = 0; i < N; ++i) {
+            if (i) { os << ", "; }
+            os << v[i];
+        }
+        return os << ')';
     }
 };
 

@@ -17,7 +17,7 @@
 
 #include "scraps/config.h"
 
-#include "scraps/opengl/OpenGL.h"
+#include "scraps/opengl/opengl.h"
 #include "scraps/opengl/VertexBuffer.h"
 
 namespace scraps {

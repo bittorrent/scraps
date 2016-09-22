@@ -17,6 +17,7 @@
 
 #include "scraps/math/Matrix.h"
 
+using namespace scraps;
 using namespace scraps::math;
 
 TEST(Matrix, translation) {
@@ -101,6 +102,20 @@ TEST(Matrix, multiplication) {
     };
 
     STATIC_ASSERT_EQ(a * b, expected);
+}
+
+TEST(Matrix, vectorMultiplication) {
+    constexpr Matrix<int, 2, 3> a{
+        1, -1, 2,
+        0, -3, 1,
+    };
+
+    constexpr Vector<int, 3> b{2, 1, 0};
+
+    constexpr Vector<int, 2> expected{1, -3};
+
+    // TODO: this can become a static assert in c++17
+    ASSERT_EQ(a * b, expected);
 }
 
 TEST(Matrix, determinant) {
@@ -202,3 +217,24 @@ TEST(Matrix, inverse) {
     STATIC_ASSERT_EQ(a.inverse(), expected);
 }
 
+TEST(Matrix, scaling) {
+    constexpr Vector<int, 3> v{1, 2, 3};
+
+    constexpr Matrix<int, 3, 3> expected{
+        1, 0, 0,
+        0, 2, 0,
+        0, 0, 3,
+    };
+
+    constexpr auto scaling = Matrix<int, 3, 3>::Scaling(v);
+    STATIC_ASSERT_EQ(scaling, expected);
+}
+
+TEST(Matrix, stream) {
+    constexpr Matrix<int, 3, 3> m{
+        1, 0, 0,
+        0, 2, 0,
+        0, 0, 3,
+    };
+    EXPECT_EQ(Format("{}", m), "[[1, 0, 0], [0, 2, 0], [0, 0, 3]]");
+}

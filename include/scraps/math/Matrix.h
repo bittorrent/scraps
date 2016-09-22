@@ -17,8 +17,11 @@
 
 #include "scraps/config.h"
 
+#include "scraps/math/Vector.h"
+
 #include <algorithm>
 #include <cmath>
+#include <ostream>
 
 #ifdef minor
 // defined on linux in sys/sysmacros.h for backward-compatibility. no one should use this
@@ -59,10 +62,23 @@ public:
             for (size_t j = 0; j < C2; ++j) {
                 T sum = 0;
                 for (size_t k = 0; k < C; ++k) {
-                    sum += (*this)(i, k) * right(k, j);
+                    sum += at(i, k) * right(k, j);
                 }
                 ret(i, j) = sum;
             }
+        }
+        return ret;
+    }
+
+    template <typename U>
+    constexpr auto operator*(const Vector<U, C>& right) const {
+        Vector<decltype(T{} * U{}), R> ret;
+        for (size_t i = 0; i < R; ++i) {
+            decltype(T{} * U{}) sum = 0;
+            for (size_t j = 0; j < C; ++j) {
+                sum += at(i, j) * right[j];
+            }
+            ret[i] = sum;
         }
         return ret;
     }
@@ -156,6 +172,29 @@ public:
         DivisorType det = determinant();
         assert(det);
         return adjugate() / det;
+    }
+
+    template <typename U = T>
+    static constexpr std::enable_if_t<R == C, Matrix<U, R, C>> Scaling(const Vector<U, R>& vector) {
+        Matrix<U, R, C> ret;
+        for (size_t i = 0; i < R; ++i) {
+            ret(i, i) = vector[i];
+        }
+        return ret;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const MatrixBase& m) {
+        os << '[';
+        for (size_t i = 0; i < R; ++i) {
+            if (i) { os << ", "; }
+            os << '[';
+            for (size_t j = 0; j < C; ++j) {
+                if (j) { os << ", "; }
+                os << m.at(i, j);
+            }
+            os << ']';
+        }
+        return os << ']';
     }
 
 protected:
