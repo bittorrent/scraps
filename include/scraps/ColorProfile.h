@@ -73,16 +73,16 @@ namespace TransferFunctions {
 }
 
 struct ColorProfile {
-    constexpr ColorProfile(ColorGamut colorPrimarySet, TransferFunction transferFunction)
-        : colorPrimarySet{std::move(colorPrimarySet)}, transferFunction{transferFunction} {}
+    constexpr ColorProfile(ColorGamut colorGamut, TransferFunction transferFunction)
+        : colorGamut{std::move(colorGamut)}, transferFunction{transferFunction} {}
 
     constexpr bool operator==(const ColorProfile& other) const {
-        return colorPrimarySet == other.colorPrimarySet && transferFunction == other.transferFunction;
+        return colorGamut == other.colorGamut && transferFunction == other.transferFunction;
     }
 
     constexpr bool operator!=(const ColorProfile& other) const { return !(*this == other); }
 
-    ColorGamut colorPrimarySet;
+    ColorGamut colorGamut;
     TransferFunction transferFunction;
 };
 
@@ -94,7 +94,7 @@ namespace ColorProfiles {
 
 inline math::Vector<double, 3> TransformColor(math::Vector<double, 3> rgb, ColorProfile from, ColorProfile to) {
     auto linear = math::Vector<double, 3>{from.transferFunction.toLinear(rgb.r), from.transferFunction.toLinear(rgb.g), from.transferFunction.toLinear(rgb.b)};
-    auto corrected = to.colorPrimarySet.rgbToXYZ().inverse() * from.colorPrimarySet.rgbToXYZ() * linear;
+    auto corrected = to.colorGamut.rgbToXYZ().inverse() * from.colorGamut.rgbToXYZ() * linear;
     auto voltage = math::Vector<double, 3>{to.transferFunction.toVoltage(corrected.r), to.transferFunction.toVoltage(corrected.g), to.transferFunction.toVoltage(corrected.b)};
     return voltage;
 }
