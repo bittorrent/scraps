@@ -74,7 +74,7 @@ namespace TransferFunctions {
 
 struct ColorProfile {
     constexpr ColorProfile(ColorGamut colorGamut, TransferFunction transferFunction)
-        : colorGamut{std::move(colorGamut)}, transferFunction{transferFunction} {}
+        : colorGamut(std::move(colorGamut)), transferFunction(transferFunction) {}
 
     constexpr bool operator==(const ColorProfile& other) const {
         return colorGamut == other.colorGamut && transferFunction == other.transferFunction;
