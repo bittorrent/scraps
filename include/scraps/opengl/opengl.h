@@ -70,10 +70,15 @@ constexpr bool kIsOpenGLES = false;
 GLint MajorVersion();
 
 /**
+* @return true if the given opengl extension is present for the current context
+*/
+bool HasExtension(std::string extension);
+
+/**
 * Define some shader macros that let you write the rest of the shader more portably.
 */
-std::string CommonVertexShaderHeader();
-std::string CommonFragmentShaderHeader();
+std::string CommonVertexShaderHeader(std::vector<std::string> extensions = {});
+std::string CommonFragmentShaderHeader(std::vector<std::string> extensions = {});
 
 }}
 

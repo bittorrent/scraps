@@ -28,12 +28,22 @@ GLint MajorVersion() {
     return ret;
 }
 
-std::string CommonShaderHeader(GLint majorVersion) {
+bool HasExtension(std::string extension) {
+    auto extensions = std::string{(const char*)glGetString(GL_EXTENSIONS)};
+    return extensions.find(std::move(extension)) != std::string::npos;
+}
+
+std::string CommonShaderHeader(GLint majorVersion, std::vector<std::string> extensions = {}) {
     std::string ret;
-    if (kIsOpenGLES && majorVersion >= 3) {
-        ret += "#version 300 es\n";
-    } else if (!kIsOpenGLES) {
+    if (kIsOpenGLES) {
+        if (majorVersion >= 3) {
+            ret += "#version 300 es\n";
+        }
+    } else {
         ret += "#version 140\n";
+    }
+    for (auto& extension : extensions) {
+        ret += "#extension "s + extension + " : enable\n";
     }
     if (kIsOpenGLES) {
         ret += "precision highp float;\n";
@@ -58,13 +68,13 @@ std::string CommonShaderHeader(GLint majorVersion) {
     return ret;
 }
 
-std::string CommonVertexShaderHeader() {
-    return CommonShaderHeader(MajorVersion());
+std::string CommonVertexShaderHeader(std::vector<std::string> extensions) {
+    return CommonShaderHeader(MajorVersion(), extensions);
 }
 
-std::string CommonFragmentShaderHeader() {
+std::string CommonFragmentShaderHeader(std::vector<std::string> extensions) {
     auto majorVersion = MajorVersion();
-    std::string ret = CommonShaderHeader(majorVersion);
+    std::string ret = CommonShaderHeader(majorVersion, extensions);
     if (kIsOpenGLES && MajorVersion() < 3) {
         ret += "#define COLOR_OUT gl_FragColor\n";
     } else {
