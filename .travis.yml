@@ -2,8 +2,11 @@ language: cpp
 dist: trusty
 sudo: required
 compiler: clang
+cache:
+  directories:
+    - needs
 install:
-    - pip install --user jinja2 pyyaml
+    - pip install --user jinja2 pyyaml colorama
     - sudo apt-get update
     - sudo apt-get install -y clang-3.8 libc++-dev libc++abi-dev xutils-dev
 script:
