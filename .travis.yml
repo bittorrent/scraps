@@ -1,18 +1,44 @@
-language: cpp
-dist: trusty
 sudo: required
-compiler: clang
 cache:
-  directories:
-    - needs
-install:
-    - pip install --user jinja2 pyyaml colorama
-    - sudo apt-get update
-    - sudo apt-get install -y clang-3.8 libc++-dev libc++abi-dev xutils-dev
-script:
-    - export CXX=clang++-3.8
-    - export CXXFLAGS=-stdlib=libc++
-    - "echo 'using clang : : $CXX : <cxxflags>$CXXFLAGS <linkflags>$CXXFLAGS ;' > project-config.jam"
-    - ./build-deps --bootstrap-b2 --configure && ./b2 tests/unit//run -j2 cxxflags="-coverage" linkflags=`find /usr/lib*/llvm-3.8/lib/ -name "libclang_rt.profile*.a"`
-after_success:
-    - bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
+    directories:
+        - needs
+        - toolchains
+matrix:
+    include:
+        - os: linux
+          language: android
+          compiler: clang
+          env:
+              - NDK_VERSION=r10e API_LEVEL=17
+          android:
+              components:
+                  - android-22
+                  - build-tools-23.0.1
+          install:
+              - ./scripts/ci/install-android-dependencies
+          script:
+              - ./scripts/ci/build-android
+        - os: linux
+          language: cpp
+          dist: trusty
+          compiler: clang
+          install:
+              - ./scripts/ci/install-linux-dependencies
+          script:
+              - ./scripts/ci/build-linux
+          after-success:
+              - bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
+        - os: osx
+          language: cpp
+          osx_image: xcode8
+          install:
+              - ./scripts/ci/install-macos-dependencies
+          script:
+              - ./scripts/ci/build-macos
+        - os: osx
+          language: cpp
+          osx_image: xcode7.3
+          install:
+              - ./scripts/ci/install-macos-dependencies
+          script:
+              - ./scripts/ci/build-macos

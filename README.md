@@ -41,6 +41,10 @@ You can override any of our dependencies by placing them in your `PKG_CONFIG_PAT
 
 `b2` will compile the library for you. You can also use `b2 install --prefix=myinstalldir` to install it, along with all of the dependencies that you did not provide during the configure step.
 
+### Other platforms
+
+Currently, only 'nix platforms are supported and only with clang and libc++. We have Travis builds for some of these but welcome pull requests for additional platform support. For help in building Scraps on your platform of choice, it may be helpful to explore the `scripts/ci` directory to determine how we do it.
+
 ## Issues & Requests
 
 If you discover an issue with security implications, we ask that you first disclose it privately by emailing any of the active BitTorrent contributors.
