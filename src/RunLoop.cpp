@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,6 +91,7 @@ void RunLoop::run() {
             if (it->fd == _wakeUpPipe[kWakeUpPipeOutput]) {
                 char buf[10];
                 while (read(it->fd, buf, sizeof(buf)) > 0);
+                _shouldWake = false;
                 continue;
             }
 
@@ -216,6 +217,13 @@ void RunLoop::reset() {
 void RunLoop::_wakeUp() {
     std::lock_guard<std::mutex> lk{_pipeMutex};
     if (_wakeUpPipe[kWakeUpPipeInput] < 0) { return; }
+    if (_shouldWake.exchange(true)) {
+        // we set _shouldWake to true when we want to wake
+        // we set _shouldWake to false after waking, but before doing anything
+        // so if _shouldWake was already true, this method has already been called since the last wake-up, and
+        // writing to the pipe would be excessive
+        return;
+    }
     if (write(_wakeUpPipe[kWakeUpPipeInput], "!", 1) != 1) {
         SCRAPS_LOGF_ERROR("error writing to wake up pipe (errno = %d)", static_cast<int>(errno));
     }
