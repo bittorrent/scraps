@@ -21,4 +21,4 @@ PROJECT_CONFIG
 cpu_count=$(nproc)
 
 ./build-deps --bootstrap-b2 --needy-target-args="-t android" --needy-satisfy-args="--android-toolchain=$android_toolchain" --configure
-./b2 -j$cpu_count variant=release
+./b2 -j$cpu_count variant=release target-os=android
