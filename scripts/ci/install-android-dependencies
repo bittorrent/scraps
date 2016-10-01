@@ -6,6 +6,7 @@ $script_dir/install-common-dependencies
 cd $script_dir/../..
 
 # makedepend for OpenSSL
+sudo apt-get update
 sudo apt-get install -y xutils-dev
 
 ####### Android NDK toolchain #######
