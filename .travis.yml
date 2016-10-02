@@ -3,6 +3,12 @@ cache:
     directories:
         - needs
         - toolchains
+before_cache:
+    # remove needs/*/download, needs/*/source, and needs/*/needs to speed up
+    # caching. If these libraries are installed correctly, the original source
+    # shouldn't be necessary.
+    - find needs -mindepth 2 -maxdepth 2 -type d \( -name source -or -name download -or -name needs \) -exec rm -rf -- {} +
+
 matrix:
     include:
 
