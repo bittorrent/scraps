@@ -8,7 +8,7 @@ platform_root=$(xcrun --show-sdk-platform-path --sdk appletvos)
 
 cpu_count=$(sysctl -n hw.ncpu)
 
-./build-deps --bootstrap-b2 --configure --needy-target-args=tvos
+./build-deps --bootstrap-b2 --configure --needy-target-args="-t tvos"
 
 cat << PROJECT_CONFIG >> project-config.jam
 import feature ;

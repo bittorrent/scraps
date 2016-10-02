@@ -8,7 +8,7 @@ platform_root=$(xcrun --show-sdk-platform-path --sdk iphoneos)
 
 cpu_count=$(sysctl -n hw.ncpu)
 
-./build-deps --bootstrap-b2 --configure --needy-target-args=ios
+./build-deps --bootstrap-b2 --configure --needy-target-args="-t ios"
 
 cat << PROJECT_CONFIG >> project-config.jam
 import feature ;
