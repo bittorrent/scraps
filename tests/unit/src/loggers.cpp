@@ -172,3 +172,20 @@ TEST(LogRateLimitedMacros, basicUsage) {
 
     EXPECT_NEAR(testLogger->messages.size(), 80, 8);
 }
+
+TEST(LogCounter, countingAbility) {
+    scraps::LogCounter counter;
+
+    EXPECT_EQ(counter.count(scraps::LogLevel::kDebug), 0);
+    EXPECT_EQ(counter.count(scraps::LogLevel::kInfo), 0);
+    EXPECT_EQ(counter.count(scraps::LogLevel::kWarning), 0);
+    EXPECT_EQ(counter.count(scraps::LogLevel::kError), 0);
+
+    counter.log(scraps::LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 2, "bar");
+    EXPECT_EQ(counter.count(scraps::LogLevel::kDebug), 1);
+    counter.log(scraps::LogLevel::kDebug, std::chrono::system_clock::now(), "bar.c", 2, "bar");
+    EXPECT_EQ(counter.count(scraps::LogLevel::kDebug), 2);
+
+    counter.log(scraps::LogLevel::kError, std::chrono::system_clock::now(), "bar.c", 2, "bar");
+    EXPECT_EQ(counter.count(scraps::LogLevel::kError), 1);
+}

@@ -63,12 +63,12 @@ libraries:
                 - sh ./config {{openssl_flags}}
                 {% endif %}
                 - make depend
-                - sh -c 'make build_libs {{cross_args}} -j{{ parameters.concurrency if parameters.concurrency else '' }}'
+                - sh -c 'make build_libs {{cross_args}} -j{build_concurrency}'
                 - sh -c 'make install_sw DIRS="crypto ssl engines"'
             post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
     curl:
-        download: http://curl.haxx.se/download/curl-7.44.0.tar.gz
-        checksum: 4dc36d2f3310585cc1f9211b5f5c71327c86fb61
+        download: https://curl.haxx.se/download/curl-7.50.3.tar.gz
+        checksum: be0065afc76a3d8568f5f78d8efddadb6310f9d7
         dependencies: openssl
         project:
             environment:
@@ -138,3 +138,8 @@ libraries:
         commit: fa34cb3f85d9358bb93ab747dbd7105e97fc4216
         project:
             header-directory: include
+    json:
+        repository: https://github.com/nlohmann/json.git
+        commit: v2.0.3
+        project:
+            header-directory: src

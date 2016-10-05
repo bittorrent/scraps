@@ -13,7 +13,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+#include <scraps/bitfield.h>
 
-#include <benchmark/benchmark.h>
+#include <fstream>
+#include <streambuf>
+#include <string>
+#include <cstdio>
 
-BENCHMARK_MAIN();
+int main(int argc, const char* argv[]) {
+    if (argc < 2) { return 1; }
+
+    std::ifstream f(argv[1], std::ios::in | std::ios::binary);
+    std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+
+    auto begin = scraps::BitIterator::Begin(str.data(), str.size());
+    auto end = scraps::BitIterator::End(str.data(), str.size());
+    auto encoded = scraps::BitfieldEncode(begin, end);
+    printf("%zu\n", encoded.size());
+
+    return 0;
+}

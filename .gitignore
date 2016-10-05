@@ -6,6 +6,7 @@ bin
 /needs
 /b2
 /project-config.jam
+/tests/fuzz/*/findings
 
 # doxygen
 /docs
