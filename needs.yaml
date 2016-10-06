@@ -74,7 +74,7 @@ libraries:
             environment:
                 # dl is required to link statically to openssl
                 LIBS: -ldl
-                {% if platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator'] %}
+                {% if platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator', 'osx'] %}
                 # Workaround for earlier versions of Xcode platforms. See https://curl.haxx.se/mail/lib-2016-09/0051.html
                 CFLAGS: -Werror=partial-availability
                 CXXFLAGS: -Werror=partial-availability
