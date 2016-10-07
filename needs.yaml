@@ -110,8 +110,8 @@ libraries:
             header-directory: include
             post-build: xxd -i LICENSE {build_directory}/include/gsl_license.c
     mnmlstc:
-        repository: https://github.com/bittorrent/mnmlstc-core.git
-        commit: 477ad177db1bed75c5f251b1a1976787cc769c00
+        repository: https://github.com/mnmlstc/core.git
+        commit: adc247ff43377129a2b85f694db02fa8dd4212c0
         project:
             header-directory: include
             post-build: xxd -i License.rst {build_directory}/include/core/license.c

@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include <gtest/gtest.h>
-
 #include "scraps/utility.h"
+
+#include <gtest/gtest.h>
 
 #if SCRAPS_MACOS
 #import <Foundation/NSProcessInfo.h>
@@ -24,37 +24,6 @@
 #include <array>
 
 using namespace scraps;
-
-TEST(utility, Base64Encode) {
-    std::string json =
-        R"({
-    "event": "Signed Up",
-    "properties": {
-        "distinct_id": "13793",
-        "token": "e3bc4100330c35722740fb8c6f5abddc",
-        "Referred By": "Friend"
-    }
-})";
-
-    const auto base64EncodedJSON =
-        "ewogICAgImV2ZW50IjogIlNpZ25lZCBVcCIsCiAgICAicHJvcGVydGllcyI6IHsKICAgICAgICAiZGlzdGluY3RfaWQiOiAiMTM3OTMiLAogIC"
-        "AgICAgICJ0b2tlbiI6ICJlM2JjNDEwMDMzMGMzNTcyMjc0MGZiOGM2ZjVhYmRkYyIsCiAgICAgICAgIlJlZmVycmVkIEJ5IjogIkZyaWVuZCIK"
-        "ICAgIH0KfQ==";
-
-    auto encoded = Base64Encode(json.data(), json.size());
-    EXPECT_EQ(encoded, base64EncodedJSON);
-
-    auto decoded = Base64Decode(encoded.data(), encoded.length());
-    EXPECT_EQ(decoded, json);
-
-    // Since base64 encoding has padding characters depending on the size of the source data, test all cases:
-    for (auto i = 0; i < 4; ++i) {
-        json.push_back('a');
-        encoded = Base64Encode(json.data(), json.size());
-        decoded = Base64Decode(encoded.data(), encoded.length());
-        EXPECT_EQ(decoded, json);
-    }
-}
 
 TEST(utility, Clamp) {
     EXPECT_EQ(Clamp(5l, 0, 10), 5l);
