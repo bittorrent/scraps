@@ -62,7 +62,11 @@ libraries:
                 {% elif platform == host_platform %}
                 - sh ./config {{openssl_flags}}
                 {% endif %}
-                - make depend
+                # 'make depend' generates lots of error messages about compiler-supplied headers it isn't set up to find.
+                # needy shows redirect portion of command if run using 'sh -c', but not when running command directly.
+                # Can't append a comment within the -c argument value, since needy will strip it out and lose the command's terminal quote.
+                - sh -c 'make depend 2> makedepend-errors.log'
+                - wc -l makedepend-errors.log
                 - sh -c 'make build_libs {{cross_args}} -j{build_concurrency}'
                 - sh -c 'make install_sw DIRS="crypto ssl engines"'
             post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
