@@ -1,11 +1,12 @@
 .DS_Store
 
 bin
+configure.json
 /bootstrap
 /dist
 /needs
 /b2
-/project-config.jam
+project-config.jam
 /tests/fuzz/*/findings
 
 # doxygen
