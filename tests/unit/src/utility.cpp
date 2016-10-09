@@ -182,10 +182,10 @@ TEST(utility, Demangle) {
 }
 
 TEST(utility, ByteFromFile) {
-    auto path = std::tmpnam(nullptr);
-    FILE* f = fopen(path, "wb");
-    fprintf(f, "test");
-    fclose(f);
+    char path[] = "tempfile-XXXXXX";
+    int fd = mkstemp(path);
+    dprintf(fd, "test");
+    close(fd);
     auto _ = gsl::finally([&] { unlink(path); });
 
     auto bytes = BytesFromFile(path);

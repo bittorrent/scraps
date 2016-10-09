@@ -114,6 +114,7 @@ libraries:
         commit: adc247ff43377129a2b85f694db02fa8dd4212c0
         project:
             header-directory: include
+            post-clean: git apply < {{ needs_file|dirname }}/dependencies/mnmlstc/0001-Prevent-warnings-for-32-bit-architectures.patch
             post-build: xxd -i License.rst {build_directory}/include/core/license.c
     fmtlib:
         repository: https://github.com/fmtlib/fmt.git
