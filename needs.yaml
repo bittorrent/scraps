@@ -1,14 +1,6 @@
 {% set common_cxx_flags = env['CXXFLAGS'] ~ ' -fvisibility=hidden' %}
+{% set xcrun_platforms = {'ios': 'iphoneos', 'tvos': 'appletvos', 'iossimulator': 'iphoneossimulator', 'tvossimulator': 'appletvossimulator'} %}
 
-{% if platform == 'ios' %}
-{% set xcrun_platform = 'iphoneos' %}
-{% elif platform == 'iossimulator' %}
-{% set xcrun_platform = 'iphonesimulator' %}
-{% elif platform == 'tvos' %}
-{% set xcrun_platform = 'appletvos' %}
-{% elif platform == 'tvossimulator' %}
-{% set xcrun_platform = 'appletvsimulator' %}
-{% endif %}
 libraries:
     asio:
         repository: https://github.com/chriskohlhoff/asio.git
@@ -57,18 +49,15 @@ libraries:
                 {% elif platform == 'android' %}
                 - sh ./Configure android {{openssl_flags}}
                 {% elif platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator'] %}
-                {% set cross_args = 'CROSS_TOP=$(xcrun --sdk ' ~ xcrun_platform ~ ' --show-sdk-platform-path)/Developer CROSS_SDK=$(basename $(xcrun --sdk ' ~ xcrun_platform ~ ' --show-sdk-path))' %}
+                {% set cross_args = 'CROSS_TOP=$(xcrun --sdk ' ~ xcrun_platforms[platform] ~ ' --show-sdk-platform-path)/Developer CROSS_SDK=$(basename $(xcrun --sdk ' ~ xcrun_platforms[platform] ~ ' --show-sdk-path))' %}
                 - sh ./Configure iphoneos-cross {{openssl_flags}}
                 {% elif platform == host_platform %}
                 - sh ./config {{openssl_flags}}
                 {% endif %}
-                # 'make depend' generates lots of error messages about compiler-supplied headers it isn't set up to find.
-                # needy shows redirect portion of command if run using 'sh -c', but not when running command directly.
-                # Can't append a comment within the -c argument value, since needy will strip it out and lose the command's terminal quote.
-                - sh -c 'make depend 2> makedepend-errors.log'
-                - wc -l makedepend-errors.log
+                # 'make depend' generates lots of error messages about compiler-supplied headers it isn't set up to find
+                - make depend 2> makedepend-errors.log
                 - sh -c 'make build_libs {{cross_args}} -j{build_concurrency}'
-                - sh -c 'make install_sw DIRS="crypto ssl engines"'
+                - make install_sw DIRS="crypto ssl engines"
             post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
     curl:
         download: https://curl.haxx.se/download/curl-7.50.3.tar.gz
