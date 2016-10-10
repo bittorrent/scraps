@@ -132,7 +132,7 @@ libraries:
             cmake-options:
                 CMAKE_BUILD_TYPE: Release
     jshackle:
-        repository: git@github.com:bittorrent/jshackle.git
+        repository: https://github.com/bittorrent/jshackle.git
         commit: fa34cb3f85d9358bb93ab747dbd7105e97fc4216
         project:
             header-directory: include

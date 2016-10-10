@@ -19,11 +19,8 @@
 
 #include <string>
 #include <cstdio>
-#include <cinttypes>
 
-// linux defines major and minor macros
-#undef major
-#undef minor
+#include <inttypes.h>
 
 namespace scraps {
 

@@ -49,7 +49,7 @@ static void BitfieldEncodeComplexity(benchmark::State& state) {
     state.SetComplexityN(state.range(0));
 }
 
-BENCHMARK(BitfieldEncodeComplexity)->RangeMultiplier(4)->Range(256, 1<<12)->Complexity();
+BENCHMARK(BitfieldEncodeComplexity)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
 EXPECT_COMPLEXITY_LE(BitfieldEncodeComplexity, benchmark::oN);
 
 static void BitfieldDecodeComplexity(benchmark::State& state) {
@@ -65,5 +65,5 @@ static void BitfieldDecodeComplexity(benchmark::State& state) {
     state.SetComplexityN(state.range(0));
 }
 
-BENCHMARK(BitfieldDecodeComplexity)->RangeMultiplier(4)->Range(256, 1<<12)->Complexity();
+BENCHMARK(BitfieldDecodeComplexity)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
 EXPECT_COMPLEXITY_LE(BitfieldDecodeComplexity, benchmark::oN);

@@ -1,34 +1,21 @@
 path-constant NEEDS_PATH : ../../needs ;
 
-lib gtest : $(NEEDS_PATH)//googletest : <name>gtest ;
-alias json : $(NEEDS_PATH)//json ;
+lib gtest      : $(NEEDS_PATH)//googletest : <name>gtest ;
+alias jshackle : $(NEEDS_PATH)//jshackle ;
+alias json     : $(NEEDS_PATH)//json ;
 
-alias scraps-tests-common :
+lib log ;
+
+exe scraps-tests :
     [ glob-tree-ex src : *.cpp ]
     ../..//scraps
-    gtest
     json
-;
-
-exe scraps-tests : scraps-tests-common/<link>static :
-    <target-os>iphone:<build>no
-    <target-os>appletv:<build>no
+    gtest
+:
+    <target-os>android:<source>jshackle
+    <target-os>android:<source>log
 ;
 
 import testing ;
 unit-test run : scraps-tests ;
 explicit run ;
-
-lib scraps-tests-android :
-    scraps-tests-common/<link>static
-    $(NEEDS_PATH)//jshackle
-:
-    <link>shared
-    <build>no
-    <target-os>android:<build>yes
-;
-
-install dist/android : scraps-tests-android/<target-os>android :
-    <build>no
-    <target-os>android:<build>yes
-;

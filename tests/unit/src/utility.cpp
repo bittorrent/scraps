@@ -181,6 +181,11 @@ TEST(utility, Demangle) {
     EXPECT_EQ(Demangle(typeid(scraps::GenericByte).name()), "scraps::GenericByte");
 }
 
+// Android doesn't have dprintf until api version 21, but does have fdprintf.
+#if SCRAPS_ANDROID && __ANDROID_API__ < 21
+#define dprintf fdprintf
+#endif
+
 TEST(utility, ByteFromFile) {
     char path[] = "tempfile-XXXXXX";
     int fd = mkstemp(path);

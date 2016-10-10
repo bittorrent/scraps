@@ -52,12 +52,14 @@ if args.cross_target:
             'android': 'android',
         }[args.cross_target]))
     b2_config.append('--target={}'.format(args.cross_target))
-    b2.append(
+    b2 += [
         'target-os={}'.format({
             'iphoneos': 'iphone',
             'appletvos': 'appletv',
             'android': 'android',
-        }[args.cross_target]))
+        }[args.cross_target]),
+        'tests/unit'
+    ]
 else:
     b2 += ['tests/unit', 'tests/benchmarks']
 
@@ -67,6 +69,9 @@ if args.cross_target == 'android':
         sys.exit(1)
     build_deps.append('--needy-satisfy-args=--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
     b2_config.append('--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
+
+    b2 = 'PATH=$ANDROID_TOOLCHAIN/arm-linux-androideabi/bin:$PATH {}'.format(' '.join([pipes.quote(s) for s in b2]))
+
 
 def run_command(command):
     if isinstance(command, list):
