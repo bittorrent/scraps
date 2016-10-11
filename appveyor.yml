@@ -1,0 +1,11 @@
+environment:
+    PYTHON: C:\\Python34
+install:
+    - git submodule update --init --recursive
+    - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+    - pip install -r needy\requirements.txt
+    - mkdir ci-bin && set PATH=%CD%\ci-bin;%PATH%
+    - ps: Set-Content ci-bin\xxd.bat -Value '@"C:\msys64\usr\bin\xxd.exe" %*'
+build_script:
+    - python needy\scripts\needy satisfy asio gsl mnmlstc
+test: off
