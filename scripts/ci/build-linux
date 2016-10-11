@@ -18,4 +18,5 @@ coverage_lib=$(find /usr/lib*/llvm-3.8/lib/ -name "libclang_rt.profile*.a")
 cpu_count=$(nproc)
 
 ./build-deps --bootstrap-b2 --configure
-./b2 tests/unit//run -j$cpu_count cxxflags="-coverage" linkflags="$coverage_lib"
+./b2 -j$cpu_count tests/unit//run cxxflags="-coverage" linkflags="$coverage_lib"
+./b2 -j$cpu_count variant=release tests/benchmarks//run
