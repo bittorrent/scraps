@@ -20,14 +20,6 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
-// Linux defines major and minor macros in sys/sysmacros.h for backward-compatibility. No one should use these.
-#ifdef minor
-#undef minor
-#endif
-#ifdef major
-#undef major
-#endif
-
 #include "scraps/platform.h"
 #include "scraps/warnings.h"
 #include "scraps/assert.h"

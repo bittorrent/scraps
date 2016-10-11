@@ -23,6 +23,14 @@
 #include <cmath>
 #include <ostream>
 
+// Linux defines major and minor macros in sys/sysmacros.h for backward-compatibility. No one should use these.
+#ifdef minor
+#undef minor
+#endif
+#ifdef major
+#undef major
+#endif
+
 namespace scraps {
 namespace math {
 
