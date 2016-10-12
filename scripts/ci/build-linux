@@ -19,4 +19,4 @@ cpu_count=$(nproc)
 
 ./build-deps --bootstrap-b2 --configure
 ./b2 -j$cpu_count tests/unit//run cxxflags="-coverage" linkflags="$coverage_lib"
-./b2 -j$cpu_count variant=release tests/benchmarks//run
+./b2 -j$cpu_count variant=release tests/benchmarks

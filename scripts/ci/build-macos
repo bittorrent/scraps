@@ -11,4 +11,4 @@ cpu_count=$(sysctl -n hw.ncpu)
 
 ./b2 -j$cpu_count variant=release
 ./b2 -j$cpu_count variant=release tests/unit//run
-./b2 -j$cpu_count variant=release tests/benchmarks//run
+./b2 -j$cpu_count variant=release tests/benchmarks
