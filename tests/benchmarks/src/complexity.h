@@ -58,15 +58,31 @@ public:
     static std::unique_ptr<Assertion> registerAssertion(std::string benchmarkName, const char* file, size_t line, std::function<bool(benchmark::BenchmarkReporter::Run)> func);
 };
 
+constexpr auto BigORank(benchmark::BigO bigO) {
+    switch(bigO) {
+    case benchmark::o1:        return 1;
+    case benchmark::oLogN:     return 2;
+    case benchmark::oN:        return 3;
+    case benchmark::oNLogN:    return 4;
+    case benchmark::oNSquared: return 5;
+    case benchmark::oNCubed:   return 6;
+    case benchmark::oAuto:   // fallthrough
+    case benchmark::oLambda: // fallthrough
+    case benchmark::oNone:   // fallthrough
+    default:
+        return 9;
+    }
+}
+
 #define CONCAT_(x, y) x ## y
 #define CONCAT(x, y) CONCAT_(x, y)
 
 // For a full list of complexity measurements, see benchmark_api.h from google benchmark
-#define EXPECT_COMPLEXITY_LT(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return r.complexity <  complexity_enum; });
-#define EXPECT_COMPLEXITY_LE(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return r.complexity <= complexity_enum; });
-#define EXPECT_COMPLEXITY_EQ(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return r.complexity == complexity_enum; });
-#define EXPECT_COMPLEXITY_GT(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return r.complexity >  complexity_enum; });
-#define EXPECT_COMPLEXITY_GE(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return r.complexity >= complexity_enum; });
+#define EXPECT_COMPLEXITY_LT(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) <  BigORank(complexity_enum); });
+#define EXPECT_COMPLEXITY_LE(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) <= BigORank(complexity_enum); });
+#define EXPECT_COMPLEXITY_EQ(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) == BigORank(complexity_enum); });
+#define EXPECT_COMPLEXITY_GT(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) >  BigORank(complexity_enum); });
+#define EXPECT_COMPLEXITY_GE(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) >= BigORank(complexity_enum); });
 #define EXPECT_RUN(benchmark_name, functor)                   static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, functor);
 
 #define COMPLEXITY_ASSERTION_MAIN()                \
