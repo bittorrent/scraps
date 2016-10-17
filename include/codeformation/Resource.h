@@ -44,6 +44,11 @@ protected:
     }
 
     template <typename T>
+    T optionalProperty(const String& name) {
+        return optional<T>(name, _properties);
+    }
+
+    template <typename T>
     T require(const Any& thing) {
         auto* ret = stdts::any_cast<T>(&thing);
         if (!ret) {
