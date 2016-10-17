@@ -53,7 +53,16 @@ args = parser.parse_args()
 if args.bootstrap_b2:
     bootstrap_b2()
 
-dependencies = [dep for dep in ['asio', 'fmtlib', 'libsodium', 'gsl', 'mnmlstc'] if not pkg_is_present(dep)]
+dependencies = [
+    'asio',
+    'fmtlib',
+    'gsl',
+    'json11',
+    'libsodium',
+    'mnmlstc',
+]
+
+dependencies = [dep for dep in dependencies if not pkg_is_present(dep)]
 if not pkg_is_present('libcurl'):
     dependencies.append('curl')
 if not pkg_is_present('libssl') or not pkg_is_present('libcrypto'):

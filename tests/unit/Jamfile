@@ -2,14 +2,12 @@ path-constant NEEDS_PATH : ../../needs ;
 
 lib gtest      : $(NEEDS_PATH)//googletest : <name>gtest ;
 alias jshackle : $(NEEDS_PATH)//jshackle ;
-alias json     : $(NEEDS_PATH)//json ;
 
 lib log ;
 
 exe scraps-tests :
     [ glob-tree-ex src : *.cpp ]
     ../..//scraps
-    json
     gtest
 :
     <target-os>android:<source>jshackle

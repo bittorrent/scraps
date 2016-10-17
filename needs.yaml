@@ -136,8 +136,14 @@ libraries:
         commit: fa34cb3f85d9358bb93ab747dbd7105e97fc4216
         project:
             header-directory: include
-    json:
-        repository: https://github.com/nlohmann/json.git
-        commit: v2.0.3
+    json11:
+        repository: https://github.com/dropbox/json11.git
+        commit: a20878aaa5bd2546466585b18b6d09808a98233d
         project:
-            header-directory: src
+            build-steps:
+                - cp json11.hpp {build_directory}/include
+                - $CXX -std=c++11 {{ '-stdlib=libc++' if platform != 'android' }} -c json11.cpp -I . -o json11.o
+                - ar -rv {build_directory}/lib/libjson11.a json11.o
+            post-build:
+                - mkdir -p {build_directory}/include/json11
+                - xxd -i LICENSE.txt {build_directory}/include/json11/license.c
