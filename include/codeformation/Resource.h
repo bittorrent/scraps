@@ -44,7 +44,7 @@ protected:
     }
 
     template <typename T>
-    T optionalProperty(const String& name) {
+    stdts::optional<T> optionalProperty(const String& name) {
         return optional<T>(name, _properties);
     }
 
