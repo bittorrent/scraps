@@ -86,7 +86,7 @@ includedir=\${exec_prefix}/include
 Name: scraps
 Version: 0
 Description: Random scraps of C++
-Requires: libcurl, openssl, fmt, asio, gsl, libsodium, mnmlstc
+Requires: libcurl, openssl, fmt, asio, gsl, libsodium, mnmlstc, json11
 Libs: -L\${libdir} -lscraps
 Libs.private: $(PRIVATE_LIBS)
 Cflags: -I\${includedir} -DASIO_STANDALONE=1 -fvisibility=hidden
@@ -105,6 +105,7 @@ alias install :
     install-gsl-if-owned
     install-asio-if-owned
     install-mnmlstc-if-owned
+    install-json11-if-owned
 ;
 
 explicit install install-lib install-pkgconfig ;
