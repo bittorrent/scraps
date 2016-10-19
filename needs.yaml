@@ -16,8 +16,8 @@ libraries:
                 - ./bootstrap.sh
                 - ./b2 install --prefix={build_directory}
     libsodium:
-        download: https://github.com/jedisct1/libsodium/releases/download/1.0.10/libsodium-1.0.10.tar.gz
-        checksum: f34f78330cf1a4f69acce5f3fc2ada2d4098c7f4
+        download: https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz
+        checksum: 60f3f3a3f4aea38a103d25844a9e181c0f7b4505
         project:
             configure-args:
                 - --enable-minimal

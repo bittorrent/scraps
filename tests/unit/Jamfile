@@ -12,6 +12,8 @@ exe scraps-tests :
 :
     <target-os>android:<source>jshackle
     <target-os>android:<source>log
+
+    <target-os>iphone:<framework>Foundation
 ;
 
 import testing ;

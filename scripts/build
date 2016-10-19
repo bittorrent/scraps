@@ -75,10 +75,10 @@ if args.cross_target == 'android':
 
 def run_command(command):
     if isinstance(command, list):
-        print(Fore.BLUE + Style.BRIGHT + '+ {}'.format(' '.join([pipes.quote(s) for s in command])) + Style.RESET_ALL)
+        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(' '.join([pipes.quote(s) for s in command])) + Style.RESET_ALL)
         subprocess.check_call(command)
     else:
-        print(Fore.BLUE + Style.BRIGHT + '+ {}'.format(command) + Style.RESET_ALL)
+        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(command) + Style.RESET_ALL)
         subprocess.check_call(command, shell=True)
 
 try:
