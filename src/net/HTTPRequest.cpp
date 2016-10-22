@@ -40,7 +40,9 @@ HTTPRequest::~HTTPRequest() {
 }
 
 void HTTPRequest::initiate(const std::string& url, const void* body, size_t bodyLength, const std::vector<std::string>& headers) {
-    SCRAPS_ASSERT(CURLIsThreadSafe() && "You need to call InitCURLThreadSafety upon application startup.");
+    if (!CURLIsThreadSafe()) {
+        SCRAPS_LOG_WARNING("cURL may not be thread safe. You should call scraps::net::InitCURLThreadSafety on startup.");
+    }
 
     _curl = curl_easy_init();
     _curlMultiHandle = curl_multi_init();
