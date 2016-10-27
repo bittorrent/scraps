@@ -198,3 +198,13 @@ TEST(utility, ByteFromFile) {
     EXPECT_EQ(bytes->size(), 4);
     EXPECT_EQ(memcmp(bytes->data(), "test", std::min<size_t>(bytes->size(), 4)), 0);
 }
+
+TEST(utility, CaseInsensitiveEquals) {
+    EXPECT_TRUE(CaseInsensitiveEquals("test", "test"));
+    EXPECT_TRUE(CaseInsensitiveEquals("test", "Test"));
+    EXPECT_TRUE(CaseInsensitiveEquals("test", "TEST"));
+
+    EXPECT_FALSE(CaseInsensitiveEquals("test", "test1"));
+    EXPECT_FALSE(CaseInsensitiveEquals("test", ""));
+    EXPECT_FALSE(CaseInsensitiveEquals("tes", "test"));
+}
