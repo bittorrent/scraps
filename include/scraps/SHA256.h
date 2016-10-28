@@ -19,8 +19,15 @@
 
 #include "scraps/Byte.h"
 
+#if SCRAPS_APPLE
+    #include "scraps/detail/SHA256Apple.h"
+    namespace scraps { using SHA256Impl = detail::SHA256Apple; }
+#else
+    #include "scraps/detail/SHA256Sodium.h"
+    namespace scraps { using SHA256Impl = detail::SHA256Sodium; }
+#endif
+
 #include <gsl.h>
-#include <sodium/crypto_hash_sha256.h>
 
 namespace scraps {
 
@@ -32,24 +39,16 @@ using SHA256Byte = StrongByte<SHA256ByteTag<BaseByteType>>;
 
 class SHA256 {
 public:
-    SHA256() { reset(); }
+    static const size_t kHashSize = 32u;
 
-    static const size_t kHashSize = crypto_hash_sha256_BYTES;
+    void reset();
 
-    void reset() {
-        crypto_hash_sha256_init(&_state);
-    }
+    void update(const void* data, size_t length);
 
-    void update(const void* data, size_t length) {
-        crypto_hash_sha256_update(&_state, reinterpret_cast<const unsigned char*>(data), length);
-    }
-
-    void finish(void* hash) {
-        crypto_hash_sha256_final(&_state, reinterpret_cast<unsigned char*>(hash));
-    }
+    void finish(void* hash);
 
 private:
-    crypto_hash_sha256_state _state;
+    SHA256Impl _impl;
 };
 
 template <typename ByteT, std::ptrdiff_t N>
@@ -62,6 +61,18 @@ GetSHA256(gsl::span<ByteT, N> data) {
     sha256.finish(ret.data());
 
     return ret;
+}
+
+inline void SHA256::reset() {
+    _impl.reset();
+}
+
+inline void SHA256::update(const void* data, size_t length) {
+    _impl.update(data, length);
+}
+
+inline void SHA256::finish(void* hash) {
+    _impl.finish(hash);
 }
 
 } // namespace scraps

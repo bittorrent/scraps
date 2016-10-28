@@ -41,6 +41,9 @@ alias scraps_deps :
     <define>STATICLIB
 
     <target-os>darwin:<framework>Foundation
+    <target-os>iphone:<framework>Foundation
+    <target-os>appletv:<framework>Foundation
+
     <target-os>darwin:<framework>CoreServices
     <target-os>darwin:<framework>CoreFoundation
     <target-os>darwin:<framework>Security

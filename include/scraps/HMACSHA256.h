@@ -17,8 +17,15 @@
 
 #include "scraps/config.h"
 
+#if SCRAPS_APPLE
+    #include "scraps/detail/HMACApple.h"
+    namespace scraps { using HMACSHA256Impl = detail::HMACApple<kCCHmacAlgSHA256>; }
+#else
+    #include "scraps/detail/SHA256Sodium.h"
+    namespace scraps { using HMACSHA256Impl = detail::HMACSHA256Sodium; }
+#endif
+
 #include <gsl.h>
-#include <sodium/crypto_auth_hmacsha256.h>
 
 namespace scraps {
 
@@ -30,29 +37,18 @@ using HMACSHA256Byte = StrongByte<HMACSHA256ByteTag<BaseByteType>>;
 
 class HMACSHA256 {
 public:
-    HMACSHA256(const void* key, size_t length) {
-        reset(key, length);
-    }
+    static const size_t kResultSize = 32u;
 
-    static const size_t kResultSize = crypto_auth_hmacsha256_BYTES;
+    HMACSHA256(const void* key, size_t length);
 
-    void reset(const void* key, size_t length) {
-        auto err = crypto_auth_hmacsha256_init(&_state, reinterpret_cast<const unsigned char*>(key), length);
-        SCRAPS_ASSERT(!err);
-    }
+    void reset(const void* key, size_t length);
 
-    void update(const void* data, size_t length) {
-        auto err = crypto_auth_hmacsha256_update(&_state, reinterpret_cast<const unsigned char*>(data), length);
-        SCRAPS_ASSERT(!err);
-    }
+    void update(const void* data, size_t length);
 
-    void finish(void* result) {
-        auto err = crypto_auth_hmacsha256_final(&_state, reinterpret_cast<unsigned char*>(result));
-        SCRAPS_ASSERT(!err);
-    }
+    void finish(void* result);
 
 private:
-    crypto_auth_hmacsha256_state _state;
+    HMACSHA256Impl _impl;
 };
 
 template <typename KeyByteType, std::ptrdiff_t KeySize, typename ByteT, std::ptrdiff_t DataSize>
@@ -65,6 +61,20 @@ GetHMACSHA256(gsl::span<KeyByteType, KeySize> key, gsl::span<ByteT, DataSize> da
     hmac.finish(ret.data());
 
     return ret;
+}
+
+inline HMACSHA256::HMACSHA256(const void* key, size_t length) : _impl{key, length} { }
+
+inline void HMACSHA256::reset(const void* key, size_t length) {
+    _impl.reset(key, length);
+}
+
+inline void HMACSHA256::update(const void* data, size_t length) {
+    _impl.update(data, length);
+}
+
+inline void HMACSHA256::finish(void* result) {
+    _impl.finish(result);
 }
 
 } // namespace scraps
