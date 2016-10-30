@@ -14,7 +14,11 @@
 * limitations under the License.
 */
 #include "scraps/SHA256.h"
+
+#if SCRAPS_APPLE
 #include "scraps/apple/SHA256.h"
+#endif
+
 #include "scraps/sodium/SHA256.h"
 #include "scraps/random.h"
 #include "complexity.h"
@@ -68,9 +72,15 @@ void SHA256ComplexityAllInOne(benchmark::State& state) {
     state.SetComplexityN(state.range(0));
 }
 
+#if SCRAPS_APPLE
+
 void SHA256ComplexityApple(benchmark::State& state) {
     SHA256Complexity<scraps::apple::SHA256>(state);
 }
+BENCHMARK(SHA256ComplexityApple)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
+EXPECT_COMPLEXITY_LE(SHA256ComplexityApple, benchmark::oN);
+
+#endif // SCRAPS_APPLE
 
 void SHA256ComplexitySodium(benchmark::State& state) {
     SHA256Complexity<scraps::sodium::SHA256>(state);
@@ -78,7 +88,6 @@ void SHA256ComplexitySodium(benchmark::State& state) {
 
 BENCHMARK(SHA256ComplexityAllInOne)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
 BENCHMARK(SHA256ComplexitySodium)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
-BENCHMARK(SHA256ComplexityApple)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
+
 EXPECT_COMPLEXITY_LE(SHA256ComplexityAllInOne, benchmark::oN);
 EXPECT_COMPLEXITY_LE(SHA256ComplexitySodium, benchmark::oN);
-EXPECT_COMPLEXITY_LE(SHA256ComplexityApple, benchmark::oN);
