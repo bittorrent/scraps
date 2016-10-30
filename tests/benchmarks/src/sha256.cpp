@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 #include "scraps/SHA256.h"
-#include "scraps/detail/SHA256Sodium.h"
+#include "scraps/apple/SHA256.h"
+#include "scraps/sodium/SHA256.h"
 #include "scraps/random.h"
 #include "complexity.h"
 
@@ -38,14 +38,16 @@ auto GetRandomTestBytes(size_t numBytes) {
 }
 } // anonymous namespace
 
-template <typename T>
-static void SHA256Complexity(benchmark::State& state) {
+template <typename SHA256Type>
+void SHA256Complexity(benchmark::State& state) {
+    SHA256Type sha256;
+    std::array<unsigned char, SHA256Type::kHashSize> result;
     while (state.KeepRunning()) {
         state.PauseTiming();
         auto bytes = GetRandomTestBytes(state.range(0));
-        std::array<unsigned char, scraps::SHA256::kHashSize> result;
+        memset(result.data(), 0, result.size());
+        sha256.reset();
         state.ResumeTiming();
-        T sha256;
         sha256.update(bytes.data(), bytes.size());
         sha256.finish(result.data());
         benchmark::DoNotOptimize(&result);
@@ -54,14 +56,29 @@ static void SHA256Complexity(benchmark::State& state) {
     state.SetComplexityN(state.range(0));
 }
 
-static void SHA256ComplexityNative(benchmark::State& state) {
-    SHA256Complexity<scraps::SHA256>(state);
+void SHA256ComplexityAllInOne(benchmark::State& state) {
+    while (state.KeepRunning()) {
+        state.PauseTiming();
+        auto bytes = GetRandomTestBytes(state.range(0));
+        state.ResumeTiming();
+        auto result = GetSHA256(gsl::as_span(bytes));
+        benchmark::DoNotOptimize(&result);
+        benchmark::ClobberMemory();
+    }
+    state.SetComplexityN(state.range(0));
 }
 
-static void SHA256ComplexitySodium(benchmark::State& state) {
-    SHA256Complexity<scraps::detail::SHA256Sodium>(state);
+void SHA256ComplexityApple(benchmark::State& state) {
+    SHA256Complexity<scraps::apple::SHA256>(state);
 }
 
+void SHA256ComplexitySodium(benchmark::State& state) {
+    SHA256Complexity<scraps::sodium::SHA256>(state);
+}
+
+BENCHMARK(SHA256ComplexityAllInOne)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
 BENCHMARK(SHA256ComplexitySodium)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
-
-BENCHMARK(SHA256ComplexityNative)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
+BENCHMARK(SHA256ComplexityApple)->RangeMultiplier(4)->Range(256, 1<<15)->Complexity();
+EXPECT_COMPLEXITY_LE(SHA256ComplexityAllInOne, benchmark::oN);
+EXPECT_COMPLEXITY_LE(SHA256ComplexitySodium, benchmark::oN);
+EXPECT_COMPLEXITY_LE(SHA256ComplexityApple, benchmark::oN);
