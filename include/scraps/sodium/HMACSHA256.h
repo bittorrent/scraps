@@ -24,7 +24,7 @@ namespace sodium {
 
 class HMACSHA256 {
 public:
-    constexpr size_t kResultSize = crypto_auth_hmacsha256_BYTES;
+    static constexpr size_t kResultSize = crypto_auth_hmacsha256_BYTES;
 
     HMACSHA256(const void* key, size_t length);
 

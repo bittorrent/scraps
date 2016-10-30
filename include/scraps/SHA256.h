@@ -23,7 +23,7 @@
     #include "scraps/apple/SHA256.h"
     namespace scraps { using SHA256 = apple::SHA256; }
 #else
-    #include "scraps/sodium/SHA256Sodium.h"
+    #include "scraps/sodium/SHA256.h"
     namespace scraps { using SHA256 = sodium::SHA256; }
 #endif
 
