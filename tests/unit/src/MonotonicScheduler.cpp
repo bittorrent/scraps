@@ -23,9 +23,19 @@
 
 using namespace scraps;
 
+
+using TestDuration = std::chrono::steady_clock::duration;
+
 // Durations are offsets from now.
-// time to sleep, schedule time point, expected output, will reset
-void MonotonicSchedulerTests(std::chrono::steady_clock::duration threshold, std::vector<std::tuple<std::chrono::steady_clock::duration, std::chrono::steady_clock::duration, std::chrono::steady_clock::duration, bool>> tps) {
+void MonotonicSchedulerTests(
+    TestDuration                threshold,
+    std::vector<std::tuple<
+        TestDuration,           // time to sleep
+        TestDuration,           // schedule time point
+        TestDuration,           // expected output
+        bool                    // will reset
+    >>                          tps
+) {
     bool didReset = false;
     constexpr auto kTestScaleFactor = 5;
 

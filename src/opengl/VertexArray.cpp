@@ -37,7 +37,14 @@ void VertexArray::bind() {
     for (auto& attribute : _attributes) {
         glEnableVertexAttribArray(std::get<0>(attribute));
         glBindBuffer(GL_ARRAY_BUFFER, std::get<1>(attribute));
-        glVertexAttribPointer(std::get<0>(attribute), std::get<2>(attribute), std::get<3>(attribute), std::get<4>(attribute), std::get<5>(attribute), reinterpret_cast<GLvoid*>(std::get<6>(attribute)));
+        glVertexAttribPointer(
+            std::get<0>(attribute),
+            std::get<2>(attribute),
+            std::get<3>(attribute),
+            std::get<4>(attribute),
+            std::get<5>(attribute),
+            reinterpret_cast<GLvoid*>(std::get<6>(attribute))
+        );
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 #endif

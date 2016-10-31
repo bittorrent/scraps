@@ -15,6 +15,7 @@
 */
 #pragma once
 
+// cppcheck-suppress preprocessorErrorDirective
 #if __has_include(<optional>)
     #include <optional>
     namespace stdts {
@@ -26,6 +27,7 @@
         using std::in_place;
         using std::make_optional;
     } // namespace stdts
+// cppcheck-suppress preprocessorErrorDirective
 #elif __has_include(<experimental/optional>)
     #include <experimental/optional>
     namespace stdts {

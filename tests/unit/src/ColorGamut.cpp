@@ -33,4 +33,3 @@ TEST(ColorProfile, rgbToXYZ) {
         }
     }
 }
-

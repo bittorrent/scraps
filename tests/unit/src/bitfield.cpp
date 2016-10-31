@@ -115,4 +115,3 @@ TEST(bitfield, BitfieldDecode) {
         EXPECT_EQ(bitfield.size(), 0);
     }
 };
-

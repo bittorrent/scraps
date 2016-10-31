@@ -15,6 +15,7 @@
 */
 #pragma once
 
+// cppcheck-suppress preprocessorErrorDirective
 #if __has_include(<string_view>)
     #include <string_view>
     namespace stdts {
@@ -24,6 +25,7 @@
         using std::u32string_view;
         using std::wstring_view;
     } // namespace stdts
+// cppcheck-suppress preprocessorErrorDirective
 #elif __has_include(<experimental/string_view>)
     #include <experimental/string_view>
     namespace stdts {

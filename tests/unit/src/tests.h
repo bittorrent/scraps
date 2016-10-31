@@ -26,4 +26,3 @@
 #define STATIC_ASSERT_NE(a, b) \
     static_assert(a != b, ""); \
     ASSERT_NE(a, b)
-

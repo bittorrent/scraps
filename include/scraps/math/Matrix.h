@@ -122,6 +122,10 @@ public:
     template <typename U = T>
     constexpr std::enable_if_t<R == C && (R > 1), U> determinant(std::nullptr_t _ = {}) const {
         U ret = 0;
+
+        // Something about the combination of the parameters and the loop really don't jive with
+        // cppcheck. Just suppress the syntax error linting for now.
+        // cppcheck-suppress syntaxError
         for (size_t n = 0; n < R; ++n) {
             ret += at(0, n) * cofactor(0, n);
         }

@@ -81,4 +81,3 @@ std::string CommonVertexShaderHeader(std::vector<std::string> extensions = {});
 std::string CommonFragmentShaderHeader(std::vector<std::string> extensions = {});
 
 }}
-

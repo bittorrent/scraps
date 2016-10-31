@@ -78,12 +78,39 @@ constexpr auto BigORank(benchmark::BigO bigO) {
 #define CONCAT(x, y) CONCAT_(x, y)
 
 // For a full list of complexity measurements, see benchmark_api.h from google benchmark
-#define EXPECT_COMPLEXITY_LT(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) <  BigORank(complexity_enum); });
-#define EXPECT_COMPLEXITY_LE(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) <= BigORank(complexity_enum); });
-#define EXPECT_COMPLEXITY_EQ(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) == BigORank(complexity_enum); });
-#define EXPECT_COMPLEXITY_GT(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) >  BigORank(complexity_enum); });
-#define EXPECT_COMPLEXITY_GE(benchmark_name, complexity_enum) static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { return BigORank(r.complexity) >= BigORank(complexity_enum); });
-#define EXPECT_RUN(benchmark_name, functor)                   static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) = ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, functor);
+#define EXPECT_COMPLEXITY_LT(benchmark_name, complexity_enum)                               \
+    static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) =           \
+    ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { \
+        return BigORank(r.complexity) <  BigORank(complexity_enum);                         \
+    });
+
+#define EXPECT_COMPLEXITY_LE(benchmark_name, complexity_enum)                               \
+    static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) =           \
+    ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { \
+        return BigORank(r.complexity) <= BigORank(complexity_enum);                         \
+    });
+
+#define EXPECT_COMPLEXITY_EQ(benchmark_name, complexity_enum)                               \
+    static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) =           \
+    ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { \
+        return BigORank(r.complexity) == BigORank(complexity_enum);                         \
+    });
+
+#define EXPECT_COMPLEXITY_GT(benchmark_name, complexity_enum)                               \
+    static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) =           \
+    ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { \
+        return BigORank(r.complexity) >  BigORank(complexity_enum);                         \
+    });
+
+#define EXPECT_COMPLEXITY_GE(benchmark_name, complexity_enum)                               \
+    static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) =           \
+    ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, [](auto r) { \
+        return BigORank(r.complexity) >= BigORank(complexity_enum);                         \
+    });
+
+#define EXPECT_RUN(benchmark_name, functor)                                                 \
+    static std::unique_ptr<Assertion> CONCAT(ComplexityAssertion_, __COUNTER__) =           \
+    ComplexityAsserter::registerAssertion(#benchmark_name, __FILE__, __LINE__, functor);
 
 #define COMPLEXITY_ASSERTION_MAIN()                \
 int main(int argc, char** argv) {                  \

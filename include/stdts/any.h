@@ -15,6 +15,7 @@
 */
 #pragma once
 
+// cppcheck-suppress preprocessorErrorDirective
 #if __has_include(<any>)
     #include <any>
     namespace stdts {
@@ -23,6 +24,7 @@
         using std::bad_any_cast;
         using std::swap;
     } // namespace stdts
+// cppcheck-suppress preprocessorErrorDirective
 #elif __has_include(<experimental/any>)
     #include <experimental/any>
     namespace stdts {
