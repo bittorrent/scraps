@@ -33,8 +33,7 @@ matrix:
           compiler: clang
           install: [ ./scripts/ci/install-linux-dependencies ]
           script:  [ ./scripts/ci/build-linux ]
-          after-success:
-              - bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
+          after_success: bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
 
         ######### Xcode #########
         # XCODE_TARGET isn't used by any of the scripts, but helps make the
@@ -47,6 +46,7 @@ matrix:
           env:     [ XCODE_TARGET=macos ]
           install: [ ./scripts/ci/install-xcode-dependencies ]
           script:  [ ./scripts/ci/build-macos ]
+          after_success: bash <(curl -s https://codecov.io/bash)
 
         # iPhone
         - os: osx
