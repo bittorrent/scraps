@@ -131,8 +131,8 @@ public:
         } else if (*hint == value) {
             // talk about a hack. returns a non-const iterator
             return _set.erase(hint, hint);
-        } else if (*hint > value && (hint == begin() || *std::prev(hint) < value)) {
-            return {_set.insert(hint, value), true};
+        } else if (value < *hint && (hint == begin() || *std::prev(hint) < value)) {
+            return _set.insert(hint, value);
         }
 
         return insert(value).first;
@@ -146,7 +146,7 @@ public:
         } else if (*hint == value) {
             // talk about a hack. returns a non-const iterator
             return _set.erase(hint, hint);
-        } else if (*hint > value && (hint == begin() || *std::prev(hint) < value)) {
+        } else if (value < *hint && (hint == begin() || *std::prev(hint) < value)) {
             return _set.insert(hint, std::move(value));
         }
 

@@ -122,81 +122,171 @@ TEST(FlatSet, capacity) {
     EXPECT_GE(set.capacity(), 1000);
 }
 
-TEST(FlatSet, insert) {
+TEST(FlatSet, insertLValues) {
+    Foo fn10{-10};
+    Foo f0{0};
+    Foo f1{1};
+    Foo f3{3};
+    Foo f4{4};
+    Foo f10{10};
     {
-        FlatSet<int> set{0, 1, 4};
-        auto result = set.insert(0);
-        EXPECT_EQ(*result.first, 0);
+        FlatSet<Foo> set{f0, f1, f4};
+        auto result = set.insert(f0);
+        EXPECT_EQ(*result.first, f0);
         EXPECT_FALSE(result.second);
-        EXPECT_EQ(set, (FlatSet<int>{0, 1, 4}));
+        EXPECT_EQ(set, (FlatSet<Foo>{f0, f1, f4}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto result = set.insert(3);
-        EXPECT_EQ(*result.first, 3);
+        FlatSet<Foo> set{f0, f1, f4};
+        auto result = set.insert(f3);
+        EXPECT_EQ(*result.first, f3);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (FlatSet<int>{0, 1, 3, 4}));
+        EXPECT_EQ(set, (FlatSet<Foo>{f0, f1, f3, f4}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto result = set.insert(10);
-        EXPECT_EQ(*result.first, 10);
+        FlatSet<Foo> set{f0, f1, f4};
+        auto result = set.insert(f10);
+        EXPECT_EQ(*result.first, f10);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (FlatSet<int>{0, 1, 4, 10}));
+        EXPECT_EQ(set, (FlatSet<Foo>{f0, f1, f4, f10}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto result = set.insert(-10);
-        EXPECT_EQ(*result.first, -10);
+        FlatSet<Foo> set{f0, f1, f4};
+        auto result = set.insert(fn10);
+        EXPECT_EQ(*result.first, fn10);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (FlatSet<int>{-10, 0, 1, 4}));
+        EXPECT_EQ(set, (FlatSet<Foo>{fn10, f0, f1, f4}));
     }
 }
 
-TEST(FlatSet, insertWithHint) {
+TEST(FlatSet, insertRValues) {
     {
-        FlatSet<int> set{0, 1, 4};
-        auto it = set.insert(set.begin(), 0);
-        EXPECT_EQ(*it, 0);
-        EXPECT_EQ(set, (FlatSet<int>{0, 1, 4}));
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto result = set.insert(Foo{0});
+        EXPECT_EQ(*result.first, Foo{0});
+        EXPECT_FALSE(result.second);
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{0}, Foo{1}, Foo{4}}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto it = set.insert(set.end(), 3);
-        EXPECT_EQ(*it, 3);
-        EXPECT_EQ(set, (FlatSet<int>{0, 1, 3, 4}));
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto result = set.insert(Foo{3});
+        EXPECT_EQ(*result.first, Foo{3});
+        EXPECT_TRUE(result.second);
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{0}, Foo{1}, Foo{3}, Foo{4}}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto it = set.insert(set.begin(), 10);
-        EXPECT_EQ(*it, 10);
-        EXPECT_EQ(set, (FlatSet<int>{0, 1, 4, 10}));
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto result = set.insert(Foo{10});
+        EXPECT_EQ(*result.first, Foo{10});
+        EXPECT_TRUE(result.second);
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto it = set.insert(set.end(), 10);
-        EXPECT_EQ(*it, 10);
-        EXPECT_EQ(set, (FlatSet<int>{0, 1, 4, 10}));
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto result = set.insert(Foo{-10});
+        EXPECT_EQ(*result.first, Foo{-10});
+        EXPECT_TRUE(result.second);
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
+    }
+}
+
+TEST(FlatSet, insertRValuesWithHint) {
+    {
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto it = set.insert(set.begin(), Foo{0});
+        EXPECT_EQ(*it, Foo{0});
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{0}, Foo{1}, Foo{4}}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto it = set.insert(set.begin(), -10);
-        EXPECT_EQ(*it, -10);
-        EXPECT_EQ(set, (FlatSet<int>{-10, 0, 1, 4}));
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto it = set.insert(set.end(), Foo{3});
+        EXPECT_EQ(*it, Foo{3});
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{0}, Foo{1}, Foo{3}, Foo{4}}));
     }
 
     {
-        FlatSet<int> set{0, 1, 4};
-        auto it = set.insert(set.end(), -10);
-        EXPECT_EQ(*it, -10);
-        EXPECT_EQ(set, (FlatSet<int>{-10, 0, 1, 4}));
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto it = set.insert(set.begin(), Foo{10});
+        EXPECT_EQ(*it, Foo{10});
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
+    }
+
+    {
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto it = set.insert(set.end(), Foo{10});
+        EXPECT_EQ(*it, Foo{10});
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
+    }
+
+    {
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto it = set.insert(set.begin(), Foo{-10});
+        EXPECT_EQ(*it, Foo{-10});
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
+    }
+
+    {
+        FlatSet<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        auto it = set.insert(set.end(), Foo{-10});
+        EXPECT_EQ(*it, Foo{-10});
+        EXPECT_EQ(set, (FlatSet<Foo>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
+    }
+}
+
+TEST(FlatSet, insertLValuesWithHFoo) {
+    Foo fn10{-10};
+    Foo f0{0};
+    Foo f1{1};
+    Foo f3{3};
+    Foo f4{4};
+    Foo f10{10};
+    {
+        FlatSet<Foo> set{f0, f1, f4};
+        auto it = set.insert(set.begin(), f0);
+        EXPECT_EQ(*it, f0);
+        EXPECT_EQ(set, (FlatSet<Foo>{f0, f1, f4}));
+    }
+
+    {
+        FlatSet<Foo> set{f0, f1, f4};
+        auto it = set.insert(set.end(), f3);
+        EXPECT_EQ(*it, f3);
+        EXPECT_EQ(set, (FlatSet<Foo>{f0, f1, f3, f4}));
+    }
+
+    {
+        FlatSet<Foo> set{f0, f1, f4};
+        auto it = set.insert(set.begin(), f10);
+        EXPECT_EQ(*it, f10);
+        EXPECT_EQ(set, (FlatSet<Foo>{f0, f1, f4, f10}));
+    }
+
+    {
+        FlatSet<Foo> set{f0, f1, f4};
+        auto it = set.insert(set.end(), f10);
+        EXPECT_EQ(*it, f10);
+        EXPECT_EQ(set, (FlatSet<Foo>{f0, f1, f4, f10}));
+    }
+
+    {
+        FlatSet<Foo> set{f0, f1, f4};
+        auto it = set.insert(set.begin(), fn10);
+        EXPECT_EQ(*it, fn10);
+        EXPECT_EQ(set, (FlatSet<Foo>{fn10, f0, f1, f4}));
+    }
+
+    {
+        FlatSet<Foo> set{f0, f1, f4};
+        auto it = set.insert(set.end(), fn10);
+        EXPECT_EQ(*it, fn10);
+        EXPECT_EQ(set, (FlatSet<Foo>{fn10, f0, f1, f4}));
     }
 }
 
