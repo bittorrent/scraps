@@ -25,16 +25,6 @@
         using std::u32string_view;
         using std::wstring_view;
     } // namespace stdts
-// cppcheck-suppress preprocessorErrorDirective
-#elif __has_include(<experimental/string_view>)
-    #include <experimental/string_view>
-    namespace stdts {
-        using std::experimental::basic_string_view;
-        using std::experimental::string_view;
-        using std::experimental::u16string_view;
-        using std::experimental::u32string_view;
-        using std::experimental::wstring_view;
-    } // namespace stdts
 #else
     #include <core/string_view.hpp>
     namespace stdts {
