@@ -47,7 +47,7 @@ inline void SHA256::reset() {
 }
 
 inline void SHA256::update(const void* data, size_t length) {
-    CC_SHA256_Update(&_state, data, length);
+    CC_SHA256_Update(&_state, data, static_cast<CC_LONG>(length));
 }
 
 inline void SHA256::finish(void* hash) {
