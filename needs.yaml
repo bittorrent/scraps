@@ -62,7 +62,9 @@ libraries:
                 {% endif %}
                 # 'make depend' generates lots of error messages about compiler-supplied headers it isn't set up to find
                 - make depend 2> makedepend-errors.log
-                - sh -c 'make build_libs {{cross_args}} -j{build_concurrency}'
+                # CI environments openssl don't tend to like spawning hundreds of simultaneous processes for parallel
+                # builds. OpenSSL hasn't historically performed well with build concurrency.
+                - sh -c 'make build_libs {{cross_args}} {{('-j{build_concurrency}') if (not env['CI'] and platform == 'osx')}}'
                 - make install_sw DIRS="crypto ssl engines"
             post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
     curl:
