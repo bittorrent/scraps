@@ -24,7 +24,6 @@ You'll need to install these yourself if you don't have them already.
 * The **pyyaml** and **jinja2** Python packages are used by Needy for our dependency configuration.
 * **git** is used to retrieve several of our dependencies.
 * **pkg-config** is used to integrate our dependencies.
-* **makedepend** is required by OpenSSL.
 * **clang** and **libc++** are required to compile.
 * **libz** is required by Curl.
 * **OpenGL** is required by Scraps.

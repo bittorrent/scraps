@@ -31,62 +31,30 @@ libraries:
                 CFLAGS: "{current} -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm"
             {% endif %}
             post-build: xxd -i LICENSE {build_directory}/include/sodium/license.c
-    openssl:
-        repository: https://github.com/openssl/openssl.git
-        commit: OpenSSL_1_0_1t
+    mbedtls:
+        download: https://tls.mbed.org/download/mbedtls-2.4.0-apache.tgz
+        checksum: 20fe40f9f831ca63839967178e3db5aaf77705d3
         project:
-            build-steps:
-                {% set openssl_flags = ' --prefix={build_directory} no-weak-ssl-ciphers' %}
-                {% if platform in ['tvos', 'tvossimulator'] %}
-                {% set openssl_flags = openssl_flags ~ ' -DHAVE_FORK=0' %}
-                {% endif %}
-                {% if platform in ['iossimulator', 'tvossimulator'] %}
-                {% set openssl_flags = openssl_flags ~ ' -D__STRICT_ANSI__=1 no-asm' %}
-                {% endif %}
-
-                {% if platform == 'osx' %}
-                - sh ./Configure darwin64-x86_64-cc {{openssl_flags}}
-                {% elif platform == 'android' %}
-                - sh ./Configure android {{openssl_flags}}
-                {% elif platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator'] %}
-                {%
-                    set cross_args = 'CROSS_TOP=$(xcrun --sdk '
-                    ~ xcrun_platforms[platform]
-                    ~ ' --show-sdk-platform-path)/Developer CROSS_SDK=$(basename $(xcrun --sdk '
-                    ~ xcrun_platforms[platform]
-                    ~ ' --show-sdk-path))'
-                %}
-                - sh ./Configure iphoneos-cross {{openssl_flags}}
-                {% elif platform == host_platform %}
-                - sh ./config {{openssl_flags}}
-                {% endif %}
-                # 'make depend' generates lots of error messages about compiler-supplied headers it isn't set up to find
-                - make depend 2> makedepend-errors.log
-                # CI environments openssl don't tend to like spawning hundreds of simultaneous processes for parallel
-                # builds. OpenSSL hasn't historically performed well with build concurrency.
-                - sh -c 'make build_libs {{cross_args}} {{('-j{build_concurrency}') if (not env['CI'] and platform == 'osx')}}'
-                - make install_sw DIRS="crypto ssl engines"
-            post-build: xxd -i LICENSE {build_directory}/include/openssl/license.c
+            build-steps: make -j{build_concurrency} install APPS= DESTDIR={build_directory}
+            post-build: xxd -i LICENSE {build_directory}/include/mbedtls/license.c
     curl:
         download: https://curl.haxx.se/download/curl-7.50.3.tar.gz
         checksum: be0065afc76a3d8568f5f78d8efddadb6310f9d7
-        dependencies: openssl
+        dependencies: mbedtls
         project:
+            {% if platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator', 'osx'] %}
             environment:
-                # dl is required to link statically to openssl
-                LIBS: -ldl
-                {% if platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator', 'osx'] %}
                 # Workaround for earlier versions of Xcode platforms. See https://curl.haxx.se/mail/lib-2016-09/0051.html
                 CFLAGS: -Werror=partial-availability
                 CXXFLAGS: -Werror=partial-availability
-                {% endif %}
+            {% endif %}
             configure-args:
                 - --disable-ldap
                 - --without-libidn
                 - --without-librtmp
                 - --disable-ntlm-wb
                 - --disable-shared
-                - --with-ssl={{ build_directory('openssl') }}
+                - --with-mbedtls={{ build_directory('mbedtls') }}
                 - --enable-optimize
                 - --disable-dependency-tracking
                 - --disable-imap

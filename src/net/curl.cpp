@@ -15,28 +15,24 @@
 */
 #include "scraps/net/curl.h"
 
-#ifdef OPENSSL_THREADS
-
 namespace scraps {
 namespace net {
 
 namespace {
-bool _gIsCURLThreadSafe = false;
+bool _gCURLIsInitialized = false;
 }
 
-void InitCURLThreadSafety() {
-    if (CURLIsThreadSafe()) { return; }
+void InitializeCURL() {
+    if (CURLIsInitialized()) { return; }
 
-    InitOpenSSLThreadSafety();
     auto result = curl_global_init(CURL_GLOBAL_ALL);
     SCRAPS_ASSERT(result == CURLE_OK);
-    _gIsCURLThreadSafe = true;
+    _gCURLIsInitialized = true;
 }
 
-bool CURLIsThreadSafe() {
-    return _gIsCURLThreadSafe;
+bool CURLIsInitialized() {
+    return _gCURLIsInitialized;
 }
 
 }} // namespace scraps::net
 
-#endif

@@ -69,8 +69,6 @@ dependencies = [
 dependencies = [dep for dep in dependencies if not pkg_is_present(dep)]
 if not pkg_is_present('libcurl'):
     dependencies.append('curl')
-if not pkg_is_present('libssl') or not pkg_is_present('libcrypto'):
-    dependencies.append('openssl')
 
 needy_common_args = filter(None, args.needy_target_args.split())
 needy_satisfy_args = filter(None, ['-j', str(args.concurrency)] + args.needy_satisfy_args.split())

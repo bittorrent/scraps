@@ -19,6 +19,6 @@
 
 int main(int argc, char* argv[]) {
     ::testing::InitGoogleTest(&argc, argv);
-    scraps::net::InitCURLThreadSafety();
+    scraps::net::InitializeCURL();
     return RUN_ALL_TESTS();
 }

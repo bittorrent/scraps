@@ -10,7 +10,7 @@ alias objc : : : :
 ;
 
 import needs/pkgconfig.jam ;
-pkgconfig.dependency openssl : libssl libcrypto ;
+pkgconfig.dependency mbedtls ;
 pkgconfig.dependency curl : libcurl ;
 pkgconfig.dependency fmtlib ;
 pkgconfig.dependency libsodium ;
@@ -25,7 +25,7 @@ lib dl : : <link>shared ;
 lib pthread : : <link>shared ;
 
 alias scraps_deps :
-    openssl
+    mbedtls
     curl
     fmtlib
     libsodium
@@ -89,7 +89,7 @@ includedir=\${exec_prefix}/include
 Name: scraps
 Version: 0
 Description: Random scraps of C++
-Requires: libcurl, openssl, fmt, asio, gsl, libsodium, mnmlstc, json11
+Requires: libcurl, mbedtls, fmt, asio, gsl, libsodium, mnmlstc, json11
 Libs: -L\${libdir} -lscraps
 Libs.private: $(PRIVATE_LIBS)
 Cflags: -I\${includedir} -DASIO_STANDALONE=1 -fvisibility=hidden
@@ -101,7 +101,7 @@ install install-pkgconfig : scraps.pc : <location>$(PKG_CONFIG) ;
 alias install :
     install-lib
     install-pkgconfig
-    install-openssl-if-owned
+    install-mbedtls-if-owned
     install-curl-if-owned
     install-fmtlib-if-owned
     install-libsodium-if-owned
