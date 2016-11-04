@@ -27,6 +27,7 @@
 #include <memory>
 #include <queue>
 #include <random>
+#include <cassert>
 
 namespace scraps {
 namespace net {
@@ -147,7 +148,7 @@ private:
         std::queue<std::shared_ptr<SendBuffer>> sendQueue;
 
         Connection(ConnectionId connectionId, int fd, State state) : id(connectionId), fd(fd), state(state) {
-            SCRAPS_ASSERT(fd >= 0);
+            assert(fd >= 0);
         }
         ~Connection();
 
@@ -168,7 +169,7 @@ private:
             auto connection = std::make_shared<Connection>(std::forward<Args>(args)...);
             _idMap.emplace(connection->id, connection);
             _fdMap.emplace(connection->fd, connection);
-            SCRAPS_ASSERT(_fdMap.size() == _idMap.size());
+            assert(_fdMap.size() == _idMap.size());
             return connection;
         }
 
@@ -181,7 +182,7 @@ private:
             connection.close();
             _fdMap.erase(connection.fd);
             _idMap.erase(it);
-            SCRAPS_ASSERT(_fdMap.size() == _idMap.size());
+            assert(_fdMap.size() == _idMap.size());
         }
 
         std::shared_ptr<Connection> findById(ConnectionId connectionId) const {

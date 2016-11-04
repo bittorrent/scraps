@@ -22,6 +22,8 @@
 
 #include <unistd.h>
 
+#include <cassert>
+
 namespace scraps {
 
 void RunLoop::run() {
@@ -201,7 +203,7 @@ void RunLoop::reset() {
     std::lock_guard<std::mutex> lk1(_mutex, std::adopt_lock);
     std::lock_guard<std::mutex> lk2(_pipeMutex, std::adopt_lock);
 
-    SCRAPS_ASSERT(_isCancelled);
+    assert(_isCancelled);
     _isCancelled = false;
 
     _wakeUpPipe[0] = -1;

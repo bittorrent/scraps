@@ -18,6 +18,8 @@
 #include "scraps/filesystem.h"
 #include "scraps/loggers.h"
 
+#include <cassert>
+
 #if SCRAPS_APPLE
 #import <Foundation/Foundation.h>
 #endif
@@ -30,7 +32,7 @@ std::atomic<LogLevel> _gLogLevel{LogLevel::kInfo};
 
 std::shared_ptr<Logger> CreateDefaultFileLogger(const std::string& appName, size_t rotateSize, size_t maxFiles) {
 #if SCRAPS_APPLE || SCRAPS_LINUX || SCRAPS_WINDOWS
-    SCRAPS_ASSERT(!appName.empty());
+    assert(!appName.empty());
     std::string logPath = FileLogger::DefaultLogPath(appName);
     CreateDirectory(logPath, true);
     if (IsDirectory(logPath)) {

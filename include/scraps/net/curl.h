@@ -15,7 +15,7 @@
 */
 #pragma once
 
-#include "scraps/assert.h"
+#include "scraps/config.h"
 
 #include <curl/curl.h>
 

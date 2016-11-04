@@ -21,6 +21,7 @@
 
 #include <mutex>
 #include <type_traits>
+#include <cassert>
 
 namespace scraps {
 
@@ -73,7 +74,7 @@ public:
 
     virtual void notify(const std::shared_ptr<AbstractNotification>& notification) const override {
         std::lock_guard<std::mutex> lock{_mutex};
-        SCRAPS_ASSERT(std::dynamic_pointer_cast<NotificationType>(notification));
+        assert(std::dynamic_pointer_cast<NotificationType>(notification));
         _function();
     }
 
@@ -95,7 +96,7 @@ public:
     virtual void notify(const std::shared_ptr<AbstractNotification>& notification) const override {
         std::lock_guard<std::mutex> lock{_mutex};
         auto casted = std::dynamic_pointer_cast<NotificationType>(notification);
-        SCRAPS_ASSERT(casted);
+        assert(casted);
         _function(*casted);
     }
 
@@ -129,7 +130,7 @@ public:
     virtual void notify(const std::shared_ptr<AbstractNotification>& notification) const override {
         std::lock_guard<std::mutex> lock{_mutex};
         auto typedNotification = std::dynamic_pointer_cast<NotificationType>(notification);
-        SCRAPS_ASSERT(typedNotification);
+        assert(typedNotification);
         _invoke(typedNotification->data);
     }
 

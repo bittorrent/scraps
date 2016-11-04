@@ -22,6 +22,7 @@
 #include <chrono>
 #include <numeric>
 #include <map>
+#include <cassert>
 
 namespace scraps {
 
@@ -115,7 +116,7 @@ stdts::optional<ResultType> AverageRate(const std::map<TimePointType, ValueType>
         return {};
     }
 
-    SCRAPS_ASSERT(sampleBegin != samples.end());
+    assert(sampleBegin != samples.end());
 
     // Two special cases occur with time points that occur inside a single
     // sample or who's end lies at a sample point:

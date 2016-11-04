@@ -22,7 +22,6 @@
 
 #include "scraps/platform.h"
 #include "scraps/warnings.h"
-#include "scraps/assert.h"
 #include "scraps/thread.h"
 #include "scraps/logging.h"
 

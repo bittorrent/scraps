@@ -15,6 +15,8 @@
 */
 #include "scraps/net/Endpoint.h"
 
+#include <cassert>
+
 namespace scraps {
 namespace net {
 
@@ -41,7 +43,7 @@ socklen_t Endpoint::getSockAddr(sockaddr_storage* storage) const {
         return sizeof(*addr);
     }
 
-    SCRAPS_ASSERT(false);
+    assert(false);
     return 0;
 }
 

@@ -17,6 +17,8 @@
 #include "scraps/Notification.h"
 #include "scraps/Observer.h"
 
+#include <cassert>
+
 namespace scraps {
 
 void NotificationCenter::_addObserver(const std::shared_ptr<AbstractObserver>& observer) {
@@ -36,7 +38,7 @@ bool NotificationCenter::_hasObserverForNotification(size_t notificationHashCode
 }
 
 void NotificationCenter::postNotification(const std::shared_ptr<AbstractNotification>& notification) const {
-    SCRAPS_ASSERT(notification);
+    assert(notification);
 
     std::vector<std::weak_ptr<AbstractObserver>> observers;
     {

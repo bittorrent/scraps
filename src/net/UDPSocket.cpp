@@ -21,6 +21,8 @@
 
 #include <gsl.h>
 
+#include <cassert>
+
 namespace scraps {
 namespace net {
 
@@ -163,7 +165,7 @@ void UDPSocket::receive() {
             auto sa = reinterpret_cast<sockaddr_in6*>(&senderStorage);
             sender = Endpoint(asio::ip::address_v6(*reinterpret_cast<asio::ip::address_v6::bytes_type*>(&sa->sin6_addr), ntohl(sa->sin6_scope_id)), ntohs(sa->sin6_port));
         } else {
-            SCRAPS_ASSERT(false);
+            assert(false);
         }
 
         if (auto receiver = _receiver.lock()) {

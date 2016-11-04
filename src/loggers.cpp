@@ -23,6 +23,7 @@
 #endif
 
 #include <cmath>
+#include <cassert>
 
 namespace scraps {
 
@@ -216,7 +217,7 @@ bool RateLimitedLogger::_tryToResumeLogging(LogMessageState* state, std::chrono:
     state->isLogging = !_stateExceedsMessageRate(*state, time);
 
     if (state->isLogging && !wasLogging) {
-        SCRAPS_ASSERT(!state->numSuppressed.empty());
+        assert(!state->numSuppressed.empty());
         auto highestSuppressedLogLevel = std::prev(state->numSuppressed.end())->first;
         _destination->log(highestSuppressedLogLevel, time, file, line, "["s + _suppressedLogString(*state) + "]");
         state->numSuppressed = {};

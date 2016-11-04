@@ -15,6 +15,8 @@
 */
 #include "scraps/net/curl.h"
 
+#include <cassert>
+
 namespace scraps {
 namespace net {
 
@@ -25,8 +27,9 @@ bool _gCURLIsInitialized = false;
 void InitializeCURL() {
     if (CURLIsInitialized()) { return; }
 
-    auto result = curl_global_init(CURL_GLOBAL_ALL);
-    SCRAPS_ASSERT(result == CURLE_OK);
+    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
+        assert(false);
+    }
     _gCURLIsInitialized = true;
 }
 
@@ -35,4 +38,3 @@ bool CURLIsInitialized() {
 }
 
 }} // namespace scraps::net
-
