@@ -26,16 +26,16 @@ matrix:
               components:
                   - android-22
                   - build-tools-23.0.1
-          install: [ ./scripts/ci/install-android-dependencies ]
-          script:  [ ./scripts/ci/build-android ]
+          install: ./scripts/ci/install-android-dependencies
+          script:  ./scripts/ci/build-android
 
         # Linux
         - os: linux
           language: cpp
           dist: trusty
           compiler: clang
-          install: [ ./scripts/ci/install-linux-dependencies ]
-          script:  [ ./scripts/ci/build-linux ]
+          install: ./scripts/ci/install-linux-dependencies
+          script:  ./scripts/ci/build-linux
           after_success: bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
 
         ######### Xcode #########
@@ -46,23 +46,23 @@ matrix:
         - os: osx
           language: cpp
           osx_image: xcode8
-          env:     [ XCODE_TARGET=macos ]
-          install: [ ./scripts/ci/install-xcode-dependencies ]
-          script:  [ ./scripts/ci/build-macos ]
+          env:     XCODE_TARGET=macos
+          install: ./scripts/ci/install-xcode-dependencies
+          script:  ./scripts/ci/build-macos
           after_success: bash <(curl -s https://codecov.io/bash)
 
         # iPhone
         - os: osx
           language: cpp
           osx_image: xcode8
-          env:     [ XCODE_TARGET=iphoneos ]
-          install: [ ./scripts/ci/install-xcode-dependencies ]
-          script:  [ ./scripts/ci/build-iphoneos ]
+          env:     XCODE_TARGET=iphoneos
+          install: ./scripts/ci/install-xcode-dependencies
+          script:  ./scripts/ci/build-iphoneos
 
         # AppleTV
         - os: osx
           language: cpp
           osx_image: xcode8
-          env:     [ XCODE_TARGET=appletvos ]
-          install: [ ./scripts/ci/install-xcode-dependencies ]
-          script:  [ ./scripts/ci/build-appletvos ]
+          env:     XCODE_TARGET=appletvos
+          install: ./scripts/ci/install-xcode-dependencies
+          script:  ./scripts/ci/build-appletvos
