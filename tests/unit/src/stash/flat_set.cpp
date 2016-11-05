@@ -74,11 +74,11 @@ TEST(flat_set, rangeConstruction) {
 TEST(flat_set, elementAccess) {
     flat_set<int> set{0, 1, 2, 3, 4};
 
-    EXPECT_EQ(*set.data() + 0, 0);
-    EXPECT_EQ(*set.data() + 1, 1);
-    EXPECT_EQ(*set.data() + 2, 2);
-    EXPECT_EQ(*set.data() + 3, 3);
-    EXPECT_EQ(*set.data() + 4, 4);
+    EXPECT_EQ(*(set.begin() + 0), 0);
+    EXPECT_EQ(*(set.begin() + 1), 1);
+    EXPECT_EQ(*(set.begin() + 2), 2);
+    EXPECT_EQ(*(set.begin() + 3), 3);
+    EXPECT_EQ(*(set.begin() + 4), 4);
 
     EXPECT_EQ(set.front(), 0);
     EXPECT_EQ(set.back(), 4);
@@ -87,11 +87,11 @@ TEST(flat_set, elementAccess) {
 TEST(flat_set, constElementAccess) {
     const flat_set<int> set{0, 1, 2, 3, 4};
 
-    EXPECT_EQ(*set.data() + 0, 0);
-    EXPECT_EQ(*set.data() + 1, 1);
-    EXPECT_EQ(*set.data() + 2, 2);
-    EXPECT_EQ(*set.data() + 3, 3);
-    EXPECT_EQ(*set.data() + 4, 4);
+    EXPECT_EQ(*(set.begin() + 0), 0);
+    EXPECT_EQ(*(set.begin() + 1), 1);
+    EXPECT_EQ(*(set.begin() + 2), 2);
+    EXPECT_EQ(*(set.begin() + 3), 3);
+    EXPECT_EQ(*(set.begin() + 4), 4);
 
     EXPECT_EQ(set.front(), 0);
     EXPECT_EQ(set.back(), 4);

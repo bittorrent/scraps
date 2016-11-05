@@ -140,7 +140,7 @@ public:
     /**
      * Constant
      */
-    void swap(flat_set<Key>& other);
+    void swap(flat_set<Key>& other) noexcept(noexcept(std::swap(other._set, _set)));
 
     // Lookup
 
@@ -190,7 +190,7 @@ template <typename Key> bool operator> (const flat_set<Key>& lhs, const flat_set
 template <typename Key> bool operator<=(const flat_set<Key>& lhs, const flat_set<Key>& rhs);
 template <typename Key> bool operator>=(const flat_set<Key>& lhs, const flat_set<Key>& rhs);
 
-template <class Key> void swap(stash::flat_set<Key>& lhs, stash::flat_set<Key>& rhs);
+template <class Key> void swap(stash::flat_set<Key>& lhs, stash::flat_set<Key>& rhs) noexcept(noexcept(lhs.swap(rhs)));
 
 // Implementation
 
@@ -205,28 +205,29 @@ flat_set<Key>::flat_set(InputIt first, InputIt last) {
 template <typename Key>
 flat_set<Key>::flat_set(std::initializer_list<Key> init) : flat_set(init.begin(), init.end()) {}
 
-template <typename Key> const_reference flat_set<Key>::front() const { return _set.front(); }
-template <typename Key> const_reference flat_set<Key>::back() const { return _set.back(); }
+template <typename Key> typename flat_set<Key>::const_reference flat_set<Key>::front() const { return _set.front(); }
+template <typename Key> typename flat_set<Key>::const_reference flat_set<Key>::back() const { return _set.back(); }
 
-template <typename Key> const_iterator flat_set<Key>::begin() const { return _set.begin(); }
-template <typename Key> const_iterator flat_set<Key>::cbegin() const { return _set.cbegin(); }
-template <typename Key> const_iterator flat_set<Key>::end() const { return _set.end(); }
-template <typename Key> const_iterator flat_set<Key>::cend() const { return _set.cend(); }
+template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::begin() const { return _set.begin(); }
+template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::cbegin() const { return _set.cbegin(); }
+template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::end() const { return _set.end(); }
+template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::cend() const { return _set.cend(); }
 
-template <typename Key> const_reverse_iterator flat_set<Key>::rbegin() const { return _set.rbegin(); }
-template <typename Key> const_reverse_iterator flat_set<Key>::crbegin() const { return _set.crbegin(); }
-template <typename Key> const_reverse_iterator flat_set<Key>::rend() const { return _set.rend(); }
-template <typename Key> const_reverse_iterator flat_set<Key>::crend() const { return _set.crend(); }
+template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::rbegin() const { return _set.rbegin(); }
+template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::crbegin() const { return _set.crbegin(); }
+template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::rend() const { return _set.rend(); }
+template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::crend() const { return _set.crend(); }
 
-template <typename Key> size_type flat_set<Key>::size() const { return _set.size(); }
-template <typename Key> size_type flat_set<Key>::max_size() const { return _set.max_size(); }
-template <typename Key> size_type flat_set<Key>::capacity() const { return _set.capacity(); }
+template <typename Key> typename flat_set<Key>::size_type flat_set<Key>::size() const { return _set.size(); }
+template <typename Key> typename flat_set<Key>::size_type flat_set<Key>::max_size() const { return _set.max_size(); }
+template <typename Key> typename flat_set<Key>::size_type flat_set<Key>::capacity() const { return _set.capacity(); }
 template <typename Key> bool flat_set<Key>::empty() const { return _set.empty(); }
 template <typename Key> void flat_set<Key>::reserve(size_type size) { _set.reserve(size); }
 template <typename Key> void flat_set<Key>::clear() { _set.clear(); }
 
 template <typename Key>
-std::pair<const_iterator, bool> flat_set<Key>::insert(const value_type& value) {
+std::pair<typename flat_set<Key>::const_iterator, bool>
+flat_set<Key>::insert(const value_type& value) {
     auto it = lower_bound(value);
     if (it != end() && *it == value) {
         return {it, false};
@@ -235,7 +236,8 @@ std::pair<const_iterator, bool> flat_set<Key>::insert(const value_type& value) {
 }
 
 template <typename Key>
-std::pair<const_iterator, bool> flat_set<Key>::insert(value_type&& value) {
+std::pair<typename flat_set<Key>::const_iterator, bool>
+flat_set<Key>::insert(value_type&& value) {
     auto it = lower_bound(value);
     if (it != end() && *it == value) {
         return {it, false};
@@ -244,7 +246,8 @@ std::pair<const_iterator, bool> flat_set<Key>::insert(value_type&& value) {
 }
 
 template <typename Key>
-const_iterator flat_set<Key>::insert(const_iterator hint, const value_type& value) {
+typename flat_set<Key>::const_iterator
+flat_set<Key>::insert(const_iterator hint, const value_type& value) {
     if (hint == end()) {
         if (empty() || *std::prev(hint) < value) {
             return _set.insert(end(), value);
@@ -259,7 +262,8 @@ const_iterator flat_set<Key>::insert(const_iterator hint, const value_type& valu
 }
 
 template <typename Key>
-const_iterator flat_set<Key>::insert(const_iterator hint, value_type&& value) {
+typename flat_set<Key>::const_iterator
+flat_set<Key>::insert(const_iterator hint, value_type&& value) {
     if (hint == end()) {
         if (_set.empty() || *std::prev(hint) < value) {
             return _set.insert(end(), std::move(value));
@@ -288,28 +292,38 @@ void flat_set<Key>::insert(std::initializer_list<value_type> ilist) {
 
 template <typename Key>
 template <typename... Args>
-std::pair<const_iterator, bool> flat_set<Key>::emplace(Args&&... args) {
+auto flat_set<Key>::emplace(Args&&... args)
+    -> std::pair<typename flat_set<Key>::const_iterator, bool>
+{
     return insert(value_type{std::forward<Args>(args)...});
 }
 
 template <typename Key>
 template <typename... Args>
-const_iterator flat_set<Key>::emplace_hint(const_iterator hint, Args&&... args) {
+auto flat_set<Key>::emplace_hint(const_iterator hint, Args&&... args)
+    -> typename flat_set<Key>::const_iterator
+{
     return insert(hint, value_type{std::forward<Args>(args)...});
 }
 
 template <typename Key>
-const_iterator flat_set<Key>::erase(const_iterator pos) {
+auto flat_set<Key>::erase(const_iterator pos)
+    -> typename flat_set<Key>::const_iterator
+{
     return _set.erase(pos);
 }
 
 template <typename Key>
-const_iterator flat_set<Key>::erase(const_iterator first, const_iterator last) {
+auto flat_set<Key>::erase(const_iterator first, const_iterator last)
+    -> typename flat_set<Key>::const_iterator
+{
     return _set.erase(first, last);
 };
 
 template <typename Key>
-size_type flat_set<Key>::erase(const key_type& key) {
+auto flat_set<Key>::erase(const key_type& key)
+    -> typename flat_set<Key>::size_type
+{
     auto it = find(key);
     if (it != end()) {
         _set.erase(it);
@@ -326,7 +340,9 @@ void flat_set<Key>::erase_if(Predicate pred) {
 
 template <typename Key>
 template <typename InputIt, typename Predicate>
-const_iterator flat_set<Key>::erase_if(InputIt begin, InputIt end, Predicate pred) {
+auto flat_set<Key>::erase_if(InputIt begin, InputIt end, Predicate pred)
+    -> typename flat_set<Key>::const_iterator
+{
     // need non-const iterators for std::remove_if
     auto b = _set.erase(begin, begin);
     auto e = _set.erase(end, end);
@@ -334,23 +350,29 @@ const_iterator flat_set<Key>::erase_if(InputIt begin, InputIt end, Predicate pre
 }
 
 template <typename Key>
-void flat_set<Key>::swap(flat_set<Key>& other) {
+void flat_set<Key>::swap(flat_set<Key>& other) noexcept(noexcept(other.swap(other))) {
     _set.swap(other._set);
 }
 
 template <typename Key>
-size_type flat_set<Key>::count(const key_type& key) const {
+auto flat_set<Key>::count(const key_type& key) const
+    -> typename flat_set<Key>::size_type
+{
     return find(key) == end() ? 0 : 1;
 }
 
 template <typename Key>
 template <typename K>
-size_type flat_set<Key>::count(const K& x) const {
+auto flat_set<Key>::count(const K& x) const
+    -> typename flat_set<Key>::size_type
+{
     return find(x) == end() ? 0 : 1;
 }
 
 template <typename Key>
-const_iterator flat_set<Key>::find(const Key& key) const {
+auto flat_set<Key>::find(const Key& key) const
+    -> typename flat_set<Key>::const_iterator
+{
     auto it = lower_bound(key);
     if (it != end() && *it == key) {
         return it;
@@ -360,7 +382,9 @@ const_iterator flat_set<Key>::find(const Key& key) const {
 
 template <typename Key>
 template <typename K>
-const_iterator flat_set<Key>::find(const K& x) const {
+auto flat_set<Key>::find(const K& x) const
+    -> typename flat_set<Key>::const_iterator
+{
     auto it = lower_bound(x);
     if (it != end() && *it == x) {
         return it;
@@ -369,37 +393,49 @@ const_iterator flat_set<Key>::find(const K& x) const {
 }
 
 template <typename Key>
-std::pair<const_iterator, const_iterator> flat_set<Key>::equal_range(const Key& key) const {
+auto flat_set<Key>::equal_range(const Key& key) const
+    -> std::pair<typename flat_set<Key>::const_iterator, typename flat_set<Key>::const_iterator>
+{
     auto first = find(key);
     return {first, first};
 }
 
 template <typename Key>
 template <typename K>
-std::pair<const_iterator, const_iterator> flat_set<Key>::equal_range(const K& x) const {
+auto flat_set<Key>::equal_range(const K& x) const
+    -> std::pair<typename flat_set<Key>::const_iterator, typename flat_set<Key>::const_iterator>
+{
     auto first = find(x);
     return {first, first};
 }
 
 template <typename Key>
-const_iterator flat_set<Key>::lower_bound(const key_type& key) const {
+auto flat_set<Key>::lower_bound(const key_type& key) const
+    -> typename flat_set<Key>::const_iterator
+{
     return std::lower_bound(begin(), end(), key);
 }
 
 template <typename Key>
 template <typename K>
-const_iterator flat_set<Key>::lower_bound(const K& x) const {
+auto flat_set<Key>::lower_bound(const K& x) const
+    -> typename flat_set<Key>::const_iterator
+{
     return std::lower_bound(begin(), end(), x, [&](auto e, auto& x) { return e < x; });
 }
 
 template <typename Key>
-const_iterator flat_set<Key>::upper_bound(const key_type& key) const {
+auto flat_set<Key>::upper_bound(const key_type& key) const
+    -> typename flat_set<Key>::const_iterator
+{
     return std::upper_bound(begin(), end(), key);
 }
 
 template <typename Key>
 template <typename K>
-const_iterator flat_set<Key>::upper_bound(const K& x) const {
+auto flat_set<Key>::upper_bound(const K& x) const
+    -> typename flat_set<Key>::const_iterator
+{
     return std::upper_bound(begin(), end(), x, [&](auto& e, auto& x) { return e < x; });
 }
 
@@ -436,8 +472,8 @@ bool operator>=(const flat_set<Key>& lhs, const flat_set<Key>& rhs) {
 }
 
 template <class Key>
-void swap(stash::flat_set<Key>& lhs, stash::flat_set<Key>& rhs) {
-    noexcept(noexcept(lhs.swap(rhs)));
+void swap(stash::flat_set<Key>& lhs, stash::flat_set<Key>& rhs) noexcept(noexcept(lhs.swap(rhs))) {
+    lhs.swap(rhs);
 }
 
 } // namespace stash
