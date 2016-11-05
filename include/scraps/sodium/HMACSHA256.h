@@ -45,17 +45,17 @@ inline HMACSHA256::HMACSHA256(const void* key, size_t length) {
 
 inline void HMACSHA256::reset(const void* key, size_t length) {
     auto err = crypto_auth_hmacsha256_init(&_state, reinterpret_cast<const unsigned char*>(key), length);
-    assert(!err);
+    assert(!err); (void)err;
 }
 
 inline void HMACSHA256::update(const void* data, size_t length) {
     auto err = crypto_auth_hmacsha256_update(&_state, reinterpret_cast<const unsigned char*>(data), length);
-    assert(!err);
+    assert(!err); (void)err;
 }
 
 inline void HMACSHA256::finish(void* result) {
     auto err = crypto_auth_hmacsha256_final(&_state, reinterpret_cast<unsigned char*>(result));
-    assert(!err);
+    assert(!err); (void)err;
 }
 
 }} // namespace scraps::sodium
