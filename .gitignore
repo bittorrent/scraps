@@ -8,6 +8,9 @@ configure.json
 /b2
 project-config.jam
 /tests/fuzz/*/findings
+/build
+/CMakeLists.txt
+
 
 # doxygen
 /docs

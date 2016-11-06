@@ -1,0 +1,72 @@
+cmake_minimum_required (VERSION 2.8.12)
+
+add_compile_options(-Wall {{cflags}})
+link_libraries({{ldflags}})
+
+add_definitions(-DASIO_STANDALONE=1 -DSTATICLIB)
+
+if(APPLE)
+    add_compile_options(-x objective-c++ -fobjc-arc)
+endif(APPLE)
+
+project(scraps)
+
+add_library(scraps
+    src/base64.cpp
+    src/bitfield.cpp
+    src/chrono.cpp
+    src/codeformation
+    src/codeformation/Stack.cpp
+    src/filesystem.cpp
+    src/licenses.cpp
+    src/loggers.cpp
+    src/logging.cpp
+    src/MonotonicScheduler.cpp
+    src/net/curl.cpp
+    src/net/Endpoint.cpp
+    src/net/HTTPConnection.cpp
+    src/net/HTTPRequest.cpp
+    src/net/TCPService.cpp
+    src/net/UDPService.cpp
+    src/net/UDPSocket.cpp
+    src/net/utility.cpp
+    src/NotificationCenter.cpp
+    src/opengl/opengl.cpp
+    src/opengl/VertexArray.cpp
+    src/opengl/VertexBuffer.cpp
+    src/RunLoop.cpp
+    src/TaskQueue.cpp
+    src/TaskThread.cpp
+    src/URL.cpp
+    src/utility.cpp
+)
+
+include_directories("$(PROJECT_BINARY_DIR)/include")
+
+if(APPLE)
+    find_library(foundation Carbon)
+    find_library(corefoundation CoreFoundation)
+    find_library(security Security)
+    find_library(opengl OpenGL)
+    find_library(coreservices CoreServices)
+    mark_as_advanced(
+        foundation
+        corefoundation
+        security
+        opengl
+        coreservices
+    )
+    set(extra_libs
+        ${foundation}
+        ${corefoundation}
+        ${security}
+        ${opengl}
+        ${coreservices}
+    )
+    target_link_libraries(scraps ${extra_libs})
+endif(APPLE)
+
+install(TARGETS scraps DESTINATION dest/bin)
+install(DIRECTORY include DESTINATION dest/include)
+
+set_property(TARGET scraps PROPERTY CXX_STANDARD 14)

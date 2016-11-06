@@ -1,6 +1,5 @@
 {% set common_cxx_flags = env['CXXFLAGS'] ~ ' -fvisibility=hidden' %}
 {% set xcrun_platforms = {'ios': 'iphoneos', 'tvos': 'appletvos', 'iossimulator': 'iphoneossimulator', 'tvossimulator': 'appletvossimulator'} %}
-
 libraries:
     asio:
         repository: https://github.com/chriskohlhoff/asio.git
@@ -8,13 +7,6 @@ libraries:
         project:
             header-directory: asio/include
             post-build: xxd -i asio/LICENSE_1_0.txt {build_directory}/include/asio/license.c
-    boost-build:
-        download: https://github.com/boostorg/build/archive/2016.03.tar.gz
-        checksum: 0e6936337c25fc87d2aff8ea6c63019e9c1e319a
-        project:
-            build-steps:
-                - ./bootstrap.sh
-                - ./b2 install --prefix={build_directory}
     libsodium:
         download: https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz
         checksum: 60f3f3a3f4aea38a103d25844a9e181c0f7b4505
@@ -37,14 +29,15 @@ libraries:
         project:
             build-steps: make -j{build_concurrency} install APPS= DESTDIR={build_directory}
             post-build: xxd -i LICENSE {build_directory}/include/mbedtls/license.c
-    curl:
+    libcurl:
         download: https://curl.haxx.se/download/curl-7.50.3.tar.gz
         checksum: be0065afc76a3d8568f5f78d8efddadb6310f9d7
         dependencies: mbedtls
         project:
             {% if platform in ['ios', 'iossimulator', 'tvos', 'tvossimulator', 'osx'] %}
             environment:
-                # Workaround for earlier versions of Xcode platforms. See https://curl.haxx.se/mail/lib-2016-09/0051.html
+                # Workaround for earlier versions of Xcode platforms.
+                # See https://curl.haxx.se/mail/lib-2016-09/0051.html
                 CFLAGS: -Werror=partial-availability
                 CXXFLAGS: -Werror=partial-availability
             {% endif %}
@@ -109,9 +102,7 @@ libraries:
                 CMAKE_BUILD_TYPE: Release
     jshackle:
         repository: https://github.com/bittorrent/jshackle.git
-        commit: fa34cb3f85d9358bb93ab747dbd7105e97fc4216
-        project:
-            header-directory: include
+        commit: adbc9a5be65e8efcef619081332efcd5aa0060d1
     json11:
         repository: https://github.com/dropbox/json11.git
         commit: a20878aaa5bd2546466585b18b6d09808a98233d

@@ -44,53 +44,28 @@ needy_target_args = '--target={}'.format({
     'android': 'android',
 }.get(args.cross_target, None))
 
-b2_target_args = 'target-os={}'.format({
-    'iphoneos': 'iphone',
-    'appletvos': 'appletv',
-    'android': 'android',
-}.get(args.cross_target, None))
-
 build_deps = [
     './build-deps',
-    '--bootstrap-b2',
     '--configure',
 ]
 
-b2 = [
-    './b2',
-    '-j{}'.format(multiprocessing.cpu_count()),
-    'link={}'.format('static' if args.cross_target != 'android' else 'shared'),
-    'variant={}'.format(args.variant),
-    'scraps',
-    'tests/unit',
-]
-
-b2_config = ['live', 'b2-config']
-
 if args.clean:
-    b2.append('-a')
     build_deps.append('--clean')
 
 if args.cross_target:
     build_deps.append('--needy-target-args={}'.format(needy_target_args))
-    b2.append(b2_target_args)
-    b2_config.append('--target={}'.format(args.cross_target))
-else:
-    b2.append('tests/benchmarks')
 
 if args.cross_target == 'android':
     if 'ANDROID_TOOLCHAIN' not in os.environ:
         print('ANDROID_TOOLCHAIN not defined')
         sys.exit(1)
     build_deps.append('--needy-satisfy-args=--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
-    b2_config.append('--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
-
-    b2 = 'PATH=$ANDROID_TOOLCHAIN/arm-linux-androideabi/bin:$PATH {}'.format(' '.join([pipes.quote(s) for s in b2]))
 
 try:
     run_command(build_deps)
-    run_command('{} > project-config.jam'.format(' '.join([pipes.quote(s) for s in b2_config])))
-    run_command(b2)
+    run_command('rm -rf build && mkdir -p build')
+    run_command('cd build && cmake ..')
+    run_command('cd build && make')
 except subprocess.CalledProcessError:
     sys.exit(1)
     pass
