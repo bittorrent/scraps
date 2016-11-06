@@ -1,7 +1,7 @@
 version: '2'
 services:
     android-env:
-        image: bittorrent/live-build-environments:android-17-arm
+        image: bittorrent/live-build-environments:android-17-arm-0992bb7
         working_dir: /mnt/scraps
         volumes:
             - .:/mnt/scraps
