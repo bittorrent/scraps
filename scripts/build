@@ -59,7 +59,7 @@ build_deps = [
 b2 = [
     './b2',
     '-j{}'.format(multiprocessing.cpu_count()),
-    'link=static',
+    'link={}'.format('static' if args.cross_target != 'android' else 'shared'),
     'variant={}'.format(args.variant),
     'scraps',
     'tests/unit',
