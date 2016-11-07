@@ -32,7 +32,7 @@ libraries:
             {% endif %}
             post-build: xxd -i LICENSE {build_directory}/include/sodium/license.c
     mbedtls:
-        download: https://tls.mbed.org/download/mbedtls-2.4.0-apache.tgz
+        download: https://s3.amazonaws.com/live-dev-deps/mbedtls-2.4.0-apache.tgz
         checksum: 20fe40f9f831ca63839967178e3db5aaf77705d3
         project:
             build-steps: make -j{build_concurrency} install APPS= DESTDIR={build_directory}
