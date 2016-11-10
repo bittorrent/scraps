@@ -2,6 +2,18 @@ sudo: required
 branches:
     except:
         - /^phabricator/base/.*$/
+deploy:
+    provider: s3
+    bucket: $DEPLOYMENT_BUCKET
+    skip_cleanup: true
+    upload_dir: travis-builds
+    local_dir: dist
+    on:
+        branch:
+            - master
+            - develop
+before_deploy:
+    - ./scripts/ci/build-distribution
 
 matrix:
     include:
