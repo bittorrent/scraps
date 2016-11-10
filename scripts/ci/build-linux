@@ -1,22 +1,12 @@
 #!/bin/bash -e
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 cd $script_dir/../..
 
 export CXX=clang++-3.8
 export CXXFLAGS=-stdlib=libc++
+export LDFLAGS=-lc++
 
-cat << PROJECT_CONFIG > project-config.jam
-using clang : : $CXX :
-    <cxxflags>$CXXFLAGS
-    <linkflags>$CXXFLAGS
-;
-PROJECT_CONFIG
-
-coverage_lib=$(find /usr/lib*/llvm-3.8/lib/ -name "libclang_rt.profile*.a")
-cpu_count=$(nproc)
-
-./build-deps --bootstrap-b2 --configure
-./b2 -j$cpu_count tests/unit//run cxxflags="-coverage" linkflags="$coverage_lib"
-./b2 -j$cpu_count variant=release tests/benchmarks
+# the benchmarks built with this would NOT be good with coverage
+./scripts/build --install --enable-coverage
+./tests/unit/dist/scraps-tests

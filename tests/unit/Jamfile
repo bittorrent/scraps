@@ -19,3 +19,9 @@ exe scraps-tests :
 import testing ;
 unit-test run : scraps-tests ;
 explicit run ;
+
+path-constant PREFIX : [ option.get prefix : "/usr/local" ] ;
+
+install install : scraps-tests : <location>$(PREFIX) ;
+
+explicit install ;

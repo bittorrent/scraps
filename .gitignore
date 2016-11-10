@@ -3,7 +3,7 @@
 bin
 configure.json
 /bootstrap
-/dist
+dist
 /needs
 /b2
 project-config.jam

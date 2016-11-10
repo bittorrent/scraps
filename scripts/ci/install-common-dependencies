@@ -1,3 +1,5 @@
 #!/bin/sh -e
 
 pip install --user jinja2 pyyaml colorama
+
+sudo pip install git+https://github.com/bittorrent/simon.git@master#egg=simon

@@ -1,24 +1,19 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import argparse
 import subprocess
 import sys
 import os
 import multiprocessing
+import pipes
+import shutil
 import platform
 import distutils.spawn
-import pipes
+import textwrap
 
 from colorama import Fore, Style
-
-
-def run_command(command):
-    if isinstance(command, list):
-        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(' '.join([pipes.quote(s) for s in command])) + Style.RESET_ALL)
-        subprocess.check_call(command)
-    else:
-        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(command) + Style.RESET_ALL)
-        subprocess.check_call(command, shell=True)
 
 project_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 os.chdir(project_root)
@@ -36,61 +31,162 @@ parser.add_argument('--variant',
 parser.add_argument('-c', '--clean',
                     action='store_true',
                     help='clean prior to building')
+parser.add_argument('--install',
+                    action='store_true',
+                    help='install targets as well')
+parser.add_argument('--enable-coverage',
+                    action='store_true',
+                    help='enables building code coverage')
+parser.add_argument('--enable-analysis',
+                    action='store_true',
+                    help='enables static analysis via simon')
 args = parser.parse_args()
 
-needy_target_args = '--target={}'.format({
-    'iphoneos': 'ios',
-    'appletvos': 'tvos',
-    'android': 'android',
-}.get(args.cross_target, None))
 
-b2_target_args = 'target-os={}'.format({
-    'iphoneos': 'iphone',
-    'appletvos': 'appletv',
-    'android': 'android',
-}.get(args.cross_target, None))
+def run_command(command):
+    if isinstance(command, list):
+        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(' '.join([pipes.quote(s) for s in command])) + Style.RESET_ALL)
+        subprocess.check_call(command)
+    else:
+        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(command) + Style.RESET_ALL)
+        subprocess.check_call(command, shell=True)
 
-build_deps = [
-    './build-deps',
-    '--bootstrap-b2',
-    '--configure',
-]
 
-b2 = [
-    './b2',
-    '-j{}'.format(multiprocessing.cpu_count()),
-    'link={}'.format('static' if args.cross_target != 'android' else 'shared'),
-    'variant={}'.format(args.variant),
-    'scraps',
-    'tests/unit',
-]
+def print_diagnostic(msg):
+    print(Fore.YELLOW + Style.BRIGHT + msg + Style.RESET_ALL)
 
-b2_config = ['live', 'b2-config']
 
-if args.clean:
-    b2.append('-a')
-    build_deps.append('--clean')
+def print_error(msg):
+    print(Fore.RED + Style.BRIGHT + msg + Style.RESET_ALL, file=sys.stderr)
 
-if args.cross_target:
-    build_deps.append('--needy-target-args={}'.format(needy_target_args))
-    b2.append(b2_target_args)
-    b2_config.append('--target={}'.format(args.cross_target))
-else:
-    b2.append('tests/benchmarks')
 
-if args.cross_target == 'android':
-    if 'ANDROID_TOOLCHAIN' not in os.environ:
-        print('ANDROID_TOOLCHAIN not defined')
+def write_b2_project_config(args):
+    if args.cross_target == 'android' and 'ANDROID_TOOLCHAIN' not in os.environ:
+        print_error('ANDROID_TOOLCHAIN must be defined')
         sys.exit(1)
-    build_deps.append('--needy-satisfy-args=--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
-    b2_config.append('--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
+    b2_config = [os.path.join('scripts', 'configure-b2')]
+    if args.cross_target:
+        b2_config.append('--target={}'.format(args.cross_target))
+    run_command('{} > project-config.jam'.format(' '.join([pipes.quote(s) for s in b2_config])))
 
-    b2 = 'PATH=$ANDROID_TOOLCHAIN/arm-linux-androideabi/bin:$PATH {}'.format(' '.join([pipes.quote(s) for s in b2]))
+
+def build_deps(args):
+    build_deps = [
+        './build-deps',
+        '--bootstrap-b2',
+        '--configure',
+    ]
+    if args.clean:
+        build_deps.append('--clean')
+    if args.cross_target:
+        build_deps.append('--needy-target-args=--target={}'.format({
+            'iphoneos': 'ios',
+            'appletvos': 'tvos',
+            'android': 'android',
+        }[args.cross_target]))
+    run_command(build_deps)
+
+
+def build(args):
+    b2 = [
+        './b2',
+        '-j{}'.format(multiprocessing.cpu_count()),
+        'link=shared' if args.cross_target == 'android' else 'link=static',
+        'variant={}'.format(args.variant),
+        'scraps',
+        'tests/unit',
+    ]
+    if args.enable_analysis:
+        if not distutils.spawn.find_executable('simon'):
+            print_error(textwrap.dedent('''\
+                unable to perform static analysis without simon
+                see https://github.com/bittorrent/simon'''))
+            sys.exit(1)
+        b2 = ['simon', 'c++-analysis'] + b2
+    if args.clean:
+        b2.append('-a')
+    if args.cross_target:
+        b2.append('target-os={}'.format({
+            'iphoneos': 'iphone',
+            'appletvos': 'appletv',
+            'android': 'android',
+        }[args.cross_target]))
+    else:
+        b2.append('tests/benchmarks')
+    if args.cross_target == 'android':
+        os.environ['PATH'] = '{}/arm-linux-androideabi/bin:{}'.format(
+            os.environ['ANDROID_TOOLCHAIN'],
+            os.environ['PATH'])
+    if args.enable_coverage:
+        if args.cross_target:
+            print_error('coverage is only supported for host')
+            sys.exit(1)
+        b2.extend([
+            'cxxflags=-coverage',
+            'linkflags={}'.format(coverage_lib(platform.system().lower()))
+        ])
+    run_command(b2)
+
+
+def coverage_lib(uname):
+    if uname == 'linux':
+        # XXX: currently only supported for clang 3.8
+        return subprocess.check_output(
+            'find /usr/lib*/llvm-3.8/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
+    elif uname == 'darwin':
+        toolchain_root = '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain'
+        return subprocess.check_output(
+            'find {}/usr/lib -name "libclang_rt.profile_osx.a"'.format(toolchain_root), shell=True).decode().strip()
+    else:
+        print_error('coverage is only supported for darwin and linux')
+        sys.exit(1)
+
+
+def install(args):
+    b2 = [
+        './b2',
+        '-j{}'.format(multiprocessing.cpu_count()),
+        'link=shared' if args.cross_target == 'android' else 'link=static',
+        'variant={}'.format(args.variant),
+        'install',
+        'tests/unit//install',
+        '--prefix=dist',
+    ]
+    if args.clean:
+        b2.append('-a')
+    if args.cross_target:
+        b2.append('target-os={}'.format({
+            'iphoneos': 'iphone',
+            'appletvos': 'appletv',
+            'android': 'android',
+        }[args.cross_target]))
+    if args.cross_target == 'android':
+        os.environ['PATH'] = '{}/arm-linux-androideabi/bin:{}'.format(
+            os.environ['ANDROID_TOOLCHAIN'],
+            os.environ['PATH'])
+    if os.path.exists('dist'):
+        shutil.rmtree('dist')
+    if os.path.exists(os.path.join('tests', 'unit', 'dist')):
+        shutil.rmtree(os.path.join('tests', 'unit', 'dist'))
+    run_command(b2)
+    os.remove(os.path.join('dist', 'needy.status'))
+
+
+def verify():
+    if not distutils.spawn.find_executable('simon'):
+        print_error(textwrap.dedent('''\
+            unable to perform license checks without simon
+            see https://github.com/bittorrent/simon'''))
+    else:
+        run_command(['simon', 'license', 'check', '--license=apache'])
 
 try:
-    run_command(build_deps)
-    run_command('{} > project-config.jam'.format(' '.join([pipes.quote(s) for s in b2_config])))
-    run_command(b2)
+    write_b2_project_config(args)
+    build_deps(args)
+    build(args)
+    verify()
+    if args.install:
+        install(args)
 except subprocess.CalledProcessError:
     sys.exit(1)
     pass

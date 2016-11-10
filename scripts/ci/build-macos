@@ -3,15 +3,6 @@
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $script_dir/../..
 
-./build-deps --bootstrap-b2 --configure
-
-echo "using darwin ;" >> project-config.jam
-
-toolchain_root=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain
-
-cpu_count=$(sysctl -n hw.ncpu)
-coverage_lib=$(find $toolchain_root/usr/lib/ -name "libclang_rt.profile_osx.a")
-
-./b2 -j$cpu_count variant=release
-./b2 -j$cpu_count variant=release tests/unit//run cxxflags="-coverage" linkflags="$coverage_lib"
-./b2 -j$cpu_count variant=release tests/benchmarks
+# the benchmarks built with this would NOT be good with coverage
+./scripts/build --install --enable-coverage
+./tests/unit/dist/scraps-tests
