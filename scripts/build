@@ -43,13 +43,40 @@ parser.add_argument('--enable-analysis',
 args = parser.parse_args()
 
 
+if args.cross_target == 'android':
+    if 'ANDROID_TOOLCHAIN' not in os.environ:
+        print_error('ANDROID_TOOLCHAIN must be defined')
+        sys.exit(1)
+    android_path_override = '{}/arm-linux-androideabi/bin:{}'.format(
+        os.environ['ANDROID_TOOLCHAIN'],
+        os.environ['PATH'])
+
+if not distutils.spawn.find_executable('simon'):
+    print_error(textwrap.dedent('''\
+        unable to perform license checks without simon
+        see https://github.com/bittorrent/simon'''))
+    if args.enable_analysis:
+        print_error(textwrap.dedent('''\
+            unable to perform static analysis without simon
+            see https://github.com/bittorrent/simon'''))
+        sys.exit(1)
+
+if args.enable_coverage and args.cross_target:
+    print_error('coverage is only supported for host')
+    sys.exit(1)
+
+
 def run_command(command):
     if isinstance(command, list):
-        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(' '.join([pipes.quote(s) for s in command])) + Style.RESET_ALL)
+        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(shell_quote(command)) + Style.RESET_ALL)
         subprocess.check_call(command)
     else:
         print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(command) + Style.RESET_ALL)
         subprocess.check_call(command, shell=True)
+
+
+def shell_quote(command):
+    return ' '.join([pipes.quote(c) for c in command])
 
 
 def print_diagnostic(msg):
@@ -60,14 +87,16 @@ def print_error(msg):
     print(Fore.RED + Style.BRIGHT + msg + Style.RESET_ALL, file=sys.stderr)
 
 
+def rm_rf(d):
+    if os.path.exists(d):
+        shutil.rmtree(d)
+
+
 def write_b2_project_config(args):
-    if args.cross_target == 'android' and 'ANDROID_TOOLCHAIN' not in os.environ:
-        print_error('ANDROID_TOOLCHAIN must be defined')
-        sys.exit(1)
     b2_config = [os.path.join('scripts', 'configure-b2')]
     if args.cross_target:
         b2_config.append('--target={}'.format(args.cross_target))
-    run_command('{} > project-config.jam'.format(' '.join([pipes.quote(s) for s in b2_config])))
+    run_command('{} > project-config.jam'.format(shell_quote(b2_config)))
 
 
 def build_deps(args):
@@ -97,12 +126,7 @@ def build(args):
         'tests/unit',
     ]
     if args.enable_analysis:
-        if not distutils.spawn.find_executable('simon'):
-            print_error(textwrap.dedent('''\
-                unable to perform static analysis without simon
-                see https://github.com/bittorrent/simon'''))
-            sys.exit(1)
-        b2 = ['simon', 'c++-analysis'] + b2
+        b2 = ['simon', 'c++-analysis'] + b2 + ['--build-dir=./bin/analysis']
     if args.clean:
         b2.append('-a')
     if args.cross_target:
@@ -113,33 +137,25 @@ def build(args):
         }[args.cross_target]))
     else:
         b2.append('tests/benchmarks')
-    if args.cross_target == 'android':
-        os.environ['PATH'] = '{}/arm-linux-androideabi/bin:{}'.format(
-            os.environ['ANDROID_TOOLCHAIN'],
-            os.environ['PATH'])
     if args.enable_coverage:
-        if args.cross_target:
-            print_error('coverage is only supported for host')
-            sys.exit(1)
         b2.extend([
             'cxxflags=-coverage',
             'linkflags={}'.format(coverage_lib(platform.system().lower()))
         ])
+    if args.cross_target == 'android':
+        b2 = 'PATH={}:$PATH {}'.format(android_path_override, shell_quote(b2))
     run_command(b2)
 
 
 def coverage_lib(uname):
-    if uname == 'linux':
-        # XXX: currently only supported for clang 3.8
-        return subprocess.check_output(
-            'find /usr/lib*/llvm-3.8/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
-    elif uname == 'darwin':
+    if uname == 'darwin':
         toolchain_root = '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain'
         return subprocess.check_output(
             'find {}/usr/lib -name "libclang_rt.profile_osx.a"'.format(toolchain_root), shell=True).decode().strip()
     else:
-        print_error('coverage is only supported for darwin and linux')
-        sys.exit(1)
+        # XXX: currently only supported for clang 3.8
+        return subprocess.check_output(
+            'find /usr/lib*/llvm-3.8/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
 
 
 def install(args):
@@ -161,23 +177,15 @@ def install(args):
             'android': 'android',
         }[args.cross_target]))
     if args.cross_target == 'android':
-        os.environ['PATH'] = '{}/arm-linux-androideabi/bin:{}'.format(
-            os.environ['ANDROID_TOOLCHAIN'],
-            os.environ['PATH'])
-    if os.path.exists('dist'):
-        shutil.rmtree('dist')
-    if os.path.exists(os.path.join('tests', 'unit', 'dist')):
-        shutil.rmtree(os.path.join('tests', 'unit', 'dist'))
+        b2 = 'PATH={}:$PATH {}'.format(android_path_override, shell_quote(b2))
+    rm_rf('dist')
+    rm_rf(os.path.join('tests', 'unit', 'dist'))
     run_command(b2)
     os.remove(os.path.join('dist', 'needy.status'))
 
 
 def verify():
-    if not distutils.spawn.find_executable('simon'):
-        print_error(textwrap.dedent('''\
-            unable to perform license checks without simon
-            see https://github.com/bittorrent/simon'''))
-    else:
+    if distutils.spawn.find_executable('simon'):
         run_command(['simon', 'license', 'check', '--license=apache'])
 
 try:
