@@ -43,6 +43,14 @@ parser.add_argument('--enable-analysis',
 args = parser.parse_args()
 
 
+def print_diagnostic(msg):
+    print(Fore.YELLOW + Style.BRIGHT + msg + Style.RESET_ALL)
+
+
+def print_error(msg):
+    print(Fore.RED + Style.BRIGHT + msg + Style.RESET_ALL, file=sys.stderr)
+
+
 if args.cross_target == 'android':
     if 'ANDROID_TOOLCHAIN' not in os.environ:
         print_error('ANDROID_TOOLCHAIN must be defined')
@@ -77,14 +85,6 @@ def run_command(command):
 
 def shell_quote(command):
     return ' '.join([pipes.quote(c) for c in command])
-
-
-def print_diagnostic(msg):
-    print(Fore.YELLOW + Style.BRIGHT + msg + Style.RESET_ALL)
-
-
-def print_error(msg):
-    print(Fore.RED + Style.BRIGHT + msg + Style.RESET_ALL, file=sys.stderr)
 
 
 def rm_rf(d):
