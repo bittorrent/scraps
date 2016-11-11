@@ -126,7 +126,7 @@ def build(args):
         'tests/unit',
     ]
     if args.enable_analysis:
-        b2 = ['simon', 'c++-analysis'] + b2 + ['--build-dir=./bin/analysis']
+        b2 = ['simon', 'c++-analysis', '--report-dir', 'analysis'] + b2 + ['--build-dir=./bin/analysis']
     if args.clean:
         b2.append('-a')
     if args.cross_target:

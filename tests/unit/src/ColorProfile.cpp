@@ -30,8 +30,8 @@ TEST(ColorProfile, transferFunctionInversion) {
         TransferFunctions::kBT709,
         TransferFunctions::kGamma<26, 10>,
     }) {
-        for (double x = 0.0; x <= 1.0; x += 0.05) {
-            EXPECT_FLOAT_EQ(function.toVoltage(function.toLinear(x)), x);
+        for (auto i = 0; i <= 20; ++i) {
+            EXPECT_FLOAT_EQ(function.toVoltage(function.toLinear(i / 20.0)), i / 20.0);
         }
     }
 }

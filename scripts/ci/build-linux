@@ -10,3 +10,5 @@ export LDFLAGS=-lc++
 # the benchmarks built with this would NOT be good with coverage
 ./scripts/build --install --enable-coverage
 ./tests/unit/dist/scraps-tests
+
+./scripts/build --variant=debug --enable-analysis

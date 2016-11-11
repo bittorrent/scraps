@@ -14,6 +14,11 @@ deploy:
             - develop
 before_deploy:
     - ./scripts/ci/build-distribution
+addons:
+    artifacts:
+        bucket: $DEPLOYMENT_BUCKET/travis-artifacts
+        paths:
+          - $(find analysis | tr "\n" ":")
 
 matrix:
     include:
