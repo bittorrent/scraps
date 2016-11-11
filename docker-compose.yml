@@ -5,3 +5,8 @@ services:
         working_dir: /mnt/scraps
         volumes:
             - .:/mnt/scraps
+    linux-env:
+        image: bittorrent/live-build-environments:linux-73a78cb
+        working_dir: /mnt/scraps
+        volumes:
+            - .:/mnt/scraps
