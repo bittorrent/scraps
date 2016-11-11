@@ -92,7 +92,7 @@ includedir=\${exec_prefix}/include
 Name: scraps
 Version: 0
 Description: Random scraps of C++
-Requires: libcurl, mbedtls, fmt, asio, gsl, libsodium, mnmlstc, json11
+Requires: mbedtls, libcurl, fmt, asio, gsl, libsodium, mnmlstc, json11
 Libs: -L\${libdir} -lscraps
 Libs.private: $(PRIVATE_LIBS)
 Cflags: -I\${includedir} -DASIO_STANDALONE=1 -fvisibility=hidden
