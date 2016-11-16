@@ -41,3 +41,22 @@ TEST(Reverse, worksWithLValues) {
 
     ASSERT_EQ(count, 4);
 }
+
+TEST(Reverse, initializerList) {
+    { // rvalue braced init list into initializer_list
+        size_t count = 0;
+        for (auto& e : Reverse({4, 3, 2, 1})) {
+            EXPECT_EQ(e, ++count);
+        }
+
+        ASSERT_EQ(count, 4);
+    }
+
+    { // lvalue initializer_list
+        size_t count = 0;
+        auto l = {4, 3, 2, 1};
+        for (auto& e : Reverse(l)) {
+            EXPECT_EQ(e, ++count);
+        }
+    }
+}
