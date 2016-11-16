@@ -63,9 +63,12 @@ bool IsLocal(const Address& address);
 std::vector<Address> Resolve(const std::string& host);
 
 /**
-* Like Resolve, but only returns IPv4 addresses.
+* Like Resolve, but only returns addresses for the given protocol.
 */
-std::vector<Address> ResolveIPv4(const std::string& host);
+std::vector<Address> Resolve(const std::string& host, Address::Protocol protocol);
+
+inline std::vector<Address> ResolveIPv4(const std::string& host) { return Resolve(host, Address::Protocol::kIPv4); }
+inline std::vector<Address> ResolveIPv6(const std::string& host) { return Resolve(host, Address::Protocol::kIPv6); }
 
 /**
 * Resolves the given host-port pair and returns a random endpoint.
