@@ -324,7 +324,7 @@ TEST(Byte, MiscUsage) {
     }
 
     {
-        std::array<FooByte,     10> fooArray{{FooByte{0xAB}, FooByte{0xBC}}};
+        std::array<FooByte,     10> fooArray{FooByte{0xAB}, FooByte{0xBC}};
         std::array<GenericByte, 10> genericArray{};
 
         std::copy(fooArray.begin(), fooArray.end(), genericArray.begin());
@@ -333,7 +333,7 @@ TEST(Byte, MiscUsage) {
     }
 
     {
-        std::array<FooByte,     10> fooArray{{FooByte{0xAB}, FooByte{0xBC}}};
+        std::array<FooByte,     10> fooArray{FooByte{0xAB}, FooByte{0xBC}};
         std::array<GenericByte, 10> genericArray{};
 
         const auto fooSpan = gsl::as_span(fooArray);
@@ -345,7 +345,7 @@ TEST(Byte, MiscUsage) {
     }
 
     {
-        std::array<FooByte,     10> fooArray{{FooByte{0xAB}, FooByte{0xBC}}};
+        std::array<FooByte,     10> fooArray{FooByte{0xAB}, FooByte{0xBC}};
         std::array<GenericByte, 10> genericArray{};
 
         const auto fooSpan     = gsl::as_span(fooArray);

@@ -47,8 +47,7 @@
 #define SCRAPS_GL_ERROR_CHECK()
 #endif
 
-namespace scraps {
-namespace opengl {
+namespace scraps::opengl {
 
 constexpr const char* GetErrorName(GLenum err) {
     switch (err) {
@@ -80,4 +79,4 @@ bool HasExtension(std::string extension);
 std::string CommonVertexShaderHeader(std::vector<std::string> extensions = {});
 std::string CommonFragmentShaderHeader(std::vector<std::string> extensions = {});
 
-}}
+} // namespace scraps::opengl

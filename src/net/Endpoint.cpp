@@ -17,8 +17,7 @@
 
 #include <cassert>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 socklen_t Endpoint::getSockAddr(sockaddr_storage* storage) const {
     memset(storage, 0, sizeof(*storage));
@@ -47,4 +46,4 @@ socklen_t Endpoint::getSockAddr(sockaddr_storage* storage) const {
     return 0;
 }
 
-}} // namespace scraps::net
+} // namespace scraps::net

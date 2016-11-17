@@ -24,15 +24,6 @@
         using std::bad_any_cast;
         using std::swap;
     } // namespace stdts
-// cppcheck-suppress preprocessorErrorDirective
-#elif __has_include(<experimental/any>)
-    #include <experimental/any>
-    namespace stdts {
-        using std::experimental::any;
-        using std::experimental::any_cast;
-        using std::experimental::bad_any_cast;
-        using std::experimental::swap;
-    } // namespace stdts
 #else
     #include <core/any.hpp>
     namespace stdts {

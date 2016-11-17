@@ -24,7 +24,7 @@ using namespace scraps;
 TEST(array, ToArray) {
     {
         int i[5]                    = {0, 1, 2, 3, 4};
-        std::array<int, 5> expected = {{0, 1, 2, 3, 4}};
+        std::array<int, 5> expected = {0, 1, 2, 3, 4};
 
         auto arr = ToArray(i);
 
@@ -33,7 +33,7 @@ TEST(array, ToArray) {
     }
     {
         int i[5]                    = {0, 1, 2, 3, 4};
-        std::array<int, 5> expected = {{0, 1, 2, 3, 4}};
+        std::array<int, 5> expected = {0, 1, 2, 3, 4};
 
         auto arr = ToArray(gsl::span<int, 5>{i});
 

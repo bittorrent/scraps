@@ -13,27 +13,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include <scraps/net/curl.h>
+#include "gtest.h"
 
-#include <cassert>
+#include <core/variant.hpp>
 
-namespace scraps::net {
+#include <string>
+#include <chrono>
 
-namespace {
-bool _gCURLIsInitialized = false;
+using namespace std::literals;
+
+TEST(core_variant, cpp17Compatibility) {
+    core::variant<int64_t, std::string> variant;
+
+    variant = "hello world"s;
+
+    variant.match([](int64_t i) {
+        FAIL();
+    }, [](const std::string& str){
+        EXPECT_EQ(str, "hello world"s);
+    });
 }
-
-void InitializeCURL() {
-    if (CURLIsInitialized()) { return; }
-
-    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
-        assert(false);
-    }
-    _gCURLIsInitialized = true;
-}
-
-bool CURLIsInitialized() {
-    return _gCURLIsInitialized;
-}
-
-} // namespace scraps::net

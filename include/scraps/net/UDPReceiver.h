@@ -19,8 +19,7 @@
 
 #include <scraps/net/Endpoint.h>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 class UDPReceiver {
 public:
@@ -29,4 +28,4 @@ public:
     virtual void receiveUDP(const Endpoint& sender, const void* data, size_t length) = 0;
 };
 
-}} // namespace scraps::net
+} // namespace scraps::net

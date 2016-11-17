@@ -28,8 +28,7 @@
 
 #include <thread>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 TCPService::Connection::~Connection() {
     close();
@@ -381,4 +380,4 @@ void TCPService::_closeAndErase(Connection& connection) {
     }
 }
 
-}} // namespace scraps::net
+} // namespace scraps::net

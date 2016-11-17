@@ -23,8 +23,7 @@
 
 #include <unistd.h>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 HTTPConnection::HTTPConnection(int socket, const std::chrono::microseconds& timeout)
     : _socket(socket), _result(kResultUnknown), _timeout(timeout) {}
@@ -190,4 +189,4 @@ int HTTPConnection::ParseRequest(const std::string& request, HTTPConnection::Req
     return -1;
 }
 
-}} // namespace scraps::net
+} // namespace scraps::net

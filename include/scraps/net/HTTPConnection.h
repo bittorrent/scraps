@@ -19,8 +19,7 @@
 
 #include <unordered_map>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 class HTTPConnection {
 public:
@@ -94,4 +93,4 @@ private:
     static int ParseRequest(const std::string& request, Request* parsed);
 };
 
-}} // namespace scraps::net
+} // namespace scraps::net

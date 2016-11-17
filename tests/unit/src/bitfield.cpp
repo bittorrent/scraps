@@ -56,16 +56,16 @@ TEST(bitfield, EliasOmegaEncode) {
 
 TEST(bitfield, EliasOmegaDecode) {
     bool code1[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
-    EXPECT_EQ(EliasOmegaDecode(code1), 1000000);
+    EXPECT_EQ(EliasOmegaDecode(code1), 1000000u);
 
     bool code2[] = {1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
-    EXPECT_EQ(EliasOmegaDecode(code2), 32767);
+    EXPECT_EQ(EliasOmegaDecode(code2), 32767u);
 
     bool code3[] = {1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
-    EXPECT_EQ(EliasOmegaDecode(code3), 1048575);
+    EXPECT_EQ(EliasOmegaDecode(code3), 1048575u);
 
     bool code4[] = {1, 1, 1, 1, 1, 1, 1, 1};
-    EXPECT_EQ(EliasOmegaDecode(code4), 0);
+    EXPECT_EQ(EliasOmegaDecode(code4), 0u);
 };
 
 TEST(bitfield, BitfieldEncode) {

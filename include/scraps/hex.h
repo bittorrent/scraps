@@ -86,7 +86,7 @@ constexpr bool ToBytes(const gsl::basic_string_span<const HexCharT, HexExtent> h
     if (hex.size() - prefixSize != bytes.size() * 2) {
         return false;
     }
-    for (std::size_t i = 0; i < bytes.size(); ++i) {
+    for (decltype(bytes.size()) i = 0; i < bytes.size(); ++i) {
         auto hi = HexToDec(hex[i * 2 + prefixSize]);
         auto lo = HexToDec(hex[i * 2 + 1 + prefixSize]);
         if (hi < 0 || lo < 0) {

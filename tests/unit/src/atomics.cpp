@@ -45,12 +45,12 @@ private:
     void _assertAtomics() {
         constexpr auto max = std::numeric_limits<AtomicType>::max();
 
-        std::atomic<AtomicType> v{0x00};
-        ASSERT_EQ(v.load(), 0x00);
+        std::atomic<AtomicType> v{0x00u};
+        ASSERT_EQ(v.load(), 0x00u);
         v = max;
         ASSERT_EQ(v.load(), max);
-        v = 0x00;
-        ASSERT_EQ(v.load(), 0x00);
+        v = 0x00u;
+        ASSERT_EQ(v.load(), 0x00u);
     }
 };
 

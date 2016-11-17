@@ -15,14 +15,13 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
 #if SCRAPS_APPLE
 
 #include <CommonCrypto/CommonDigest.h>
 
-namespace scraps {
-namespace apple {
+namespace scraps::apple {
 
 class SHA256 {
 public:
@@ -54,6 +53,6 @@ inline void SHA256::finish(void* hash) {
     CC_SHA256_Final(reinterpret_cast<unsigned char*>(hash), &_state);
 }
 
-}} // namespace scraps::apple
+} // namespace scraps::apple
 
 #endif

@@ -18,8 +18,7 @@
 #include <scraps/config.h>
 #include <scraps/opengl/opengl.h>
 
-namespace scraps {
-namespace opengl {
+namespace scraps::opengl {
 
 class VertexBuffer {
 public:
@@ -48,5 +47,4 @@ private:
     GLenum _currentTarget = 0;
 };
 
-} // namespace opengl
-} // namespace scraps
+} // namespace scraps::opengl

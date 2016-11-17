@@ -20,8 +20,7 @@
 #include <sodium/crypto_auth_hmacsha256.h>
 #include <cassert>
 
-namespace scraps {
-namespace sodium {
+namespace scraps::sodium {
 
 class HMACSHA256 {
 public:
@@ -58,4 +57,4 @@ inline void HMACSHA256::finish(void* result) {
     assert(!err); (void)err;
 }
 
-}} // namespace scraps::sodium
+} // namespace scraps::sodium

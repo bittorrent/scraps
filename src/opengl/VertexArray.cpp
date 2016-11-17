@@ -15,8 +15,7 @@
 */
 #include <scraps/opengl/VertexArray.h>
 
-namespace scraps {
-namespace opengl {
+namespace scraps::opengl {
 
 VertexArray::VertexArray() {
 #if !SCRAPS_EMULATE_VERTEX_ARRAY
@@ -72,5 +71,4 @@ void VertexArray::setAttribute(GLuint index, VertexBuffer& buffer, GLint size, G
 #endif
 }
 
-} // namespace opengl
-} // namespace scraps
+} // namespace scraps::opengl

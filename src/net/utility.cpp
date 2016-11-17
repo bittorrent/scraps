@@ -22,8 +22,7 @@
 
 #include <thread>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 void ShutdownAndCloseTCPSocket(int fd) {
 #if _WIN32
@@ -121,4 +120,4 @@ Address DefaultInterface(bool ipv6) {
     return localAddress;
 }
 
-}} // namespace scraps::net
+} // namespace scraps::net

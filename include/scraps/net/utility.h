@@ -23,8 +23,7 @@
 
 #include <vector>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 /**
 * Returns the code for the most recent socket error
@@ -89,4 +88,4 @@ Address DefaultInterface(bool ipv6 = false);
 inline Address DefaultIPv4Interface() { return DefaultInterface(false); }
 inline Address DefaultIPv6Interface() { return DefaultInterface(true); }
 
-}} // namespace scraps::net
+} // namespace scraps::net

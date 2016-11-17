@@ -23,8 +23,7 @@
 #include <functional>
 #include <ostream>
 
-namespace scraps {
-namespace math {
+namespace scraps::math {
 
 template <typename T, size_t N>
 struct VectorComponents {
@@ -149,4 +148,4 @@ struct Vector : VectorComponents<T, N> {
     }
 };
 
-} } // namespace scraps::math
+} // namespace scraps::math

@@ -20,8 +20,7 @@
 #include <scraps/opengl/opengl.h>
 #include <scraps/opengl/VertexBuffer.h>
 
-namespace scraps {
-namespace opengl {
+namespace scraps::opengl {
 
 #if OPENGL_ES && !SCRAPS_IOS && !SCRAPS_TVOS
 // for now we need to emulate this for opengl es
@@ -47,5 +46,4 @@ private:
 #endif
 };
 
-} // namespace opengl
-} // namespace scraps
+} // namespace scraps::opengl

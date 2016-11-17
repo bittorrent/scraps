@@ -21,8 +21,7 @@
 
 #include <CommonCrypto/CommonHMAC.h>
 
-namespace scraps {
-namespace apple {
+namespace scraps::apple {
 
 enum class HMACAlgorithmType : unsigned int {
     SHA1   = kCCHmacAlgSHA1,
@@ -81,6 +80,6 @@ inline void HMAC<Type>::finish(void* result) {
     CCHmacFinal(&_state, reinterpret_cast<unsigned char*>(result));
 }
 
-}} // namespace scraps::apple
+} // namespace scraps::apple
 
 #endif

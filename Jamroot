@@ -39,7 +39,7 @@ alias scraps_deps :
     json11
 : : :
     <include>include
-    <cxxflags>"-Wall -std=c++1y -fvisibility=hidden"
+    <cxxflags>"-Wall -Wextra -Wno-unused-parameter -Wno-missing-braces -Wno-sign-compare -std=c++1z -fvisibility=hidden"
     <define>ASIO_STANDALONE=1
     <define>STATICLIB
 

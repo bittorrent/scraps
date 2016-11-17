@@ -32,8 +32,7 @@ SCRAPS_IGNORE_WARNINGS_POP
 
 #include <condition_variable>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 /**
 * Implements a tcp server. ConnectionClass should be a class with a run() method, to
@@ -256,4 +255,4 @@ private:
     }
 };
 
-}} // namespace scraps::net
+} // namespace scraps::net

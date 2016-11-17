@@ -22,8 +22,7 @@ SCRAPS_IGNORE_WARNINGS_PUSH
 #include <asio/ip/udp.hpp>
 SCRAPS_IGNORE_WARNINGS_POP
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 class Address : public asio::ip::address {
 public:
@@ -38,7 +37,7 @@ public:
     Protocol protocol() const { return is_v4() ? Protocol::kIPv4 : Protocol::kIPv6; }
 };
 
-}} // namespace scraps::net
+} // namespace scraps::net
 
 namespace std {
 

@@ -19,10 +19,9 @@
 
 #include <curl/curl.h>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 void InitializeCURL();
 bool CURLIsInitialized();
 
-}} // namespace scraps::net
+} // namespace scraps::net

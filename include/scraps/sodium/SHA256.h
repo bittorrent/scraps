@@ -19,8 +19,7 @@
 
 #include <sodium/crypto_hash_sha256.h>
 
-namespace scraps {
-namespace sodium {
+namespace scraps::sodium {
 
 class SHA256 {
 public:
@@ -52,4 +51,4 @@ inline void SHA256::finish(void* hash) {
     crypto_hash_sha256_final(&_state, reinterpret_cast<unsigned char*>(hash));
 }
 
-}} // namespace scraps::sodium
+} // namespace scraps::sodium

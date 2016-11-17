@@ -27,18 +27,15 @@
         using std::in_place;
         using std::make_optional;
     } // namespace stdts
-// cppcheck-suppress preprocessorErrorDirective
-#elif __has_include(<experimental/optional>)
-    #include <experimental/optional>
-    namespace stdts {
-        using std::experimental::optional;
-        using std::experimental::nullopt_t;
-        using std::experimental::in_place_t;
-        using std::experimental::bad_optional_access;
-        using std::experimental::nullopt;
-        using std::experimental::in_place;
-        using std::experimental::make_optional;
-    } // namespace stdts
 #else
-    #error "an implementation of optional is required!"
+    #include <core/optional.hpp>
+    namespace stdts {
+        using core::optional;
+        using core::nullopt_t;
+        using core::in_place_t;
+        using core::bad_optional_access;
+        using core::nullopt;
+        using core::in_place;
+        using core::make_optional;
+    } // namespace stdts
 #endif

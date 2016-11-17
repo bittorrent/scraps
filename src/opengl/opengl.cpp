@@ -15,8 +15,7 @@
 */
 #include <scraps/opengl/opengl.h>
 
-namespace scraps {
-namespace opengl {
+namespace scraps::opengl {
 
 GLint MajorVersion() {
     GLint ret = -1;
@@ -83,4 +82,4 @@ std::string CommonFragmentShaderHeader(std::vector<std::string> extensions) {
     return ret;
 }
 
-}} // namespace scraps::opengl
+} // namespace scraps::opengl

@@ -101,14 +101,14 @@ void NonatomicIteration(T&& iterable, F&& function) {
 
 template <typename T, std::ptrdiff_t N>
 gsl::basic_string_span<T> TrimLeft(gsl::basic_string_span<T, N> str) {
-    size_t i = 0;
+    decltype(str.size()) i = 0;
     while(i < str.size() && isspace(str[i])) { ++i; };
     return {str.data() + i, static_cast<std::ptrdiff_t>(str.size() - i)};
 }
 
 template <typename T, std::ptrdiff_t N>
 gsl::basic_string_span<T> TrimRight(gsl::basic_string_span<T, N> str) {
-    size_t i = str.size();
+    decltype(str.size()) i = str.size();
     while(i > 0 && isspace(str[i - 1])) { --i; };
     return {str.data(), static_cast<std::ptrdiff_t>(i)};
 }

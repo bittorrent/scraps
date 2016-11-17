@@ -29,8 +29,7 @@
 #include <random>
 #include <cassert>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 struct TCPServiceDelegate;
 
@@ -226,4 +225,4 @@ struct TCPServiceDelegate {
     virtual void tcpServiceConnectionClosed(TCPService::ConnectionId connectionId) {}
 };
 
-}} // namespace scraps::net
+} // namespace scraps::net

@@ -61,7 +61,7 @@ TEST(utility, DecToHex) {
 TEST(utility, ToBytes) {
     {
         std::string str{"AB"};
-        std::array<scraps::Byte, 1> expected = {{scraps::Byte{0xAB}}};
+        std::array<scraps::Byte, 1> expected = {scraps::Byte{0xAB}};
         std::array<scraps::Byte, 1> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
@@ -70,7 +70,7 @@ TEST(utility, ToBytes) {
 
     {
         std::string str{"0xAB"};
-        std::array<scraps::Byte, 1> expected = {{scraps::Byte{0xAB}}};
+        std::array<scraps::Byte, 1> expected = {scraps::Byte{0xAB}};
         std::array<scraps::Byte, 1> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
@@ -105,10 +105,10 @@ TEST(utility, ToBytes) {
 }
 
 TEST(utility, ToHex) {
-    std::array<scraps::Byte, 8> bytes = {{
+    std::array<scraps::Byte, 8> bytes = {
         scraps::Byte{0x01}, scraps::Byte{0x23}, scraps::Byte{0x45}, scraps::Byte{0x67},
         scraps::Byte{0x89}, scraps::Byte{0xAB}, scraps::Byte{0xCD}, scraps::Byte{0xEF},
-    }};
+    };
 
     EXPECT_EQ(ToHex(bytes), "0123456789abcdef");
 

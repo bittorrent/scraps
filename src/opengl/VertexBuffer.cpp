@@ -15,8 +15,7 @@
 */
 #include <scraps/opengl/VertexBuffer.h>
 
-namespace scraps {
-namespace opengl {
+namespace scraps::opengl {
 
 VertexBuffer::VertexBuffer() {
     glGenBuffers(1, &_object);
@@ -44,5 +43,4 @@ void VertexBuffer::store(const uint8_t* data, size_t size, GLenum usage) {
     unbind();
 }
 
-} // namespace opengl
-} // namespace scraps
+} // namespace scraps::opengl

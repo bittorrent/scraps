@@ -56,7 +56,10 @@ void FileLogger::log(LogLevel level, const std::string& message) {
 
     std::lock_guard<std::mutex> lock{_mutex};
 
-    if (_rotateSize && ftell(_file) >= _rotateSize) { _rotate(); }
+    auto pos = ftell(_file);
+    if (_rotateSize && (pos == -1 || static_cast<size_t>(pos) >= _rotateSize)) {
+        _rotate();
+    }
 
     fprintf(_file, "%s\n", message.c_str());
     fflush(_file);
@@ -85,7 +88,9 @@ void FileLogger::_rotate() {
     fclose(_file);
     for (size_t i = _maxFiles - 1; i >= 1; --i) {
         auto path = _filePath + '.' + _numberString(i);
-        if (i == _maxFiles - 1) { remove(path.c_str()); } else {
+        if (i == _maxFiles - 1) {
+            remove(path.c_str());
+        } else {
             rename(path.c_str(), (_filePath + '.' + _numberString(i + 1)).c_str());
         }
     }

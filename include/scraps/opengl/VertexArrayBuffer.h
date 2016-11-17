@@ -20,8 +20,7 @@
 #include <scraps/opengl/VertexArray.h>
 #include <scraps/opengl/VertexBuffer.h>
 
-namespace scraps {
-namespace opengl {
+namespace scraps::opengl {
 
 /**
 * Convenience class for when you just need a vertex array with a single buffer.
@@ -36,5 +35,4 @@ public:
     }
 };
 
-} // namespace opengl
-} // namespace scraps
+} // namespace scraps::opengl

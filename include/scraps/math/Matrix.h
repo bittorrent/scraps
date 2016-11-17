@@ -31,8 +31,7 @@
 #undef major
 #endif
 
-namespace scraps {
-namespace math {
+namespace scraps::math {
 
 template <typename T, size_t R, size_t C> struct Matrix;
 
@@ -253,4 +252,4 @@ struct Matrix<T, 4, 4> : MatrixBase<T, 4, 4> {
     }
 };
 
-} } // namespace scraps::math
+} // namespace scraps::math

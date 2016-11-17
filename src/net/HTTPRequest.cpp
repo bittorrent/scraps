@@ -22,8 +22,7 @@
 
 #include <gsl.h>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 HTTPRequest::~HTTPRequest() {
     abort();
@@ -215,4 +214,4 @@ size_t HTTPRequest::CURLHeaderWriteCallback(char* ptr, size_t size, size_t nmemb
     return size * nmemb;
 }
 
-}} // namespace scraps::net
+} // namespace scraps::net

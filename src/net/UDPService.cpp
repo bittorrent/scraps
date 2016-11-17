@@ -17,8 +17,7 @@
 
 #include <scraps/logging.h>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 UDPService::UDPService() {
     _runLoop.setEventHandler([this](int fd, short events) {
@@ -104,4 +103,4 @@ void UDPService::_purgeDeadSockets() {
     }
 }
 
-}} // namespace scraps::net
+} // namespace scraps::net

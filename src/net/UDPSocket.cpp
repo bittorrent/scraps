@@ -23,8 +23,7 @@
 
 #include <cassert>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 constexpr size_t UDPSocket::kEthernetMTU;
 constexpr size_t UDPSocket::kIPv4HeaderSize;
@@ -119,18 +118,18 @@ bool UDPSocket::send(const Endpoint& destination, const void* data, size_t lengt
 
     if (sent < 0) {
         SCRAPS_LOG_ERROR("udp socket send error (errno = {})", static_cast<int>(errno));
-    } else if (sent != length) {
+    } else if (static_cast<size_t>(sent) != length) {
         SCRAPS_LOG_WARNING("udp socket sent != length ({} != {})", sent, length);
     }
 
-    if ((destination.address().is_v4() && sent > kMaxIPv4UDPPayloadSize) ||
-        (destination.address().is_v6() && sent > kMaxIPv6UDPPayloadSize)) {
+    if ((destination.address().is_v4() && static_cast<size_t>(sent) > kMaxIPv4UDPPayloadSize) ||
+        (destination.address().is_v6() && static_cast<size_t>(sent) > kMaxIPv6UDPPayloadSize)) {
         SCRAPS_LOG_WARNING("udp socket sent {} bytes, which is over the max udp payload size", sent);
     }
 
     _totalSentBytes += sent;
 
-    return sent == length;
+    return static_cast<size_t>(sent) == length;
 }
 
 void UDPSocket::receive() {
@@ -221,4 +220,4 @@ bool UDPSocket::_bind(const char* interface, uint16_t port) {
     return true;
 }
 
-}} // namespace scraps::net
+} // namespace scraps::net

@@ -26,8 +26,7 @@
 #include <thread>
 #include <atomic>
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 /**
 * Thread-safe.
@@ -112,4 +111,4 @@ private:
     bool _bind(const char* interface, uint16_t port);
 };
 
-}} // namespace scraps::net
+} // namespace scraps::net

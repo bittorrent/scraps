@@ -22,8 +22,7 @@ SCRAPS_IGNORE_WARNINGS_PUSH
 #include <asio/ip/udp.hpp>
 SCRAPS_IGNORE_WARNINGS_POP
 
-namespace scraps {
-namespace net {
+namespace scraps::net {
 
 class Endpoint : public asio::ip::udp::endpoint {
 public:
@@ -36,7 +35,7 @@ public:
     socklen_t getSockAddr(sockaddr_storage* storage) const;
 };
 
-}} // namespace scraps::net
+} // namespace scraps::net
 
 namespace std {
 
