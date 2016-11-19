@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/opengl/VertexBuffer.h"
+#include <scraps/opengl/VertexBuffer.h>
 
 namespace scraps {
 namespace opengl {

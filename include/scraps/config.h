@@ -20,10 +20,10 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
-#include "scraps/platform.h"
-#include "scraps/warnings.h"
-#include "scraps/thread.h"
-#include "scraps/logging.h"
+#include <scraps/platform.h>
+#include <scraps/warnings.h>
+#include <scraps/thread.h>
+#include <scraps/logging.h>
 
 namespace scraps {
 

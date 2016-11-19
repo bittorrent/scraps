@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/Observer.h"
+#include <scraps/Observer.h>
 
 #include <unordered_map>
 

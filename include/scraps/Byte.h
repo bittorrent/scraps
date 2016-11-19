@@ -15,8 +15,8 @@
 */
 #pragma once
 
-#include "scraps/config.h"
-#include "scraps/operators.h"
+#include <scraps/config.h>
+#include <scraps/operators.h>
 
 #include <type_traits>
 

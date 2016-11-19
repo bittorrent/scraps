@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "stdts/string_view.h"
+#include <stdts/string_view.h>
 
 #include <thread>
 #include <chrono>

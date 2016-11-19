@@ -15,8 +15,8 @@
 */
 #pragma once
 
-#include "scraps/config.h"
-#include "scraps/Buffer.h"
+#include <scraps/config.h>
+#include <scraps/Buffer.h>
 
 #include "jshackle/ToJava.h"
 #include "jshackle/ToNative.h"

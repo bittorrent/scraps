@@ -15,7 +15,7 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
 #include <sodium/crypto_hash_sha256.h>
 

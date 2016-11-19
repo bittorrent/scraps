@@ -15,8 +15,8 @@
 */
 #pragma once
 
-#include "scraps/config.h"
-#include "scraps/opengl/opengl.h"
+#include <scraps/config.h>
+#include <scraps/opengl/opengl.h>
 
 namespace scraps {
 namespace opengl {

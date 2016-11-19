@@ -15,10 +15,10 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/RunLoop.h"
-#include "scraps/net/UDPSocket.h"
+#include <scraps/RunLoop.h>
+#include <scraps/net/UDPSocket.h>
 
 namespace scraps {
 namespace net {

@@ -15,10 +15,10 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/math/Matrix.h"
-#include "scraps/math/Vector.h"
+#include <scraps/math/Matrix.h>
+#include <scraps/math/Vector.h>
 
 namespace scraps {
 

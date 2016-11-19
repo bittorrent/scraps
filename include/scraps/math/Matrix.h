@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/math/Vector.h"
+#include <scraps/math/Vector.h>
 
 #include <algorithm>
 #include <cmath>

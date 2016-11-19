@@ -15,10 +15,10 @@
 */
 #pragma once
 
-#include "scraps/config.h"
-#include "scraps/ColorGamut.h"
+#include <scraps/config.h>
+#include <scraps/ColorGamut.h>
 
-#include "scraps/math/Vector.h"
+#include <scraps/math/Vector.h>
 
 namespace scraps {
 

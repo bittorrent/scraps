@@ -13,13 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/net/HTTPConnection.h"
+#include <scraps/net/HTTPConnection.h>
 
-#include "scraps/chrono.h"
-#include "scraps/logging.h"
-#include "scraps/utility.h"
-#include "scraps/URL.h"
-#include "scraps/net/utility.h"
+#include <scraps/chrono.h>
+#include <scraps/logging.h>
+#include <scraps/utility.h>
+#include <scraps/URL.h>
+#include <scraps/net/utility.h>
 
 #include <unistd.h>
 

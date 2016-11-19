@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/chrono.h"
+#include <scraps/chrono.h>
 
 namespace scraps {
 

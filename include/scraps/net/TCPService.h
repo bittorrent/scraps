@@ -15,10 +15,10 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/RunLoop.h"
-#include "scraps/thread.h"
+#include <scraps/RunLoop.h>
+#include <scraps/thread.h>
 #include <unordered_map>
 
 #include <netinet/in.h>

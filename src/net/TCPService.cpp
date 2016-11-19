@@ -13,12 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/net/TCPService.h"
+#include <scraps/net/TCPService.h>
 
-#include "scraps/logging.h"
-#include "scraps/utility.h"
-#include "scraps/net/Endpoint.h"
-#include "scraps/net/utility.h"
+#include <scraps/logging.h>
+#include <scraps/utility.h>
+#include <scraps/net/Endpoint.h>
+#include <scraps/net/utility.h>
 
 #include <unistd.h>
 #include <arpa/inet.h>

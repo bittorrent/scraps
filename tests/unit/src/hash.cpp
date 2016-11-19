@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/hash.h"
+#include "gtest.h"
 
-#include <gtest/gtest.h>
+#include <scraps/hash.h>
 
 using namespace scraps;
 

@@ -15,10 +15,10 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/Byte.h"
-#include "scraps/Temp.h"
+#include <scraps/Byte.h>
+#include <scraps/Temp.h>
 
 #include <gsl.h>
 

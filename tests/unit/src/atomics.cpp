@@ -13,10 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+#include "gtest.h"
+
 #include <atomic>
 #include <limits>
-
-#include <gtest/gtest.h>
 
 /**
  * When linking with -latomic on Android with Clang, it appears that

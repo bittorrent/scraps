@@ -15,15 +15,15 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/base64.h"
-#include "scraps/Byte.h"
-#include "scraps/hex.h"
-#include "scraps/Temp.h"
-#include "scraps/random.h"
-#include "scraps/hash.h"
-#include "stdts/optional.h"
+#include <scraps/base64.h>
+#include <scraps/Byte.h>
+#include <scraps/hex.h>
+#include <scraps/Temp.h>
+#include <scraps/random.h>
+#include <scraps/hash.h>
+#include <stdts/optional.h>
 
 #include <gsl.h>
 

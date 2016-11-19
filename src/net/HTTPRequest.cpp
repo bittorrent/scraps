@@ -13,12 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/net/HTTPRequest.h"
+#include <scraps/net/HTTPRequest.h>
 
-#include "scraps/logging.h"
-#include "scraps/thread.h"
-#include "scraps/utility.h"
-#include "scraps/net/curl.h"
+#include <scraps/logging.h>
+#include <scraps/thread.h>
+#include <scraps/utility.h>
+#include <scraps/net/curl.h>
 
 #include <gsl.h>
 

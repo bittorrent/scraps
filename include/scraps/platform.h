@@ -15,7 +15,7 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
 #define SCRAPS_MAC_OS_X_AT_LEAST(version) 0
 

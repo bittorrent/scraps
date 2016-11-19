@@ -15,8 +15,8 @@
 */
 #pragma once
 
-#include "scraps/config.h"
-#include "scraps/utility.h"
+#include <scraps/config.h>
+#include <scraps/utility.h>
 
 SCRAPS_IGNORE_WARNINGS_PUSH
 #include <asio/ip/udp.hpp>

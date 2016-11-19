@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/utility.h"
+#include <scraps/utility.h>
 
-#include "scraps/format.h"
+#include <scraps/format.h>
 
 #include <cctype>
 #include <fstream>

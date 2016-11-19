@@ -15,8 +15,8 @@
 */
 #pragma once
 
-#include "scraps/config.h"
-#include "scraps/format.h"
+#include <scraps/config.h>
+#include <scraps/format.h>
 
 #include <atomic>
 #include <ctime>

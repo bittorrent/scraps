@@ -15,13 +15,13 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
 #if SCRAPS_APPLE
-    #include "scraps/apple/HMAC.h"
+    #include <scraps/apple/HMAC.h>
     namespace scraps { using HMACSHA256 = apple::HMAC<apple::HMACAlgorithmType::SHA256>; }
 #else
-    #include "scraps/sodium/HMACSHA256.h"
+    #include <scraps/sodium/HMACSHA256.h>
     namespace scraps { using HMACSHA256 = sodium::HMACSHA256; }
 #endif
 

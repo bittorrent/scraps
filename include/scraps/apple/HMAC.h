@@ -15,7 +15,7 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
 #if SCRAPS_APPLE
 

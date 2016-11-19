@@ -15,15 +15,15 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/Byte.h"
+#include <scraps/Byte.h>
 
 #if SCRAPS_APPLE
-    #include "scraps/apple/SHA256.h"
+    #include <scraps/apple/SHA256.h>
     namespace scraps { using SHA256 = apple::SHA256; }
 #else
-    #include "scraps/sodium/SHA256.h"
+    #include <scraps/sodium/SHA256.h>
     namespace scraps { using SHA256 = sodium::SHA256; }
 #endif
 

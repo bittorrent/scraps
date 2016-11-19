@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "stash/flat_set.h"
+#include "../gtest.h"
 
-#include <gtest/gtest.h>
+#include <stash/flat_set.h>
 
 #include <iostream>
 

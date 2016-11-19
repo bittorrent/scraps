@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "gtest/gtest.h"
+#include "../gtest.h"
 
-#include "scraps/math/Vector.h"
+#include <scraps/math/Vector.h>
 
 using namespace scraps::math;
 

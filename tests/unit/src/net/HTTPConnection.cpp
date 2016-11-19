@@ -13,12 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/logging.h"
-#include "scraps/net/HTTPConnection.h"
-#include "scraps/net/HTTPRequest.h"
-#include "scraps/net/TCPAcceptor.h"
+#include "../gtest.h"
 
-#include <gtest/gtest.h>
+#include <scraps/logging.h>
+#include <scraps/net/HTTPConnection.h>
+#include <scraps/net/HTTPRequest.h>
+#include <scraps/net/TCPAcceptor.h>
 
 using namespace scraps;
 using namespace scraps::net;

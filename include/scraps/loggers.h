@@ -15,15 +15,15 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/CircularBuffer.h"
-#include "scraps/logging.h"
-#include "scraps/thread.h"
-#include "scraps/utility.h"
-#include "scraps/net/UDPSocket.h"
-#include "scraps/TimeValueSamples.h"
-#include "scraps/TaskThread.h"
+#include <scraps/CircularBuffer.h>
+#include <scraps/logging.h>
+#include <scraps/thread.h>
+#include <scraps/utility.h>
+#include <scraps/net/UDPSocket.h>
+#include <scraps/TimeValueSamples.h>
+#include <scraps/TaskThread.h>
 
 #include <atomic>
 #include <mutex>

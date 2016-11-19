@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/AbstractTaskScheduler.h"
+#include <scraps/AbstractTaskScheduler.h>
 
 #include <condition_variable>
 #include <vector>

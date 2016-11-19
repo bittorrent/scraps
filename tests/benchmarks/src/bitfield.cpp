@@ -13,10 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
-#include "scraps/bitfield.h"
-#include "scraps/random.h"
 #include "complexity.h"
+
+#include <scraps/bitfield.h>
+#include <scraps/random.h>
 
 #include <benchmark/benchmark.h>
 #include <iostream>

@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/NotificationCenter.h"
-#include "scraps/Notification.h"
-#include "scraps/Observer.h"
+#include <scraps/NotificationCenter.h>
+#include <scraps/Notification.h>
+#include <scraps/Observer.h>
 
 #include <cassert>
 

@@ -13,15 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/SHA256.h"
+#include "complexity.h"
 
 #if SCRAPS_APPLE
-#include "scraps/apple/SHA256.h"
+#include <scraps/apple/SHA256.h>
 #endif
 
-#include "scraps/sodium/SHA256.h"
-#include "scraps/random.h"
-#include "complexity.h"
+#include <scraps/random.h>
+#include <scraps/sodium/SHA256.h>
+#include <scraps/SHA256.h>
 
 #include <benchmark/benchmark.h>
 #include <iostream>

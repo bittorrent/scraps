@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/net/Endpoint.h"
+#include <scraps/net/Endpoint.h>
 
 namespace scraps {
 namespace net {

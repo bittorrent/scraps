@@ -13,11 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/Timer.h"
+#include "gtest.h"
 
-#include "scraps/thread.h"
-
-#include <gtest/gtest.h>
+#include <scraps/Timer.h>
+#include <scraps/thread.h>
 
 using namespace scraps;
 

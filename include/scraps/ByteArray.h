@@ -14,9 +14,9 @@
 * limitations under the License.
 */
 #pragma once
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/utility.h"
+#include <scraps/utility.h>
 
 #include <ostream>
 

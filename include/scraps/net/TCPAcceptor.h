@@ -15,11 +15,11 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/logging.h"
-#include "scraps/thread.h"
-#include "scraps/net/utility.h"
+#include <scraps/logging.h>
+#include <scraps/thread.h>
+#include <scraps/net/utility.h>
 
 #include <unordered_map>
 

@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/TaskThread.h"
+#include <scraps/TaskThread.h>
 
 #include <functional>
 #include <future>

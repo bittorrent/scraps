@@ -13,11 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/loggers.h"
+#include "gtest.h"
 
-#include "scraps/Timer.h"
-
-#include <gtest/gtest.h>
+#include <scraps/loggers.h>
+#include <scraps/Timer.h>
 
 #include <mutex>
 

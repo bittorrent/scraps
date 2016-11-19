@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/opengl/VertexArray.h"
+#include <scraps/opengl/VertexArray.h>
 
 namespace scraps {
 namespace opengl {

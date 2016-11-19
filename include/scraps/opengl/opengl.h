@@ -15,7 +15,7 @@
 */
 #pragma once
 
-#include "scraps/platform.h"
+#include <scraps/platform.h>
 
 #if SCRAPS_IOS || SCRAPS_TVOS
     #include <OpenGLES/ES3/gl.h>

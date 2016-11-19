@@ -15,11 +15,11 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/net/Address.h"
-#include "scraps/net/UDPReceiver.h"
-#include "scraps/net/UDPSender.h"
+#include <scraps/net/Address.h>
+#include <scraps/net/UDPReceiver.h>
+#include <scraps/net/UDPSender.h>
 
 #include <array>
 #include <mutex>

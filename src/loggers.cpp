@@ -13,8 +13,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/AverageRate.h"
-#include "scraps/loggers.h"
+#include <scraps/AverageRate.h>
+#include <scraps/loggers.h>
 
 #if SCRAPS_APPLE
 #import <Foundation/Foundation.h>

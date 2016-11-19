@@ -13,20 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "gtest.h"
 
-#include <scraps/hex.h>
-#include <scraps/HMACSHA256.h>
+#include <scraps/config.h>
 
-using namespace scraps;
-
-TEST(HMACSHA256, basic) {
-    std::string key = "key";
-    HMACSHA256 digest(key.data(), key.size());
-    std::string data = "0123456789";
-    digest.update(data.data(), data.size());
-    std::array<unsigned char, HMACSHA256::kResultSize> result;
-    digest.finish(result.data());
-
-    EXPECT_EQ("1418bde51967febed1356d35d916222a78b616b4d3d090ec34e3531f41325ed3", ToHex(result));
-}
+SCRAPS_IGNORE_WARNINGS_PUSH
+#include <gtest/gtest.h>
+SCRAPS_IGNORE_WARNINGS_POP

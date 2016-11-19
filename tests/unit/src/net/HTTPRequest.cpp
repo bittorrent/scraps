@@ -13,10 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/net/HTTPRequest.h"
-#include "scraps/net/utility.h"
+#include "../gtest.h"
 
-#include <gtest/gtest.h>
+#include <scraps/net/HTTPRequest.h>
+#include <scraps/net/utility.h>
 
 #include <json11.hpp>
 

@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/net/Endpoint.h"
+#include <scraps/net/Endpoint.h>
 
 #include <cassert>
 

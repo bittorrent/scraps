@@ -13,16 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/MonotonicScheduler.h"
+#include "gtest.h"
 
-#include "scraps/chrono.h"
-
-#include <gtest/gtest.h>
+#include <scraps/MonotonicScheduler.h>
+#include <scraps/chrono.h>
 
 #include <vector>
 
 using namespace scraps;
-
 
 using TestDuration = std::chrono::steady_clock::duration;
 

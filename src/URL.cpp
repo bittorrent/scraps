@@ -13,11 +13,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/URL.h"
+#include <scraps/URL.h>
 
 #include <cstdlib>
 
-#include "scraps/utility.h"
+#include <scraps/utility.h>
 
 namespace scraps {
 

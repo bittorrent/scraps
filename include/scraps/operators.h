@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/type-traits.h"
+#include <scraps/type-traits.h>
 
 namespace scraps {
 

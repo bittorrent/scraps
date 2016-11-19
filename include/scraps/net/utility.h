@@ -15,11 +15,11 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/net/Address.h"
-#include "scraps/net/Endpoint.h"
-#include "scraps/utility.h"
+#include <scraps/net/Address.h>
+#include <scraps/net/Endpoint.h>
+#include <scraps/utility.h>
 
 #include <vector>
 

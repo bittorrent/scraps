@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/random.h"
+#include "gtest.h"
 
-#include <gtest/gtest.h>
+#include <scraps/random.h>
 
 using namespace scraps;
 

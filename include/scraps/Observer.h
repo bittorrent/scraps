@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/Notification.h"
+#include <scraps/Notification.h>
 
 #include <mutex>
 #include <type_traits>

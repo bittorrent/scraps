@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/CircularBuffer.h"
+#include "gtest.h"
 
-#include <gtest/gtest.h>
+#include <scraps/CircularBuffer.h>
 
 using namespace scraps;
 

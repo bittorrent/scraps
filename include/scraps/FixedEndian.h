@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/Endian.h"
+#include <scraps/Endian.h>
 
 namespace scraps {
 

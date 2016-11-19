@@ -13,10 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+#include "../gtest.h"
+
 #include <codeformation/Stack.h>
 #include <codeformation/Resource.h>
-
-#include <gtest/gtest.h>
 
 using namespace codeformation::types;
 

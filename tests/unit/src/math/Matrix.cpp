@@ -15,7 +15,7 @@
 */
 #include "../tests.h"
 
-#include "scraps/math/Matrix.h"
+#include <scraps/math/Matrix.h>
 
 using namespace scraps;
 using namespace scraps::math;

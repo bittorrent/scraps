@@ -15,11 +15,11 @@
 */
 #pragma once
 
-#include "scraps/config.h"
+#include <scraps/config.h>
 
-#include "scraps/Temp.h"
-#include "scraps/type-traits.h"
-#include "scraps/utility.h"
+#include <scraps/Temp.h>
+#include <scraps/type-traits.h>
+#include <scraps/utility.h>
 
 SCRAPS_IGNORE_WARNINGS_PUSH
 #include <gsl.h>

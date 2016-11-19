@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "scraps/Wheel.h"
+#include "gtest.h"
 
-#include <gtest/gtest.h>
+#include <scraps/Wheel.h>
 
 using namespace scraps;
 
