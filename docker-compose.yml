@@ -8,10 +8,10 @@ services:
     linux-env:
         extends:
             service: base
-        image: bittorrent/live-build-environments:linux-73a78cb
+        image: bittorrent/live-build-environments:linux-6a57cdd
     android-env:
         extends:
             service: base
-        image: bittorrent/live-build-environments:android-n17-s22-arm-486fb54
+        image: bittorrent/live-build-environments:android-n17-s25-arm-6a57cdd
         environment:
             - SCRAPS_CROSS_TARGET=android
