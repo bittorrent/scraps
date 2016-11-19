@@ -9,8 +9,8 @@ libraries:
             header-directory: asio/include
             post-build: xxd -i asio/LICENSE_1_0.txt {build_directory}/include/asio/license.c
     boost-build:
-        download: https://github.com/boostorg/build/archive/2016.03.tar.gz
-        checksum: 0e6936337c25fc87d2aff8ea6c63019e9c1e319a
+        download: https://github.com/boostorg/build/archive/boost-1.62.0.tar.gz
+        checksum: c1788d2671078748976506012e4c9ac9bc429556
         project:
             build-steps:
                 - ./bootstrap.sh
