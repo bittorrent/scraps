@@ -1,7 +1,6 @@
 sudo: required
 branches:
-    except:
-        - /^phabricator/base/.*$/
+    except: /^phabricator/base/.*$/
 deploy:
     provider: s3
     bucket: $DEPLOYMENT_BUCKET
@@ -20,36 +19,46 @@ before_deploy:
 addons:
     artifacts:
         bucket: $DEPLOYMENT_BUCKET/travis-artifacts
-        paths:
-          - $(find analysis | tr "\n" ":")
+        paths: $(find analysis | tr "\n" ":")
 
 matrix:
     include:
 
         # Android
         - os: linux
-          language: android
-          compiler: clang
-          env:
-              - NDK_VERSION=r10e
-              - API_LEVEL=17
-              - TARGET=android
-          android:
-              components:
-                  - android-22
-                  - build-tools-23.0.1
-          install: ./scripts/ci/install-android-dependencies
-          script:  ./scripts/ci/build-android
+          services: docker
+          language: generic
+          env: TARGET=android
+          install: docker-compose pull android-env
+          script:
+              - |
+                GITHUB_SSH_KEY=~/.ssh/id_rsa docker-compose run \
+                  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+                  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+                  -e CACHE_BUCKET=$CACHE_BUCKET \
+                  -e TRAVIS=true -e CI=true \
+                  --rm android-env \
+                bash -c \
+                  "./scripts/ci/install-android-dependencies && \
+                  ./scripts/ci/build-android"
 
         # Linux
         - os: linux
-          language: cpp
+          language: generic
+          env: TARGET=linux
           dist: trusty
-          compiler: clang
-          env:
-              - TARGET=linux
-          install: ./scripts/ci/install-linux-dependencies
-          script:  ./scripts/ci/build-linux
+          install: docker-compose pull linux-env
+          script:
+              - |
+                GITHUB_SSH_KEY=~/.ssh/id_rsa docker-compose run \
+                  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+                  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+                  -e CACHE_BUCKET=$CACHE_BUCKET \
+                  -e TRAVIS=true -e CI=true \
+                  --rm linux-env \
+                bash -c \
+                  "./scripts/ci/install-linux-dependencies && \
+                  ./scripts/ci/build-linux"
           after_success: bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
 
         ######### Xcode #########
@@ -78,3 +87,35 @@ matrix:
           env:     TARGET=appletvos
           install: ./scripts/ci/install-xcode-dependencies
           script:  ./scripts/ci/build-appletvos
+
+        ############ Analysis ############
+
+        # Linux
+        - os: linux
+          language: generic
+          env:
+              - TARGET=linux
+              - ANALYSIS=1
+          dist: trusty
+          install: docker-compose pull linux-env
+          script:
+              - |
+                GITHUB_SSH_KEY=~/.ssh/id_rsa docker-compose run \
+                  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+                  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+                  -e CACHE_BUCKET=$CACHE_BUCKET \
+                  -e TRAVIS=true -e CI=true \
+                  --rm linux-env \
+                bash -c \
+                  "./scripts/ci/install-linux-dependencies && \
+                  ./scripts/ci/build-linux"
+
+        # MacOS
+        - os: osx
+          language: cpp
+          osx_image: xcode8
+          env:
+            - TARGET=macos
+            - ANALYSIS=1
+          install: ./scripts/ci/install-xcode-dependencies
+          script:  ./scripts/ci/build-macos

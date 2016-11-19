@@ -18,6 +18,9 @@ pkgconfig.dependency gsl ;
 pkgconfig.dependency asio ;
 pkgconfig.dependency mnmlstc ;
 pkgconfig.dependency json11 ;
+pkgconfig.dependency googletest ;
+pkgconfig.dependency jshackle ;
+pkgconfig.dependency benchmark ;
 
 lib GLESv2 : : <link>shared ;
 lib z : : <link>shared ;

@@ -1,27 +1,16 @@
-path-constant NEEDS_PATH : ../../needs ;
-
-lib gtest      : $(NEEDS_PATH)//googletest : <name>gtest ;
-alias jshackle : $(NEEDS_PATH)//jshackle ;
-
 lib log ;
 
 exe scraps-tests :
     [ glob-tree-ex src : *.cpp ]
     ../..//scraps
-    gtest
+    ../..//googletest
 :
-    <target-os>android:<source>jshackle
+    <target-os>android:<source>../..//jshackle
     <target-os>android:<source>log
 
-    <target-os>iphone:<framework>Foundation
+    #<target-os>iphone:<framework>Foundation
 ;
 
-import testing ;
-unit-test run : scraps-tests ;
-explicit run ;
-
 path-constant PREFIX : [ option.get prefix : "/usr/local" ] ;
-
 install install : scraps-tests : <location>$(PREFIX) ;
-
 explicit install ;

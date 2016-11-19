@@ -1,15 +1,11 @@
-path-constant NEEDS_PATH : ../../needs ;
-
-lib benchmark : $(NEEDS_PATH)//benchmark : <name>benchmark ;
-
 exe scraps-benchmark :
     [ glob-tree-ex src : *.cpp ]
     ../..//scraps/<variant>release
-    benchmark
+    ../..//benchmark
 :
     <variant>release
 ;
 
-import testing ;
-unit-test run : scraps-benchmark ;
-explicit run ;
+path-constant PREFIX : [ option.get prefix : "/usr/local" ] ;
+install install : scraps-benchmark : <location>$(PREFIX) ;
+explicit install ;

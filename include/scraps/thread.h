@@ -24,7 +24,7 @@
 
 #if SCRAPS_MACOS || SCRAPS_IOS
 #include <pthread.h>
-#elif SCRAPS_LINUX
+#elif SCRAPS_LINUX || SCRAPS_ANDROID
 #include <sys/prctl.h>
 #endif
 
@@ -33,7 +33,7 @@ namespace scraps {
 inline void SetThreadName(stdts::string_view name) {
 #if SCRAPS_MACOS || SCRAPS_IOS
     pthread_setname_np(name.data());
-#elif SCRAPS_LINUX
+#elif SCRAPS_LINUX || SCRAPS_ANDROID
     prctl(PR_SET_NAME, name.data(), 0, 0, 0);
 #endif
 }

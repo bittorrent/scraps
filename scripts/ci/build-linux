@@ -7,8 +7,10 @@ export CXX=clang++-3.8
 export CXXFLAGS=-stdlib=libc++
 export LDFLAGS=-lc++
 
-# the benchmarks built with this would NOT be good with coverage
-./scripts/build --install --enable-coverage
-./tests/unit/dist/scraps-tests
-
-./scripts/build --variant=debug --enable-analysis
+if [[ -z $ANALYSIS ]] ; then
+    # the benchmarks built with this would NOT be good with coverage
+    ./scripts/build --install --enable-coverage
+    ./tests/unit/dist/scraps-tests
+else
+    ./scripts/build --variant=debug --enable-analysis
+fi

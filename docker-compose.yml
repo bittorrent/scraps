@@ -1,12 +1,17 @@
 version: '2'
 services:
-    android-env:
-        image: bittorrent/live-build-environments:android-17-arm-0992bb7
+    base:
+        image: dummy
         working_dir: /mnt/scraps
         volumes:
             - .:/mnt/scraps
     linux-env:
+        extends:
+            service: base
         image: bittorrent/live-build-environments:linux-73a78cb
-        working_dir: /mnt/scraps
-        volumes:
-            - .:/mnt/scraps
+    android-env:
+        extends:
+            service: base
+        image: bittorrent/live-build-environments:android-n17-s22-arm-486fb54
+        environment:
+            - SCRAPS_CROSS_TARGET=android
