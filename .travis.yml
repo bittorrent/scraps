@@ -7,13 +7,16 @@ deploy:
     bucket: $DEPLOYMENT_BUCKET
     skip_cleanup: true
     upload_dir: travis-builds
-    local_dir: dist
+    local_dir: deploy
     on:
-        branch:
-            - master
-            - develop
+        all_branches: true
 before_deploy:
-    - ./scripts/ci/build-distribution
+    - |
+      ./scripts/live-ci-tools/build-travis-distribution.py \
+        dist \
+        --output-directory deploy \
+        --suffix $TARGET \
+        --exclude needy.status
 addons:
     artifacts:
         bucket: $DEPLOYMENT_BUCKET/travis-artifacts
