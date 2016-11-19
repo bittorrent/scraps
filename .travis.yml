@@ -33,6 +33,7 @@ matrix:
           env:
               - NDK_VERSION=r10e
               - API_LEVEL=17
+              - TARGET=android
           android:
               components:
                   - android-22
@@ -45,19 +46,19 @@ matrix:
           language: cpp
           dist: trusty
           compiler: clang
+          env:
+              - TARGET=linux
           install: ./scripts/ci/install-linux-dependencies
           script:  ./scripts/ci/build-linux
           after_success: bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"
 
         ######### Xcode #########
-        # XCODE_TARGET isn't used by any of the scripts, but helps make the
-        # build matrix a little more readable on Travis.
 
         # MacOS
         - os: osx
           language: cpp
           osx_image: xcode8
-          env:     XCODE_TARGET=macos
+          env:     TARGET=macos
           install: ./scripts/ci/install-xcode-dependencies
           script:  ./scripts/ci/build-macos
           after_success: bash <(curl -s https://codecov.io/bash)
@@ -66,7 +67,7 @@ matrix:
         - os: osx
           language: cpp
           osx_image: xcode8
-          env:     XCODE_TARGET=iphoneos
+          env:     TARGET=iphoneos
           install: ./scripts/ci/install-xcode-dependencies
           script:  ./scripts/ci/build-iphoneos
 
@@ -74,6 +75,6 @@ matrix:
         - os: osx
           language: cpp
           osx_image: xcode8
-          env:     XCODE_TARGET=appletvos
+          env:     TARGET=appletvos
           install: ./scripts/ci/install-xcode-dependencies
           script:  ./scripts/ci/build-appletvos
