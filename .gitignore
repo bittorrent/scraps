@@ -9,7 +9,3 @@ dist
 /b2
 project-config.jam
 /tests/fuzz/*/findings
-
-# doxygen
-/docs
-/doxygen-warnings.log
