@@ -32,7 +32,7 @@ matrix:
           install: docker-compose pull android-env
           script:
               - |
-                GITHUB_SSH_KEY=~/.ssh/id_rsa docker-compose run \
+                docker-compose run \
                   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
                   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
                   -e CACHE_BUCKET=$CACHE_BUCKET \
@@ -50,7 +50,7 @@ matrix:
           install: docker-compose pull linux-env
           script:
               - |
-                GITHUB_SSH_KEY=~/.ssh/id_rsa docker-compose run \
+                docker-compose run \
                   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
                   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
                   -e CACHE_BUCKET=$CACHE_BUCKET \
@@ -104,7 +104,7 @@ matrix:
           install: docker-compose pull linux-env
           script:
               - |
-                GITHUB_SSH_KEY=~/.ssh/id_rsa docker-compose run \
+                docker-compose run \
                   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
                   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
                   -e CACHE_BUCKET=$CACHE_BUCKET \
