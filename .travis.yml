@@ -62,7 +62,6 @@ matrix:
           after_success:
               - |
                 docker-compose run \
-                  -e CODECOV_TOKEN=$CODECOV_TOKEN \
                   --rm linux-env \
                 bash -c 'bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"'
 
