@@ -3,5 +3,5 @@ codecov:
         - !ci.appveyor.com
 coverage:
     ignore:
-        - tests/*
+        - tests/.*
     branch: develop
