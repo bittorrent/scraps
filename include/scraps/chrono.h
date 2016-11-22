@@ -22,12 +22,6 @@
 
 namespace scraps {
 
-template<class Rep, class Period>
-std::chrono::duration<Rep, Period> abs(std::chrono::duration<Rep, Period> d) {
-    static_assert(std::chrono::duration<Rep, Period>::min() < std::chrono::duration<Rep, Period>::zero(), "Input type cannot express negative duration");
-    return d >= d.zero() ? d : -d;
-}
-
 template<typename Rep, typename Period>
 auto MillisecondCount(std::chrono::duration<Rep, Period> d) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
