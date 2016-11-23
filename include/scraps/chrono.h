@@ -17,6 +17,8 @@
 
 #include <scraps/config.h>
 
+#include <stdts/chrono.h>
+
 #include <chrono>
 #include <thread>
 
