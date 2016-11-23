@@ -20,7 +20,7 @@ os.chdir(project_root)
 
 parser = argparse.ArgumentParser(description='Convenience script to build everything on a few select platforms.')
 parser.add_argument('-t', '--target',
-                    default='',
+                    default=os.environ.get('SCRAPS_CROSS_TARGET'),
                     dest='cross_target',
                     choices=['iphoneos', 'appletvos', 'android'],
                     help='cross-compilation target')
@@ -47,9 +47,6 @@ parser.add_argument('--prefix',
                     default='dist',
                     help='installation prefix')
 args = parser.parse_args()
-
-if not args.cross_target:
-    args.cross_target = os.environ.get('SCRAPS_CROSS_TARGET')
 
 if not args.linkage:
     args.linkage = 'shared' if args.cross_target == 'android' else 'static'

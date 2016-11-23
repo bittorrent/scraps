@@ -3,12 +3,3 @@
 if [[ $AWS_SECRET_ACCESS_KEY ]] && [[ $CACHE_BUCKET ]] ; then
     echo '{"build-caches": ["s3://'$CACHE_BUCKET'"]}' > .needyconfig
 fi
-
-# command line utilities aren't available in PATH on macOS with --user
-cmd="pip install awscli git+https://github.com/bittorrent/simon.git@master#egg=simon"
-if type sudo >/dev/null 2>&1 ; then
-    sudo $cmd
-else
-    # sudo isn't available in the docker build
-    $cmd
-fi
