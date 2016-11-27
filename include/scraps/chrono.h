@@ -35,3 +35,14 @@ auto MillisecondCount(std::chrono::duration<Rep, Period> d) {
 timeval ToTimeval(const std::chrono::microseconds& value);
 
 } // namespace scraps
+
+namespace std {
+
+template<class Rep, class Period>
+struct hash<std::chrono::duration<Rep, Period>> {
+    size_t operator()(const std::chrono::duration<Rep, Period>& d) const {
+        return std::hash<decltype(d.count())>()(d.count());
+    }
+};
+
+} // namespace std
