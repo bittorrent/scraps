@@ -42,12 +42,12 @@ public:
     /**
     * Sets the event handler.
     */
-    void setEventHandler(const std::function<void(int fd, short events)>& eventHandler);
+    void setEventHandler(std::function<void(int fd, short events)> eventHandler);
 
     /**
     * Sets a function to be invoked by the poll loop after a specified delay.
     */
-    void async(const std::function<void()>& func, std::chrono::milliseconds delay = std::chrono::milliseconds(0));
+    void async(std::function<void()> func, std::chrono::milliseconds delay = std::chrono::milliseconds(0));
 
     /**
     * Finish running any outstanding functions left in the queue. This should only be needed
@@ -89,11 +89,19 @@ private:
     std::unordered_set<int> _pendingRemovals;
 
     struct AsyncFunction {
-        AsyncFunction(const std::function<void()>& func, std::chrono::steady_clock::time_point time, uint64_t order) : func(func), time(time), order(order) {}
+        AsyncFunction(std::function<void()> func, std::chrono::steady_clock::time_point time, uint64_t order)
+            : func{std::move(func)}
+            , time{time}
+            , order{order}
+        {}
+
         std::function<void()> func;
         std::chrono::steady_clock::time_point time;
         uint64_t order = 0;
-        bool operator<(const AsyncFunction& other) const { return time == other.time ? (order > other.order) : (time > other.time); }
+
+        bool operator<(const AsyncFunction& other) const {
+            return time == other.time ? (order > other.order) : (time > other.time);
+        }
     };
 
     std::priority_queue<AsyncFunction> _asyncFunctions;
