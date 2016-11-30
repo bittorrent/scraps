@@ -7,10 +7,8 @@ exe scraps-tests :
 :
     <target-os>android:<source>../..//jshackle
     <target-os>android:<source>log
-
-    #<target-os>iphone:<framework>Foundation
 ;
 
 path-constant PREFIX : [ option.get prefix : "/usr/local" ] ;
-install install : scraps-tests : <location>$(PREFIX) ;
+install install : scraps-tests : <location>$(PREFIX)/bin ;
 explicit install ;

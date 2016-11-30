@@ -6,7 +6,7 @@ cd $script_dir/../..
 if [[ -z $ANALYSIS ]] ; then
     # the benchmarks built with this would NOT be good with coverage
     ./scripts/build --install --enable-coverage
-    ./tests/unit/dist/scraps-tests
+    ./tests/unit/dist/bin/scraps-tests
 else
     ./scripts/build --variant=debug --enable-analysis
 fi

@@ -7,5 +7,5 @@ exe scraps-benchmark :
 ;
 
 path-constant PREFIX : [ option.get prefix : "/usr/local" ] ;
-install install : scraps-benchmark : <location>$(PREFIX) ;
+install install : scraps-benchmark : <location>$(PREFIX)/bin ;
 explicit install ;
