@@ -30,9 +30,14 @@ public:
     Endpoint(Args&&... args) : asio::ip::udp::endpoint(std::forward<Args>(args)...) {}
 
     /**
-    * Used to get a sockaddr struct for the given address / port.
+    * Used to get a sockaddr struct and length for the given address / port.
     */
-    socklen_t getSockAddr(sockaddr_storage* storage) const;
+    void getSockAddr(sockaddr_storage* address, socklen_t* addressLength) const;
+
+    /**
+     * Used to construct an Endpoint from a sockaddr.
+     */
+    static Endpoint FromSockaddr(const sockaddr* address, socklen_t addressLength);
 };
 
 } // namespace scraps::net

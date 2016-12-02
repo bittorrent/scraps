@@ -113,7 +113,8 @@ bool UDPSocket::send(const Endpoint& destination, const void* data, size_t lengt
     if (_socket < 0) { return false; }
 
     sockaddr_storage addr;
-    socklen_t addrLength = destination.getSockAddr(&addr);
+    socklen_t addrLength;
+    destination.getSockAddr(&addr, &addrLength);
     int sent = ::sendto(_socket, data, length, 0, reinterpret_cast<sockaddr*>(&addr), addrLength);
 
     if (sent < 0) {
@@ -155,17 +156,10 @@ void UDPSocket::receive() {
 
         _totalReceivedBytes += bytes;
 
-        Endpoint sender;
-
-        if (senderStorage.ss_family == AF_INET && senderStorageLength == sizeof(sockaddr_in)) {
-            auto sa = reinterpret_cast<sockaddr_in*>(&senderStorage);
-            sender = Endpoint(asio::ip::address_v4(*reinterpret_cast<asio::ip::address_v4::bytes_type*>(&sa->sin_addr)), ntohs(sa->sin_port));
-        } else if (senderStorage.ss_family == AF_INET6 && senderStorageLength == sizeof(sockaddr_in6)) {
-            auto sa = reinterpret_cast<sockaddr_in6*>(&senderStorage);
-            sender = Endpoint(asio::ip::address_v6(*reinterpret_cast<asio::ip::address_v6::bytes_type*>(&sa->sin6_addr), ntohl(sa->sin6_scope_id)), ntohs(sa->sin6_port));
-        } else {
-            assert(false);
-        }
+        auto sender = Endpoint::FromSockaddr(
+            reinterpret_cast<sockaddr*>(&senderStorage),
+            senderStorageLength
+        );
 
         if (auto receiver = _receiver.lock()) {
             lock.unlock();

@@ -183,7 +183,8 @@ TCPService::ConnectionId TCPService::connect(const std::string& host, uint16_t p
         }
         Endpoint endpoint{addresses[UniformDistribution(_prng, 0, addresses.size() - 1)], port};
         sockaddr_storage addr;
-        auto addrLength = endpoint.getSockAddr(&addr);
+        socklen_t addrLength;
+        endpoint.getSockAddr(&addr, &addrLength);
         _connect(id, reinterpret_cast<sockaddr*>(&addr), addrLength);
     });
 
