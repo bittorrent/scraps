@@ -421,7 +421,7 @@ template <typename K>
 auto flat_set<Key>::lower_bound(const K& x) const
     -> typename flat_set<Key>::const_iterator
 {
-    return std::lower_bound(begin(), end(), x, [&](auto e, auto& x) { return e < x; });
+    return std::lower_bound(begin(), end(), x, [&](auto& e, auto& x) { return e < x; });
 }
 
 template <typename Key>
