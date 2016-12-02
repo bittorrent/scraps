@@ -1,11 +1,12 @@
 .DS_Store
 
 /analysis
+/b2
+/bootstrap
+/needs
+/needy-wrappers
+/tests/fuzz/*/findings
 bin
 configure.json
-/bootstrap
 dist
-/needs
-/b2
 project-config.jam
-/tests/fuzz/*/findings

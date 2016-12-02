@@ -24,8 +24,10 @@ libraries:
                 - --enable-minimal
                 - --disable-soname-versions
                 - --disable-shared
-            {% if (platform == 'ios' or platform == 'tvos') and 'arm' in architecture %}
+            {% if platform in ['ios', 'tvos'] and 'arm' in architecture %}
                 - --host=arm-apple-darwin10
+            {% elif platform in ['iossimulator', 'tvossimulator'] %}
+                - --host=x86_64-apple-darwin10
             {% endif %}
             {% if platform == 'android' and architecture == 'armv7' %}
             environment:
@@ -50,6 +52,9 @@ libraries:
                 CXXFLAGS: -Werror=partial-availability
             {% endif %}
             configure-args:
+                {% if platform in ['iossimulator', 'tvossimulator'] %}
+                - --host=x86_64-apple-darwin10
+                {% endif %}
                 - --disable-ldap
                 - --without-libidn
                 - --without-librtmp
