@@ -169,7 +169,12 @@ private:
  */
 class RateLimitedLogger : public Logger {
 public:
-    explicit RateLimitedLogger(std::shared_ptr<Logger> destination, double maximumMessagesPerSecond, std::chrono::system_clock::duration sampleDuration = 15s, std::chrono::steady_clock::duration reminderInterval = 5s)
+    explicit RateLimitedLogger(
+        std::shared_ptr<Logger> destination,
+        double maximumMessagesPerSecond,
+        std::chrono::system_clock::duration sampleDuration = 15s,
+        std::chrono::steady_clock::duration reminderInterval = 5s
+    )
         : _destination{destination}
         , _maximumMessagesPerSecond{maximumMessagesPerSecond}
         , _sampleDuration{sampleDuration}
@@ -219,12 +224,19 @@ public:
      * Common DogStatsDLogger setup.
      */
     template <typename... DogStatsDLoggerArgs>
-    static std::shared_ptr<Logger> FilteredRateLimitedLogger(double maximumMessagesPerSecond, std::chrono::system_clock::duration sampleDuration, std::chrono::steady_clock::duration reminderInterval, DogStatsDLoggerArgs&& ... args) {
+    static std::shared_ptr<Logger> FilteredRateLimitedLogger(
+        double maximumMessagesPerSecond,
+        std::chrono::system_clock::duration sampleDuration,
+        std::chrono::steady_clock::duration reminderInterval,
+        DogStatsDLoggerArgs&& ... args
+    ) {
         return std::make_shared<FilterLogger>(
             std::make_shared<RateLimitedLogger>(
                 std::make_shared<DogStatsDLogger>(std::forward<DogStatsDLoggerArgs>(args)...),
-                maximumMessagesPerSecond, sampleDuration, reminderInterval),
-            [](LogLevel level, auto...) { return level >= LogLevel::kWarning; });
+                maximumMessagesPerSecond, sampleDuration, reminderInterval
+            ),
+            [](LogLevel level, auto...) { return level >= LogLevel::kWarning; }
+        );
     }
 
 private:

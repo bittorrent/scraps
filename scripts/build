@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+
+import argparse
+import subprocess
+import sys
+import os
+import multiprocessing
+import platform
+import distutils.spawn
+import pipes
+
+from colorama import Fore, Style
+
+
+def run_command(command):
+    if isinstance(command, list):
+        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(' '.join([pipes.quote(s) for s in command])) + Style.RESET_ALL)
+        subprocess.check_call(command)
+    else:
+        print(Fore.CYAN + Style.BRIGHT + '+ {}'.format(command) + Style.RESET_ALL)
+        subprocess.check_call(command, shell=True)
+
+project_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+os.chdir(project_root)
+
+parser = argparse.ArgumentParser(description='Convenience script to build everything on a few select platforms.')
+parser.add_argument('-t', '--target',
+                    default='',
+                    dest='cross_target',
+                    choices=['iphoneos', 'appletvos', 'android'],
+                    help='cross-compilation target')
+parser.add_argument('--variant',
+                    default='release',
+                    choices=['release', 'debug'],
+                    help='variant to build')
+parser.add_argument('-c', '--clean',
+                    action='store_true',
+                    help='clean prior to building')
+args = parser.parse_args()
+
+needy_target_args = '--target={}'.format({
+    'iphoneos': 'ios',
+    'appletvos': 'tvos',
+    'android': 'android',
+}.get(args.cross_target, None))
+
+b2_target_args = 'target-os={}'.format({
+    'iphoneos': 'iphone',
+    'appletvos': 'appletv',
+    'android': 'android',
+}.get(args.cross_target, None))
+
+build_deps = [
+    './build-deps',
+    '--bootstrap-b2',
+    '--configure',
+]
+
+b2 = [
+    './b2',
+    '-j{}'.format(multiprocessing.cpu_count()),
+    'link=static',
+    'variant={}'.format(args.variant),
+    'scraps',
+    'tests/unit',
+]
+
+b2_config = ['live', 'b2-config']
+
+if args.clean:
+    b2.append('-a')
+    build_deps.append('--clean')
+
+if args.cross_target:
+    build_deps.append('--needy-target-args={}'.format(needy_target_args))
+    b2.append(b2_target_args)
+    b2_config.append('--target={}'.format(args.cross_target))
+else:
+    b2.append('tests/benchmarks')
+
+if args.cross_target == 'android':
+    if 'ANDROID_TOOLCHAIN' not in os.environ:
+        print('ANDROID_TOOLCHAIN not defined')
+        sys.exit(1)
+    build_deps.append('--needy-satisfy-args=--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
+    b2_config.append('--android-toolchain={}'.format(os.environ['ANDROID_TOOLCHAIN']))
+
+    b2 = 'PATH=$ANDROID_TOOLCHAIN/arm-linux-androideabi/bin:$PATH {}'.format(' '.join([pipes.quote(s) for s in b2]))
+
+try:
+    run_command(build_deps)
+    run_command('{} > project-config.jam'.format(' '.join([pipes.quote(s) for s in b2_config])))
+    run_command(b2)
+except subprocess.CalledProcessError:
+    sys.exit(1)
+    pass

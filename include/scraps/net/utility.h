@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,9 +63,12 @@ bool IsLocal(const Address& address);
 std::vector<Address> Resolve(const std::string& host);
 
 /**
-* Like Resolve, but only returns IPv4 addresses.
+* Like Resolve, but only returns addresses for the given protocol.
 */
-std::vector<Address> ResolveIPv4(const std::string& host);
+std::vector<Address> Resolve(const std::string& host, Address::Protocol protocol);
+
+inline std::vector<Address> ResolveIPv4(const std::string& host) { return Resolve(host, Address::Protocol::kIPv4); }
+inline std::vector<Address> ResolveIPv6(const std::string& host) { return Resolve(host, Address::Protocol::kIPv6); }
 
 /**
 * Resolves the given host-port pair and returns a random endpoint.

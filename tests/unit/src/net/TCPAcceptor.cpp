@@ -105,4 +105,3 @@ TEST(TCPAcceptor, inUsePorts) {
     ASSERT_FALSE(c.start(Address::from_string("127.0.0.1"), 6501));
     ASSERT_TRUE(c.start(Address::from_string("127.0.0.1"), 6502));
 }
-

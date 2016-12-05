@@ -134,4 +134,11 @@ bool SetBlocking(int fd, bool blocking = true);
 */
 std::string Demangle(const char* name);
 
+/**
+* Returns whether two strings are equal disregarding case
+*/
+inline bool CaseInsensitiveEquals(stdts::string_view l, stdts::string_view r) {
+    return l.size() == r.size() && std::equal(l.begin(), l.end(), r.begin(), [](char a, char b){ return tolower(a) == tolower(b); });
+}
+
 } // namespace scraps

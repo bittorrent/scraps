@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -76,11 +76,11 @@ std::vector<Address> Resolve(const std::string& host) {
     return ret;
 }
 
-std::vector<Address> ResolveIPv4(const std::string& host) {
+std::vector<Address> Resolve(const std::string& host, Address::Protocol protocol) {
     std::vector<Address> ret;
     auto addresses = Resolve(host);
     for (auto& address : addresses) {
-        if (address.protocol() == Address::Protocol::kIPv4) {
+        if (address.protocol() == protocol) {
             ret.emplace_back(address);
         }
     }

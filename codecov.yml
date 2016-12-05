@@ -1,3 +1,6 @@
+codecov:
+    ci:
+        - !ci.appveyor.com
 coverage:
     ignore:
         - tests/.*

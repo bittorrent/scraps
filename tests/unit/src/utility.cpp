@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include <gtest/gtest.h>
-
 #include "scraps/utility.h"
+
+#include <gtest/gtest.h>
 
 #if SCRAPS_MACOS
 #import <Foundation/NSProcessInfo.h>
@@ -24,37 +24,6 @@
 #include <array>
 
 using namespace scraps;
-
-TEST(utility, Base64Encode) {
-    std::string json =
-        R"({
-    "event": "Signed Up",
-    "properties": {
-        "distinct_id": "13793",
-        "token": "e3bc4100330c35722740fb8c6f5abddc",
-        "Referred By": "Friend"
-    }
-})";
-
-    const auto base64EncodedJSON =
-        "ewogICAgImV2ZW50IjogIlNpZ25lZCBVcCIsCiAgICAicHJvcGVydGllcyI6IHsKICAgICAgICAiZGlzdGluY3RfaWQiOiAiMTM3OTMiLAogIC"
-        "AgICAgICJ0b2tlbiI6ICJlM2JjNDEwMDMzMGMzNTcyMjc0MGZiOGM2ZjVhYmRkYyIsCiAgICAgICAgIlJlZmVycmVkIEJ5IjogIkZyaWVuZCIK"
-        "ICAgIH0KfQ==";
-
-    auto encoded = Base64Encode(json.data(), json.size());
-    EXPECT_EQ(encoded, base64EncodedJSON);
-
-    auto decoded = Base64Decode(encoded.data(), encoded.length());
-    EXPECT_EQ(decoded, json);
-
-    // Since base64 encoding has padding characters depending on the size of the source data, test all cases:
-    for (auto i = 0; i < 4; ++i) {
-        json.push_back('a');
-        encoded = Base64Encode(json.data(), json.size());
-        decoded = Base64Decode(encoded.data(), encoded.length());
-        EXPECT_EQ(decoded, json);
-    }
-}
 
 TEST(utility, Clamp) {
     EXPECT_EQ(Clamp(5l, 0, 10), 5l);
@@ -136,8 +105,10 @@ TEST(utility, ToBytes) {
 }
 
 TEST(utility, ToHex) {
-    std::array<scraps::Byte, 8> bytes = {
-        {scraps::Byte{0x01}, scraps::Byte{0x23}, scraps::Byte{0x45}, scraps::Byte{0x67}, scraps::Byte{0x89}, scraps::Byte{0xAB}, scraps::Byte{0xCD}, scraps::Byte{0xEF}}};
+    std::array<scraps::Byte, 8> bytes = {{
+        scraps::Byte{0x01}, scraps::Byte{0x23}, scraps::Byte{0x45}, scraps::Byte{0x67},
+        scraps::Byte{0x89}, scraps::Byte{0xAB}, scraps::Byte{0xCD}, scraps::Byte{0xEF},
+    }};
 
     EXPECT_EQ(ToHex(bytes), "0123456789abcdef");
 
@@ -212,15 +183,30 @@ TEST(utility, Demangle) {
     EXPECT_EQ(Demangle(typeid(scraps::GenericByte).name()), "scraps::GenericByte");
 }
 
+// Android doesn't have dprintf until api version 21, but does have fdprintf.
+#if SCRAPS_ANDROID && __ANDROID_API__ < 21
+#define dprintf fdprintf
+#endif
+
 TEST(utility, ByteFromFile) {
-    auto path = std::tmpnam(nullptr);
-    FILE* f = fopen(path, "wb");
-    fprintf(f, "test");
-    fclose(f);
+    char path[] = "tempfile-XXXXXX";
+    int fd = mkstemp(path);
+    dprintf(fd, "test");
+    close(fd);
     auto _ = gsl::finally([&] { unlink(path); });
 
     auto bytes = BytesFromFile(path);
     ASSERT_TRUE(bytes);
     EXPECT_EQ(bytes->size(), 4);
     EXPECT_EQ(memcmp(bytes->data(), "test", std::min<size_t>(bytes->size(), 4)), 0);
+}
+
+TEST(utility, CaseInsensitiveEquals) {
+    EXPECT_TRUE(CaseInsensitiveEquals("test", "test"));
+    EXPECT_TRUE(CaseInsensitiveEquals("test", "Test"));
+    EXPECT_TRUE(CaseInsensitiveEquals("test", "TEST"));
+
+    EXPECT_FALSE(CaseInsensitiveEquals("test", "test1"));
+    EXPECT_FALSE(CaseInsensitiveEquals("test", ""));
+    EXPECT_FALSE(CaseInsensitiveEquals("tes", "test"));
 }

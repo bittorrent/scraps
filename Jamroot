@@ -1,75 +1,5 @@
 project scraps ;
 
-rule clang-defaults ( properties * ) {
-    local result ;
-    if <toolset>darwin in $(properties) {
-        result += <cflags>-Wbool-conversion ;
-        result += <cflags>-Wconditional-uninitialized ;
-        result += <cflags>-Wconstant-conversion ;
-        result += <cflags>-Wduplicate-method-match ;
-        result += <cflags>-Wenum-conversion ;
-        result += <cflags>-Wint-conversion ;
-        result += <cflags>-fdiagnostics-show-note-include-stack ;
-        result += <cflags>-fmacro-backtrace-limit=0 ;
-        result += <cflags>-Werror=deprecated-objc-isa-usage ;
-        result += <cflags>-Werror=objc-root-class ;
-        result += <cflags>-Wno-missing-prototypes ;
-        result += <cflags>-Wno-selector ;
-        result += <cflags>-Wno-strict-selector-match ;
-        result += <cflags>-Wprotocol ;
-        result += <cflags>-Wundeclared-selector ;
-    }
-    if <toolset>darwin in $(properties) || <toolset>clang in $(properties) {
-        result += <cflags>-fmessage-length=0 ;
-        result += <cflags>-fstrict-aliasing ;
-        result += <cflags>-Wdeprecated-declarations ;
-        result += <cflags>-Wempty-body ;
-        result += <cflags>-Werror=return-type ;
-        result += <cflags>-Winvalid-offsetof ;
-        result += <cflags>-Wno-arc-repeated-use-of-weak ;
-        result += <cflags>-Wno-c++11-extensions ;
-        result += <cflags>-Wno-c++1y-extensions ;
-        result += <cflags>-Wno-conversion ;
-        result += <cflags>-Wno-deprecated-declarations ;
-        result += <cflags>-Wno-deprecated-implementations ;
-        result += <cflags>-Wno-exit-time-destructors ;
-        result += <cflags>-Wno-four-char-constants ;
-        result += <cflags>-Wno-implicit-atomic-properties ;
-        result += <cflags>-Wno-missing-braces ;
-        result += <cflags>-Wno-missing-field-initializers ;
-        result += <cflags>-Wno-newline-eof ;
-        result += <cflags>-Wno-non-virtual-dtor ;
-        result += <cflags>-Wno-overloaded-virtual ;
-        result += <cflags>-Wno-receiver-is-weak ;
-        result += <cflags>-Wno-shadow ;
-        result += <cflags>-Wno-sign-conversion ;
-        result += <cflags>-Wno-unknown-pragmas ;
-        result += <cflags>-Wno-unused-label ;
-        result += <cflags>-Wno-unused-local-typedef ;
-        result += <cflags>-Wno-unused-parameter ;
-        result += <cflags>-Wparentheses ;
-        result += <cflags>-Wswitch ;
-        result += <cflags>-Wunreachable-code ;
-        result += <cflags>-Wunused-function ;
-        result += <cflags>-Wunused-value ;
-        result += <cflags>-Wunused-variable ;
-    }
-    return $(result) ;
-}
-
-alias project_defaults : : : :
-    <conditional>@clang-defaults
-
-    <toolset>gcc:<cflags>-Wno-error=format
-    <toolset>gcc:<cflags>-Wno-error=unused-variable
-    <toolset>gcc:<cflags>-Wno-unused-variable
-    <toolset>gcc:<cflags>-Wno-format
-    <toolset>gcc:<cflags>-Wno-unused-local-typedefs
-    <toolset>gcc:<cflags>-Wno-sign-compare
-
-    <define>STATICLIB
-;
-
 alias objc : : : :
     <target-os>darwin:<cxxflags>"-x objective-c++"
     <target-os>iphone:<cxxflags>"-x objective-c++"
@@ -87,6 +17,7 @@ pkgconfig.dependency libsodium ;
 pkgconfig.dependency gsl ;
 pkgconfig.dependency asio ;
 pkgconfig.dependency mnmlstc ;
+pkgconfig.dependency json11 ;
 
 lib GLESv2 : : <link>shared ;
 lib z : : <link>shared ;
@@ -101,14 +32,18 @@ alias scraps_deps :
     gsl
     asio
     mnmlstc
-    project_defaults
     objc
+    json11
 : : :
     <include>include
-    <cxxflags>"-std=c++1y -fvisibility=hidden"
+    <cxxflags>"-Wall -std=c++1y -fvisibility=hidden"
     <define>ASIO_STANDALONE=1
+    <define>STATICLIB
 
     <target-os>darwin:<framework>Foundation
+    <target-os>iphone:<framework>Foundation
+    <target-os>appletv:<framework>Foundation
+
     <target-os>darwin:<framework>CoreServices
     <target-os>darwin:<framework>CoreFoundation
     <target-os>darwin:<framework>Security
@@ -154,7 +89,7 @@ includedir=\${exec_prefix}/include
 Name: scraps
 Version: 0
 Description: Random scraps of C++
-Requires: libcurl, openssl, fmt, asio, gsl, libsodium, mnmlstc
+Requires: libcurl, openssl, fmt, asio, gsl, libsodium, mnmlstc, json11
 Libs: -L\${libdir} -lscraps
 Libs.private: $(PRIVATE_LIBS)
 Cflags: -I\${includedir} -DASIO_STANDALONE=1 -fvisibility=hidden
@@ -173,6 +108,7 @@ alias install :
     install-gsl-if-owned
     install-asio-if-owned
     install-mnmlstc-if-owned
+    install-json11-if-owned
 ;
 
 explicit install install-lib install-pkgconfig ;

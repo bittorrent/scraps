@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,8 +18,8 @@
 #include "scraps/platform.h"
 
 #if SCRAPS_IOS || SCRAPS_TVOS
-    #include <OpenGLES/ES2/gl.h>
-    #include <OpenGLES/ES2/glext.h>
+    #include <OpenGLES/ES3/gl.h>
+    #include <OpenGLES/ES3/glext.h>
     #define OPENGL_ES 1
 #elif defined(__APPLE__)
     #include <OpenGL/OpenGL.h>
@@ -35,35 +35,22 @@
     #include <GL/gl.h>
 #endif
 
-#if OPENGL_ES
-#define SCRAPS_COMMON_SHADER_HEADER \
-    "precision highp float;\n" \
-    "#define VARYING_IN varying\n" \
-    "#define VARYING_OUT varying\n" \
-    "#define ATTRIBUTE_IN attribute\n" \
-    "#define SAMPLE texture2D\n" \
-
-#define SCRAPS_VERTEX_SHADER_HEADER SCRAPS_COMMON_SHADER_HEADER
-#define SCRAPS_FRAGMENT_SHADER_HEADER SCRAPS_COMMON_SHADER_HEADER \
-    "#define COLOR_OUT gl_FragColor\n"
-
+#if !NDEBUG
+#define SCRAPS_GL_ERROR_CHECK() \
+    { \
+        auto err = glGetError(); \
+        if (err != GL_NO_ERROR) { \
+            SCRAPS_LOG_WARNING("opengl error 0x{:x} {}", err, scraps::opengl::GetErrorName(err)); \
+        } \
+    }
 #else
-#define SCRAPS_COMMON_SHADER_HEADER \
-    "#version 140\n" \
-    "#define VARYING_IN in\n" \
-    "#define VARYING_OUT out\n" \
-    "#define ATTRIBUTE_IN in\n" \
-    "#define SAMPLE texture\n" \
-
-#define SCRAPS_VERTEX_SHADER_HEADER SCRAPS_COMMON_SHADER_HEADER
-#define SCRAPS_FRAGMENT_SHADER_HEADER SCRAPS_COMMON_SHADER_HEADER \
-    "out vec4 COLOR_OUT;\n"
-
+#define SCRAPS_GL_ERROR_CHECK()
 #endif
 
 namespace scraps {
+namespace opengl {
 
-constexpr const char* getGLErrorType(GLenum err) {
+constexpr const char* GetErrorName(GLenum err) {
     switch (err) {
         case GL_INVALID_OPERATION:              return "INVALID_OPERATION";
         case GL_INVALID_ENUM:                   return "INVALID_ENUM";
@@ -74,16 +61,23 @@ constexpr const char* getGLErrorType(GLenum err) {
     };
 }
 
-}
-
-#if !NDEBUG
-#define SCRAPS_GL_ERROR_CHECK() \
-    { \
-        auto err = glGetError(); \
-        if (err != GL_NO_ERROR) { \
-            SCRAPS_LOG_WARNING("opengl error 0x{:x} {}", err, scraps::getGLErrorType(err)); \
-        } \
-    }
+#if OPENGL_ES
+constexpr bool kIsOpenGLES = true;
 #else
-#define SCRAPS_GL_ERROR_CHECK()
+constexpr bool kIsOpenGLES = false;
 #endif
+
+GLint MajorVersion();
+
+/**
+* @return true if the given opengl extension is present for the current context
+*/
+bool HasExtension(std::string extension);
+
+/**
+* Define some shader macros that let you write the rest of the shader more portably.
+*/
+std::string CommonVertexShaderHeader(std::vector<std::string> extensions = {});
+std::string CommonFragmentShaderHeader(std::vector<std::string> extensions = {});
+
+}}

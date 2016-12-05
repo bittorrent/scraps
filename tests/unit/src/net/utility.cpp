@@ -70,4 +70,3 @@ TEST(NetUtility, ResolveRandomIPv4Endpoint) {
     }
     EXPECT_FALSE("we got the same endpoint every time. it should have been random");
 }
-

@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,8 +19,15 @@
 
 #include "scraps/Byte.h"
 
+#if SCRAPS_APPLE
+    #include "scraps/apple/SHA256.h"
+    namespace scraps { using SHA256 = apple::SHA256; }
+#else
+    #include "scraps/sodium/SHA256.h"
+    namespace scraps { using SHA256 = sodium::SHA256; }
+#endif
+
 #include <gsl.h>
-#include <sodium/crypto_hash_sha256.h>
 
 namespace scraps {
 
@@ -29,28 +36,6 @@ struct SHA256ByteTag {};
 
 template <typename BaseByteType>
 using SHA256Byte = StrongByte<SHA256ByteTag<BaseByteType>>;
-
-class SHA256 {
-public:
-    SHA256() { reset(); }
-
-    static const size_t kHashSize = crypto_hash_sha256_BYTES;
-
-    void reset() {
-        crypto_hash_sha256_init(&_state);
-    }
-
-    void update(const void* data, size_t length) {
-        crypto_hash_sha256_update(&_state, reinterpret_cast<const unsigned char*>(data), length);
-    }
-
-    void finish(void* hash) {
-        crypto_hash_sha256_final(&_state, reinterpret_cast<unsigned char*>(hash));
-    }
-
-private:
-    crypto_hash_sha256_state _state;
-};
 
 template <typename ByteT, std::ptrdiff_t N>
 std::array<SHA256Byte<std::remove_const_t<ByteT>>, SHA256::kHashSize>

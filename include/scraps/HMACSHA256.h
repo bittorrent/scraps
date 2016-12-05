@@ -1,12 +1,12 @@
 /**
 * Copyright 2016 BitTorrent Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *    http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,15 @@
 
 #include "scraps/config.h"
 
+#if SCRAPS_APPLE
+    #include "scraps/apple/HMAC.h"
+    namespace scraps { using HMACSHA256 = apple::HMAC<apple::HMACAlgorithmType::SHA256>; }
+#else
+    #include "scraps/sodium/HMACSHA256.h"
+    namespace scraps { using HMACSHA256 = sodium::HMACSHA256; }
+#endif
+
 #include <gsl.h>
-#include <sodium/crypto_auth_hmacsha256.h>
 
 namespace scraps {
 
@@ -27,33 +34,6 @@ struct HMACSHA256ByteTag {};
 
 template <typename BaseByteType>
 using HMACSHA256Byte = StrongByte<HMACSHA256ByteTag<BaseByteType>>;
-
-class HMACSHA256 {
-public:
-    HMACSHA256(const void* key, size_t length) {
-        reset(key, length);
-    }
-
-    static const size_t kResultSize = crypto_auth_hmacsha256_BYTES;
-
-    void reset(const void* key, size_t length) {
-        auto err = crypto_auth_hmacsha256_init(&_state, reinterpret_cast<const unsigned char*>(key), length);
-        SCRAPS_ASSERT(!err);
-    }
-
-    void update(const void* data, size_t length) {
-        auto err = crypto_auth_hmacsha256_update(&_state, reinterpret_cast<const unsigned char*>(data), length);
-        SCRAPS_ASSERT(!err);
-    }
-
-    void finish(void* result) {
-        auto err = crypto_auth_hmacsha256_final(&_state, reinterpret_cast<unsigned char*>(result));
-        SCRAPS_ASSERT(!err);
-    }
-
-private:
-    crypto_auth_hmacsha256_state _state;
-};
 
 template <typename KeyByteType, std::ptrdiff_t KeySize, typename ByteT, std::ptrdiff_t DataSize>
 std::array<HMACSHA256Byte<std::remove_const_t<ByteT>>, HMACSHA256::kResultSize>

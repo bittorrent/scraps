@@ -18,11 +18,11 @@
 
 #include <gtest/gtest.h>
 
-#include <json.hpp>
+#include <json11.hpp>
 
 using namespace scraps;
 using namespace scraps::net;
-using json = nlohmann::json;
+using json = json11::Json;
 
 TEST(HTTPRequest, basicGET) {
     HTTPRequest request;
@@ -36,7 +36,9 @@ TEST(HTTPRequest, basicGET) {
     ASSERT_EQ(200, request.responseStatus());
     ASSERT_EQ(request.responseHeaders("content-type")[0], "application/json");
 
-    auto body = json::parse(request.responseBody());
+    std::string error;
+    auto body = json::parse(request.responseBody(), error);
+    ASSERT_TRUE(error.empty());
     EXPECT_EQ(body["args"]["foo"], "bar");
 }
 
@@ -50,7 +52,9 @@ TEST(HTTPRequest, basicPOST) {
     ASSERT_EQ(200, request.responseStatus());
     ASSERT_EQ(request.responseHeaders("content-type")[0], "application/json");
 
-    auto body = json::parse(request.responseBody());
+    std::string error;
+    auto body = json::parse(request.responseBody(), error);
+    ASSERT_TRUE(error.empty());
     EXPECT_EQ(body["form"]["foo"], "bar");
 }
 

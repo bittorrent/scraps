@@ -17,9 +17,10 @@
 
 #include "scraps/config.h"
 
-#include <condition_variable>
-#include <mutex>
+#include "stdts/string_view.h"
+
 #include <thread>
+#include <chrono>
 
 #if SCRAPS_MACOS || SCRAPS_IOS
 #include <pthread.h>
@@ -29,15 +30,13 @@
 
 namespace scraps {
 
-inline void SetThreadName(const char* name) {
+inline void SetThreadName(stdts::string_view name) {
 #if SCRAPS_MACOS || SCRAPS_IOS
-    pthread_setname_np(name);
+    pthread_setname_np(name.data());
 #elif SCRAPS_LINUX
-    prctl(PR_SET_NAME, name, 0, 0, 0);
+    prctl(PR_SET_NAME, name.data(), 0, 0, 0);
 #endif
 }
-
-inline void SetThreadName(const std::string& name) { SetThreadName(name.c_str()); }
 
 template<typename Rep, typename Period>
 std::chrono::steady_clock::duration TimedSleep(const std::chrono::duration<Rep, Period>& d) {
