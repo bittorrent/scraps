@@ -75,11 +75,11 @@ std::vector<Address> Resolve(const std::string& host) {
     return ret;
 }
 
-std::vector<Address> ResolveIPv4(const std::string& host) {
+std::vector<Address> Resolve(const std::string& host, Address::Protocol protocol) {
     std::vector<Address> ret;
     auto addresses = Resolve(host);
     for (auto& address : addresses) {
-        if (address.protocol() == Address::Protocol::kIPv4) {
+        if (address.protocol() == protocol) {
             ret.emplace_back(address);
         }
     }
