@@ -71,10 +71,10 @@ TEST(NAT64Adapter, basics) {
     ASSERT_EQ(std::future_status::ready, status);
     auto response = futureResponse.get();
 
-    const uint8_t expectedHeader[] = { 0xf3, 0x84, 0x81, 0x80, 0x00, 0x01 };
+    const std::array<uint8_t, 6> expectedHeader{ 0xf3, 0x84, 0x81, 0x80, 0x00, 0x01 };
 
     ASSERT_GT(response.size(), 0x20);
-    EXPECT_TRUE(std::equal(expectedHeader, expectedHeader + sizeof(expectedHeader), response.begin()));
+    EXPECT_TRUE(std::equal(expectedHeader.begin(), expectedHeader.end(), response.begin()));
 }
 
 TEST(NAT64Adapter, addressConversion) {
