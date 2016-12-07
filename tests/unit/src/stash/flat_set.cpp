@@ -22,18 +22,23 @@
 using namespace stash;
 
 struct Foo {
-    Foo() = default;
-    explicit Foo(int i) :i{i} {}
-    bool operator==(const Foo& rhs) const { return i == rhs.i; }
-    bool operator==(int rhs)        const { return this->i == rhs; }
-    bool operator<(const Foo& rhs)  const { return i < rhs.i; }
-    bool operator<(int rhs)         const { return this->i < rhs; }
-
     int i = 0;
+
+    struct Compare {
+        using is_transparent = std::true_type;
+        bool operator()(const Foo& lhs, const Foo& rhs) { return lhs.i < rhs.i; }
+        bool operator()(int lhs,        const Foo& rhs) { return lhs   < rhs.i; }
+        bool operator()(const Foo& lhs, int rhs)        { return lhs.i < rhs; }
+    };
 };
 
 bool operator<(int i, const Foo& f) {
     return i < f.i;
+}
+
+TEST(flat_set, detail_IsTransparent) {
+    static_assert(detail::IsTransparent<Foo::Compare>::value, "is_transparent detected correctly");
+    static_assert(!detail::IsTransparent<Foo>::value, "is_transparent detected correctly");
 }
 
 TEST(flat_set, defaultConstruction) {
@@ -130,113 +135,113 @@ TEST(flat_set, insertLValues) {
     Foo f4{4};
     Foo f10{10};
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto result = set.insert(f0);
-        EXPECT_EQ(*result.first, f0);
+        EXPECT_EQ(result.first->i, f0.i);
         EXPECT_FALSE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{f0, f1, f4}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{f0, f1, f4}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto result = set.insert(f3);
-        EXPECT_EQ(*result.first, f3);
+        EXPECT_EQ(result.first->i, f3.i);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{f0, f1, f3, f4}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{f0, f1, f3, f4}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto result = set.insert(f10);
-        EXPECT_EQ(*result.first, f10);
+        EXPECT_EQ(result.first->i, f10.i);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{f0, f1, f4, f10}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{f0, f1, f4, f10}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto result = set.insert(fn10);
-        EXPECT_EQ(*result.first, fn10);
+        EXPECT_EQ(result.first->i, fn10.i);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{fn10, f0, f1, f4}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{fn10, f0, f1, f4}));
     }
 }
 
 TEST(flat_set, insertRValues) {
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto result = set.insert(Foo{0});
-        EXPECT_EQ(*result.first, Foo{0});
+        EXPECT_EQ(result.first->i, 0);
         EXPECT_FALSE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{0}, Foo{1}, Foo{4}}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{0}, Foo{1}, Foo{4}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto result = set.insert(Foo{3});
-        EXPECT_EQ(*result.first, Foo{3});
+        EXPECT_EQ(result.first->i, 3);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{0}, Foo{1}, Foo{3}, Foo{4}}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{0}, Foo{1}, Foo{3}, Foo{4}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto result = set.insert(Foo{10});
-        EXPECT_EQ(*result.first, Foo{10});
+        EXPECT_EQ(result.first->i, 10);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto result = set.insert(Foo{-10});
-        EXPECT_EQ(*result.first, Foo{-10});
+        EXPECT_EQ(result.first->i, -10);
         EXPECT_TRUE(result.second);
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
     }
 }
 
 TEST(flat_set, insertRValuesWithHint) {
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto it = set.insert(set.begin(), Foo{0});
-        EXPECT_EQ(*it, Foo{0});
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{0}, Foo{1}, Foo{4}}));
+        EXPECT_EQ(it->i, 0);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{0}, Foo{1}, Foo{4}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto it = set.insert(set.end(), Foo{3});
-        EXPECT_EQ(*it, Foo{3});
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{0}, Foo{1}, Foo{3}, Foo{4}}));
+        EXPECT_EQ(it->i, 3);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{0}, Foo{1}, Foo{3}, Foo{4}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto it = set.insert(set.begin(), Foo{10});
-        EXPECT_EQ(*it, Foo{10});
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
+        EXPECT_EQ(it->i, 10);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto it = set.insert(set.end(), Foo{10});
-        EXPECT_EQ(*it, Foo{10});
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
+        EXPECT_EQ(it->i, 10);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{0}, Foo{1}, Foo{4}, Foo{10}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto it = set.insert(set.begin(), Foo{-10});
-        EXPECT_EQ(*it, Foo{-10});
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
+        EXPECT_EQ(it->i, -10);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
     }
 
     {
-        flat_set<Foo> set{Foo{0}, Foo{1}, Foo{4}};
+        flat_set<Foo, Foo::Compare> set{Foo{0}, Foo{1}, Foo{4}};
         auto it = set.insert(set.end(), Foo{-10});
-        EXPECT_EQ(*it, Foo{-10});
-        EXPECT_EQ(set, (flat_set<Foo>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
+        EXPECT_EQ(it->i, -10);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{Foo{-10}, Foo{0}, Foo{1}, Foo{4}}));
     }
 }
 
@@ -248,45 +253,45 @@ TEST(flat_set, insertLValuesWithHint) {
     Foo f4{4};
     Foo f10{10};
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto it = set.insert(set.begin(), f0);
-        EXPECT_EQ(*it, f0);
-        EXPECT_EQ(set, (flat_set<Foo>{f0, f1, f4}));
+        EXPECT_EQ(it->i, f0.i);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{f0, f1, f4}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto it = set.insert(set.end(), f3);
-        EXPECT_EQ(*it, f3);
-        EXPECT_EQ(set, (flat_set<Foo>{f0, f1, f3, f4}));
+        EXPECT_EQ(it->i, f3.i);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{f0, f1, f3, f4}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto it = set.insert(set.begin(), f10);
-        EXPECT_EQ(*it, f10);
-        EXPECT_EQ(set, (flat_set<Foo>{f0, f1, f4, f10}));
+        EXPECT_EQ(it->i, f10.i);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{f0, f1, f4, f10}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto it = set.insert(set.end(), f10);
-        EXPECT_EQ(*it, f10);
-        EXPECT_EQ(set, (flat_set<Foo>{f0, f1, f4, f10}));
+        EXPECT_EQ(it->i, f10.i);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{f0, f1, f4, f10}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto it = set.insert(set.begin(), fn10);
-        EXPECT_EQ(*it, fn10);
-        EXPECT_EQ(set, (flat_set<Foo>{fn10, f0, f1, f4}));
+        EXPECT_EQ(it->i, fn10.i);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{fn10, f0, f1, f4}));
     }
 
     {
-        flat_set<Foo> set{f0, f1, f4};
+        flat_set<Foo, Foo::Compare> set{f0, f1, f4};
         auto it = set.insert(set.end(), fn10);
-        EXPECT_EQ(*it, fn10);
-        EXPECT_EQ(set, (flat_set<Foo>{fn10, f0, f1, f4}));
+        EXPECT_EQ(it->i, fn10.i);
+        EXPECT_EQ(set, (flat_set<Foo, Foo::Compare>{fn10, f0, f1, f4}));
     }
 }
 
@@ -437,8 +442,7 @@ TEST(flat_set, swap) {
 }
 
 TEST(flat_set, count) {
-
-    flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+    flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
 
     EXPECT_EQ(set.count(Foo{1}), 1);
     EXPECT_EQ(set.count(Foo{5}), 0);
@@ -455,7 +459,7 @@ TEST(flat_set, find) {
     }
 
     {
-        flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.find(6), set.end());
         EXPECT_EQ(set.find(1), set.begin());
     }
@@ -469,7 +473,7 @@ TEST(flat_set, findConst) {
     }
 
     {
-        const flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        const flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.find(6), set.end());
         EXPECT_EQ(set.find(1), set.begin());
     }
@@ -483,7 +487,7 @@ TEST(flat_set, equal_range) {
     }
 
     {
-        flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.equal_range(6), std::make_pair(set.end(), set.end()));
         EXPECT_EQ(set.equal_range(1), std::make_pair(set.begin(), set.begin()));
     }
@@ -497,7 +501,7 @@ TEST(flat_set, const_equal_range) {
     }
 
     {
-        const flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        const flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.equal_range(6), std::make_pair(set.end(), set.end()));
         EXPECT_EQ(set.equal_range(1), std::make_pair(set.begin(), set.begin()));
     }
@@ -511,7 +515,7 @@ TEST(flat_set, lower_bound) {
     }
 
     {
-        flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.lower_bound(20), set.end());
         EXPECT_EQ(set.lower_bound(1), set.begin());
     }
@@ -525,7 +529,7 @@ TEST(flat_set, lower_boundConst) {
     }
 
     {
-        const flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        const flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.lower_bound(20), set.end());
         EXPECT_EQ(set.lower_bound(1), set.begin());
     }
@@ -539,7 +543,7 @@ TEST(flat_set, upper_bound) {
     }
 
     {
-        flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.upper_bound(20), set.end());
         EXPECT_EQ(set.upper_bound(1), std::next(set.begin()));
     }
@@ -553,7 +557,7 @@ TEST(flat_set, upper_boundConst) {
     }
 
     {
-        const flat_set<Foo> set{Foo{1}, Foo{4}, Foo{10}};
+        const flat_set<Foo, Foo::Compare> set{Foo{1}, Foo{4}, Foo{10}};
         EXPECT_EQ(set.upper_bound(20), set.end());
         EXPECT_EQ(set.upper_bound(1), std::next(set.begin()));
     }

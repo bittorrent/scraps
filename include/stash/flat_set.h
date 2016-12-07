@@ -16,12 +16,32 @@
 #pragma once
 
 #include <algorithm>
-#include <vector>
 #include <initializer_list>
+#include <utility>
+#include <vector>
 
 namespace stash {
 
-template <typename Key>
+namespace detail {
+template <class Compare, typename K = void>
+struct IsTransparent {
+    using yes = char;
+    struct no { char c1; char c; };
+    template <class U> static yes test(typename U::is_transparent*);
+    template <class U> static no test(...);
+    static bool constexpr value = sizeof(test<Compare>(nullptr)) == sizeof(yes);
+};
+
+template <typename Compare, typename T1, typename T2>
+bool Equivalent(T1&& lhs, T2&& rhs) {
+    return !Compare()(lhs, rhs) && !Compare()(rhs, lhs);
+}
+} // namespace detail
+
+template <
+    typename Key,
+    class Compare = std::less<Key>
+>
 class flat_set {
 public:
     using reference              = typename std::vector<Key>::const_reference;
@@ -140,7 +160,7 @@ public:
     /**
      * Constant
      */
-    void swap(flat_set<Key>& other) noexcept(noexcept(std::swap(other._set, _set)));
+    void swap(flat_set<Key, Compare>& other) noexcept(noexcept(std::swap(other._set, _set)));
 
     // Lookup
 
@@ -149,180 +169,180 @@ public:
      */
     size_type count(const key_type& key) const;
     template <typename K>
-    size_type count(const K& x) const;
+    auto count(const K& x) const -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, size_type>;
 
     /**
      * Logarithmic
      */
     const_iterator find(const Key& key) const;
     template <typename K>
-    const_iterator find(const K& x) const;
+    auto find(const K& x) const -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, const_iterator>;
 
     /**
      * Logarithmic
      */
     std::pair<const_iterator, const_iterator> equal_range(const Key& key) const;
     template <typename K>
-    std::pair<const_iterator, const_iterator> equal_range(const K& x) const;
+    auto equal_range(const K& x) const -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, std::pair<const_iterator, const_iterator>>;
 
     /**
      * Logarithmic
      */
     const_iterator lower_bound(const key_type& key) const;
     template <typename K>
-    const_iterator lower_bound(const K& x) const;
+    auto lower_bound(const K& x) const -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, const_iterator>;
 
     /**
      * Logarithmic
      */
     const_iterator upper_bound(const key_type& key) const;
     template <typename K>
-    const_iterator upper_bound(const K& x) const;
+    auto upper_bound(const K& x) const -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, const_iterator>;
 
 private:
     std::vector<Key> _set;
 };
 
-template <typename Key> bool operator==(const flat_set<Key>& lhs, const flat_set<Key>& rhs);
-template <typename Key> bool operator!=(const flat_set<Key>& lhs, const flat_set<Key>& rhs);
-template <typename Key> bool operator< (const flat_set<Key>& lhs, const flat_set<Key>& rhs);
-template <typename Key> bool operator> (const flat_set<Key>& lhs, const flat_set<Key>& rhs);
-template <typename Key> bool operator<=(const flat_set<Key>& lhs, const flat_set<Key>& rhs);
-template <typename Key> bool operator>=(const flat_set<Key>& lhs, const flat_set<Key>& rhs);
+template <typename Key, typename Compare> bool operator==(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs);
+template <typename Key, typename Compare> bool operator!=(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs);
+template <typename Key, typename Compare> bool operator< (const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs);
+template <typename Key, typename Compare> bool operator> (const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs);
+template <typename Key, typename Compare> bool operator<=(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs);
+template <typename Key, typename Compare> bool operator>=(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs);
 
-template <class Key> void swap(stash::flat_set<Key>& lhs, stash::flat_set<Key>& rhs) noexcept(noexcept(lhs.swap(rhs)));
+template <typename Key, typename Compare> void swap(stash::flat_set<Key, Compare>& lhs, stash::flat_set<Key, Compare>& rhs) noexcept(noexcept(lhs.swap(rhs)));
 
 // Implementation
 
 // flat_set
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename InputIt>
-flat_set<Key>::flat_set(InputIt first, InputIt last) {
+flat_set<Key, Compare>::flat_set(InputIt first, InputIt last) {
     insert(first, last);
 }
 
-template <typename Key>
-flat_set<Key>::flat_set(std::initializer_list<Key> init) : flat_set(init.begin(), init.end()) {}
+template <typename Key, typename Compare>
+flat_set<Key, Compare>::flat_set(std::initializer_list<Key> init) : flat_set(init.begin(), init.end()) {}
 
-template <typename Key> typename flat_set<Key>::const_reference flat_set<Key>::front() const { return _set.front(); }
-template <typename Key> typename flat_set<Key>::const_reference flat_set<Key>::back() const { return _set.back(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_reference flat_set<Key, Compare>::front() const { return _set.front(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_reference flat_set<Key, Compare>::back() const { return _set.back(); }
 
-template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::begin() const { return _set.begin(); }
-template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::cbegin() const { return _set.cbegin(); }
-template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::end() const { return _set.end(); }
-template <typename Key> typename flat_set<Key>::const_iterator flat_set<Key>::cend() const { return _set.cend(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_iterator flat_set<Key, Compare>::begin() const { return _set.begin(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_iterator flat_set<Key, Compare>::cbegin() const { return _set.cbegin(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_iterator flat_set<Key, Compare>::end() const { return _set.end(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_iterator flat_set<Key, Compare>::cend() const { return _set.cend(); }
 
-template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::rbegin() const { return _set.rbegin(); }
-template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::crbegin() const { return _set.crbegin(); }
-template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::rend() const { return _set.rend(); }
-template <typename Key> typename flat_set<Key>::const_reverse_iterator flat_set<Key>::crend() const { return _set.crend(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_reverse_iterator flat_set<Key, Compare>::rbegin() const { return _set.rbegin(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_reverse_iterator flat_set<Key, Compare>::crbegin() const { return _set.crbegin(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_reverse_iterator flat_set<Key, Compare>::rend() const { return _set.rend(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::const_reverse_iterator flat_set<Key, Compare>::crend() const { return _set.crend(); }
 
-template <typename Key> typename flat_set<Key>::size_type flat_set<Key>::size() const { return _set.size(); }
-template <typename Key> typename flat_set<Key>::size_type flat_set<Key>::max_size() const { return _set.max_size(); }
-template <typename Key> typename flat_set<Key>::size_type flat_set<Key>::capacity() const { return _set.capacity(); }
-template <typename Key> bool flat_set<Key>::empty() const { return _set.empty(); }
-template <typename Key> void flat_set<Key>::reserve(size_type size) { _set.reserve(size); }
-template <typename Key> void flat_set<Key>::clear() { _set.clear(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::size_type flat_set<Key, Compare>::size() const { return _set.size(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::size_type flat_set<Key, Compare>::max_size() const { return _set.max_size(); }
+template <typename Key, typename Compare> typename flat_set<Key, Compare>::size_type flat_set<Key, Compare>::capacity() const { return _set.capacity(); }
+template <typename Key, typename Compare> bool flat_set<Key, Compare>::empty() const { return _set.empty(); }
+template <typename Key, typename Compare> void flat_set<Key, Compare>::reserve(size_type size) { _set.reserve(size); }
+template <typename Key, typename Compare> void flat_set<Key, Compare>::clear() { _set.clear(); }
 
-template <typename Key>
-std::pair<typename flat_set<Key>::const_iterator, bool>
-flat_set<Key>::insert(const value_type& value) {
+template <typename Key, typename Compare>
+std::pair<typename flat_set<Key, Compare>::const_iterator, bool>
+flat_set<Key, Compare>::insert(const value_type& value) {
     auto it = lower_bound(value);
-    if (it != end() && *it == value) {
+    if (it != end() && detail::Equivalent<Compare>(*it, value)) {
         return {it, false};
     }
     return {_set.insert(it, value_type{value}), true};
 }
 
-template <typename Key>
-std::pair<typename flat_set<Key>::const_iterator, bool>
-flat_set<Key>::insert(value_type&& value) {
+template <typename Key, typename Compare>
+std::pair<typename flat_set<Key, Compare>::const_iterator, bool>
+flat_set<Key, Compare>::insert(value_type&& value) {
     auto it = lower_bound(value);
-    if (it != end() && *it == value) {
+    if (it != end() && detail::Equivalent<Compare>(*it, value)) {
         return {it, false};
     }
     return {_set.insert(it, std::move(value)), true};
 }
 
-template <typename Key>
-typename flat_set<Key>::const_iterator
-flat_set<Key>::insert(const_iterator hint, const value_type& value) {
+template <typename Key, typename Compare>
+typename flat_set<Key, Compare>::const_iterator
+flat_set<Key, Compare>::insert(const_iterator hint, const value_type& value) {
     if (hint == end()) {
-        if (empty() || *std::prev(hint) < value) {
+        if (empty() || Compare()(*std::prev(hint), value)) {
             return _set.insert(end(), value);
         }
-    } else if (*hint == value) {
+    } else if (detail::Equivalent<Compare>(*hint, value)) {
         return hint;
-    } else if (value < *hint && (hint == begin() || *std::prev(hint) < value)) {
+    } else if (Compare()(value, *hint) && (hint == begin() || Compare()(*std::prev(hint), value))) {
         return _set.insert(hint, value);
     }
 
     return insert(value).first;
 }
 
-template <typename Key>
-typename flat_set<Key>::const_iterator
-flat_set<Key>::insert(const_iterator hint, value_type&& value) {
+template <typename Key, typename Compare>
+typename flat_set<Key, Compare>::const_iterator
+flat_set<Key, Compare>::insert(const_iterator hint, value_type&& value) {
     if (hint == end()) {
-        if (_set.empty() || *std::prev(hint) < value) {
+        if (_set.empty() || Compare()(*std::prev(hint), value)) {
             return _set.insert(end(), std::move(value));
         }
-    } else if (*hint == value) {
+    } else if (detail::Equivalent<Compare>(*hint, value)) {
         return hint;
-    } else if (value < *hint && (hint == begin() || *std::prev(hint) < value)) {
+    } else if (Compare()(value, *hint) && (hint == begin() || Compare()(*std::prev(hint), value))) {
         return _set.insert(hint, std::move(value));
     }
 
     return insert(std::move(value)).first;
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename InputIt>
-void flat_set<Key>::insert(InputIt first, InputIt last) {
+void flat_set<Key, Compare>::insert(InputIt first, InputIt last) {
     for (auto it = first; it != last; ++it) {
         insert(*it);
     }
 }
 
-template <typename Key>
-void flat_set<Key>::insert(std::initializer_list<value_type> ilist) {
+template <typename Key, typename Compare>
+void flat_set<Key, Compare>::insert(std::initializer_list<value_type> ilist) {
     insert(ilist.begin(), ilist.end());
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename... Args>
-auto flat_set<Key>::emplace(Args&&... args)
-    -> std::pair<typename flat_set<Key>::const_iterator, bool>
+auto flat_set<Key, Compare>::emplace(Args&&... args)
+    -> std::pair<typename flat_set<Key, Compare>::const_iterator, bool>
 {
     return insert(value_type{std::forward<Args>(args)...});
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename... Args>
-auto flat_set<Key>::emplace_hint(const_iterator hint, Args&&... args)
-    -> typename flat_set<Key>::const_iterator
+auto flat_set<Key, Compare>::emplace_hint(const_iterator hint, Args&&... args)
+    -> typename flat_set<Key, Compare>::const_iterator
 {
     return insert(hint, value_type{std::forward<Args>(args)...});
 }
 
-template <typename Key>
-auto flat_set<Key>::erase(const_iterator pos)
-    -> typename flat_set<Key>::const_iterator
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::erase(const_iterator pos)
+    -> typename flat_set<Key, Compare>::const_iterator
 {
     return _set.erase(pos);
 }
 
-template <typename Key>
-auto flat_set<Key>::erase(const_iterator first, const_iterator last)
-    -> typename flat_set<Key>::const_iterator
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::erase(const_iterator first, const_iterator last)
+    -> typename flat_set<Key, Compare>::const_iterator
 {
     return _set.erase(first, last);
 };
 
-template <typename Key>
-auto flat_set<Key>::erase(const key_type& key)
-    -> typename flat_set<Key>::size_type
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::erase(const key_type& key)
+    -> typename flat_set<Key, Compare>::size_type
 {
     auto it = find(key);
     if (it != end()) {
@@ -332,16 +352,16 @@ auto flat_set<Key>::erase(const key_type& key)
     return 0;
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename Predicate>
-void flat_set<Key>::erase_if(Predicate pred) {
+void flat_set<Key, Compare>::erase_if(Predicate pred) {
     _set.erase(std::remove_if(_set.begin(), _set.end(), pred), _set.end());
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename InputIt, typename Predicate>
-auto flat_set<Key>::erase_if(InputIt begin, InputIt end, Predicate pred)
-    -> typename flat_set<Key>::const_iterator
+auto flat_set<Key, Compare>::erase_if(InputIt begin, InputIt end, Predicate pred)
+    -> typename flat_set<Key, Compare>::const_iterator
 {
     // need non-const iterators for std::remove_if
     auto b = _set.erase(begin, begin);
@@ -349,130 +369,133 @@ auto flat_set<Key>::erase_if(InputIt begin, InputIt end, Predicate pred)
     return _set.erase(std::remove_if(b, e, pred), e);
 }
 
-template <typename Key>
-void flat_set<Key>::swap(flat_set<Key>& other) noexcept(noexcept(other.swap(other))) {
+template <typename Key, typename Compare>
+void flat_set<Key, Compare>::swap(flat_set<Key, Compare>& other) noexcept(noexcept(other.swap(other))) {
     _set.swap(other._set);
 }
 
-template <typename Key>
-auto flat_set<Key>::count(const key_type& key) const
-    -> typename flat_set<Key>::size_type
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::count(const key_type& key) const
+    -> typename flat_set<Key, Compare>::size_type
 {
     return find(key) == end() ? 0 : 1;
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename K>
-auto flat_set<Key>::count(const K& x) const
-    -> typename flat_set<Key>::size_type
+auto flat_set<Key, Compare>::count(const K& x) const
+    -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, typename flat_set::size_type>
 {
     return find(x) == end() ? 0 : 1;
 }
 
-template <typename Key>
-auto flat_set<Key>::find(const Key& key) const
-    -> typename flat_set<Key>::const_iterator
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::find(const Key& key) const
+    -> typename flat_set<Key, Compare>::const_iterator
 {
     auto it = lower_bound(key);
-    if (it != end() && *it == key) {
+    if (it != end() && detail::Equivalent<Compare>(*it, key)) {
         return it;
     }
     return end();
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename K>
-auto flat_set<Key>::find(const K& x) const
-    -> typename flat_set<Key>::const_iterator
+auto flat_set<Key, Compare>::find(const K& x) const
+    -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, typename flat_set::const_iterator>
 {
     auto it = lower_bound(x);
-    if (it != end() && *it == x) {
+    if (it != end() && detail::Equivalent<Compare>(*it, x)) {
         return it;
     }
     return end();
 }
 
-template <typename Key>
-auto flat_set<Key>::equal_range(const Key& key) const
-    -> std::pair<typename flat_set<Key>::const_iterator, typename flat_set<Key>::const_iterator>
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::equal_range(const Key& key) const
+    -> std::pair<typename flat_set<Key, Compare>::const_iterator, typename flat_set<Key, Compare>::const_iterator>
 {
     auto first = find(key);
     return {first, first};
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename K>
-auto flat_set<Key>::equal_range(const K& x) const
-    -> std::pair<typename flat_set<Key>::const_iterator, typename flat_set<Key>::const_iterator>
+auto flat_set<Key, Compare>::equal_range(const K& x) const
+    -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, std::pair<typename flat_set<Key, Compare>::const_iterator, typename flat_set<Key, Compare>::const_iterator>>
 {
     auto first = find(x);
     return {first, first};
 }
 
-template <typename Key>
-auto flat_set<Key>::lower_bound(const key_type& key) const
-    -> typename flat_set<Key>::const_iterator
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::lower_bound(const key_type& key) const
+    -> typename flat_set<Key, Compare>::const_iterator
 {
-    return std::lower_bound(begin(), end(), key);
+    return std::lower_bound(begin(), end(), key, Compare());
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename K>
-auto flat_set<Key>::lower_bound(const K& x) const
-    -> typename flat_set<Key>::const_iterator
+auto flat_set<Key, Compare>::lower_bound(const K& x) const
+    -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, typename flat_set::const_iterator>
 {
-    return std::lower_bound(begin(), end(), x, [&](auto& e, auto& x) { return e < x; });
+    return std::lower_bound(begin(), end(), x, [&](auto& e, auto& x) { return Compare()(e, x); });
 }
 
-template <typename Key>
-auto flat_set<Key>::upper_bound(const key_type& key) const
-    -> typename flat_set<Key>::const_iterator
+template <typename Key, typename Compare>
+auto flat_set<Key, Compare>::upper_bound(const key_type& key) const
+    -> typename flat_set<Key, Compare>::const_iterator
 {
-    return std::upper_bound(begin(), end(), key);
+    return std::upper_bound(begin(), end(), key, Compare());
 }
 
-template <typename Key>
+template <typename Key, typename Compare>
 template <typename K>
-auto flat_set<Key>::upper_bound(const K& x) const
-    -> typename flat_set<Key>::const_iterator
+auto flat_set<Key, Compare>::upper_bound(const K& x) const
+    -> std::enable_if_t<detail::IsTransparent<Compare, K>::value, typename flat_set::const_iterator>
 {
-    return std::upper_bound(begin(), end(), x, [&](auto& e, auto& x) { return e < x; });
+    return std::upper_bound(begin(), end(), x, [&](auto& e, auto& x) { return Compare()(e, x); });
 }
 
 // non-member operators
 
-template <typename Key>
-bool operator==(const flat_set<Key>& lhs, const flat_set<Key>& rhs) {
-    return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+template <typename Key, typename Compare>
+bool operator==(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs) {
+    return lhs.size() == rhs.size()
+        && std::equal(lhs.begin(), lhs.end(), rhs.begin(), [](auto& a, auto& b){
+            return detail::Equivalent<Compare>(a, b);
+        });
 }
 
-template <typename Key>
-bool operator!=(const flat_set<Key>& lhs, const flat_set<Key>& rhs) {
+template <typename Key, typename Compare>
+bool operator!=(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs) {
     return !(lhs == rhs);
 }
 
-template <typename Key>
-bool operator<(const flat_set<Key>& lhs, const flat_set<Key>& rhs) {
-    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+template <typename Key, typename Compare>
+bool operator<(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs) {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), Compare());
 }
 
-template <typename Key>
-bool operator>(const flat_set<Key>& lhs, const flat_set<Key>& rhs) {
-    return std::lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end());
+template <typename Key, typename Compare>
+bool operator>(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs) {
+    return std::lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end(), Compare());
 }
 
-template <typename Key>
-bool operator<=(const flat_set<Key>& lhs, const flat_set<Key>& rhs) {
+template <typename Key, typename Compare>
+bool operator<=(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs) {
     return !(lhs > rhs);
 }
 
-template <typename Key>
-bool operator>=(const flat_set<Key>& lhs, const flat_set<Key>& rhs) {
+template <typename Key, typename Compare>
+bool operator>=(const flat_set<Key, Compare>& lhs, const flat_set<Key, Compare>& rhs) {
     return !(lhs < rhs);
 }
 
-template <class Key>
-void swap(stash::flat_set<Key>& lhs, stash::flat_set<Key>& rhs) noexcept(noexcept(lhs.swap(rhs))) {
+template <typename Key, typename Compare>
+void swap(stash::flat_set<Key, Compare>& lhs, stash::flat_set<Key, Compare>& rhs) noexcept(noexcept(lhs.swap(rhs))) {
     lhs.swap(rhs);
 }
 
