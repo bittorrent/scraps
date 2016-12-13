@@ -13,23 +13,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#pragma once
+#include <scraps/log/LoggerInterface.h>
 
-#include <scraps/config.h>
+#include <mutex>
 
-#include <scraps/log/log.h>
+class TestLogger : public scraps::log::LoggerInterface {
+public:
+    virtual void log(scraps::log::Message message) override {
+        auto text = scraps::Formatf("%s %s:%u %s", scraps::log::LevelString(message.level), message.file, message.line, message.text);
 
-namespace scraps {
+        std::lock_guard<std::mutex> lock{mutex};
+        messages.emplace_back(std::move(text));
+    }
 
-// Don't break the old API just yet
-// TODO: break the old API
-
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
-
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+    std::mutex mutex;
+    std::vector<std::string> messages;
+};

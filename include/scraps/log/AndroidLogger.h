@@ -17,19 +17,28 @@
 
 #include <scraps/config.h>
 
-#include <scraps/log/log.h>
+#if SCRAPS_ANDROID
 
-namespace scraps {
+#include <scraps/log/FormattedLogger.h>
 
-// Don't break the old API just yet
-// TODO: break the old API
+#include <mutex>
+#include <string>
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
+namespace scraps::log {
 
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
+/**
+* The AndroidLogger class logs messages to the Android log.
+*/
+class AndroidLogger : public FormattedLogger {
+public:
+    explicit AndroidLogger(std::shared_ptr<FormatterInterface> formatter = nullptr);
 
-} // namespace scraps
+    virtual void write(Level level, const std::string& formattedMessage) override;
+
+private:
+    std::mutex _mutex;
+};
+
+} // namespace scraps::log
+
+#endif // SCRAPS_ANDROID

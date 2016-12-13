@@ -13,23 +13,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#pragma once
+#include <scraps/log/StandardLogger.h>
 
-#include <scraps/config.h>
+namespace scraps::log {
 
-#include <scraps/log/log.h>
+StandardLogger::StandardLogger(std::shared_ptr<FormatterInterface> formatter)
+    : FormattedLogger{std::move(formatter)}
+{
+}
 
-namespace scraps {
+void StandardLogger::write(LogLevel level, const std::string& message) {
+    std::lock_guard<std::mutex> lock{_mutex};
+#ifdef __ANDROID__
+    auto f = stdout; // only stdout for android
+#else
+    auto f = level <= LogLevel::kInfo ? stdout : stderr;
+#endif
 
-// Don't break the old API just yet
-// TODO: break the old API
+    fprintf(f, "%s\n", message.c_str());
+    fflush(f);
+}
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
-
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+} // namespace scraps::log

@@ -1,0 +1,6 @@
+exe scraps-log :
+    [ glob *.cpp ]
+    ../..//scraps
+:
+    <variant>release
+;

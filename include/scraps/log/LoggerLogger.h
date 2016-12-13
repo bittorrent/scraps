@@ -17,19 +17,28 @@
 
 #include <scraps/config.h>
 
-#include <scraps/log/log.h>
+#include <scraps/log/LoggerInterface.h>
 
-namespace scraps {
+#include <initializer_list>
+#include <string>
+#include <vector>
 
-// Don't break the old API just yet
-// TODO: break the old API
+namespace scraps::log {
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
+/**
+* The LoggerLogger class logs messages to other loggers.
+*/
+class LoggerLogger : public LoggerInterface {
+public:
+    template <typename... Loggers>
+    explicit LoggerLogger(Loggers&& ... loggers)
+        : _loggers{std::initializer_list<std::shared_ptr<Logger>>{std::forward<Loggers>(loggers)...}}
+    {}
 
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
+    virtual void log(Message message) override;
 
-} // namespace scraps
+private:
+    std::vector<std::shared_ptr<LoggerInterface>> _loggers;
+};
+
+} // namespace scraps::log

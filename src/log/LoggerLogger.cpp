@@ -13,23 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#pragma once
+#include <scraps/log/LoggerLogger.h>
 
-#include <scraps/config.h>
+namespace scraps::log {
 
-#include <scraps/log/log.h>
+void LoggerLogger::log(Message message) {
+    for (auto& logger : _loggers) {
+        logger->log(message); // no move
+    }
+}
 
-namespace scraps {
-
-// Don't break the old API just yet
-// TODO: break the old API
-
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
-
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+} // namespace scraps::log

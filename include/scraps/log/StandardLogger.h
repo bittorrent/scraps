@@ -17,19 +17,23 @@
 
 #include <scraps/config.h>
 
-#include <scraps/log/log.h>
+#include <scraps/log/FormattedLogger.h>
 
-namespace scraps {
+#include <mutex>
 
-// Don't break the old API just yet
-// TODO: break the old API
+namespace scraps::log {
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
+/**
+* The StandardLogger class logs messages to stdout and stderr.
+*/
+class StandardLogger : public FormattedLogger {
+public:
+    explicit StandardLogger(std::shared_ptr<FormatterInterface> formatter = nullptr);
 
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
+    virtual void write(Level level, const std::string& formattedMessage) override;
 
-} // namespace scraps
+private:
+    std::mutex _mutex;
+};
+
+} // namespace scraps::log

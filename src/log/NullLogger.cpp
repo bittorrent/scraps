@@ -13,23 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#pragma once
+#include <scraps/log/NullLogger.h>
 
-#include <scraps/config.h>
+namespace scraps::log {
 
-#include <scraps/log/log.h>
+void NullLogger::log(Message message)
+{
+}
 
-namespace scraps {
-
-// Don't break the old API just yet
-// TODO: break the old API
-
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
-
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+} // namespace scraps::log

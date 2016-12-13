@@ -13,23 +13,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#pragma once
+#include <scraps/log/FormattedLogger.h>
 
-#include <scraps/config.h>
+#include <scraps/log/StandardFormatter.h>
 
-#include <scraps/log/log.h>
+namespace scraps::log {
 
-namespace scraps {
+FormattedLogger::FormattedLogger()
+    : FormattedLogger{std::make_shared<StandardFormatter>()}
+{
+}
 
-// Don't break the old API just yet
-// TODO: break the old API
+FormattedLogger::FormattedLogger(std::shared_ptr<FormatterInterface> formatter)
+    : _formatter{formatter ? std::move(formatter) : std::make_shared<StandardFormatter>()}
+{
+}
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
+void FormattedLogger::log(Message message) {
+    auto formattedMessage = _formatter->format(message);
+    write(message.level, formattedMessage);
+}
 
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+} // namespace scraps::log

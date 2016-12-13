@@ -1,0 +1,1 @@
+[{time:%F %T}] {level:DEBUG,INFO,WARNING,ERROR} {file}:{line} {text}

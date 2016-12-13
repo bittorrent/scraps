@@ -17,19 +17,19 @@
 
 #include <scraps/config.h>
 
-#include <scraps/log/log.h>
+#include <scraps/log/LoggerInterface.h>
 
-namespace scraps {
+namespace scraps::log {
 
-// Don't break the old API just yet
-// TODO: break the old API
+/**
+* Discards log messages.
+*/
+class NullLogger : public LoggerInterface {
+public:
+    /**
+    * This implementation should be thread-safe.
+    */
+    virtual void log(Message message) override;
+};
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
-
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+} // namespace scraps::log

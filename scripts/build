@@ -140,7 +140,10 @@ def build(args):
     def targets():
         targets = ['scraps', 'tests/unit']
         if not args.cross_target:
-            targets.append('tests/benchmarks')
+            targets.extend([
+                'tests/benchmarks',
+                'examples/log',
+            ])
         return shell_quote(targets)
 
     def common_args():

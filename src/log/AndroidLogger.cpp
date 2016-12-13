@@ -13,23 +13,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#pragma once
+#include <scraps/log/AndroidLogger.h>
 
-#include <scraps/config.h>
+#if SCRAPS_ANDROID
+#include <android/log.h>
 
-#include <scraps/log/log.h>
+namespace scraps::log {
 
-namespace scraps {
+AndroidLogger::AndroidLogger(std::shared_ptr<FormatterInterface> formatter)
+    : FormattedLogger{std::move(formatter)}
+{
+}
 
-// Don't break the old API just yet
-// TODO: break the old API
+void AndroidLogger::write(LogLevel level, const std::string& message) {
+    __android_log_print(level == LogLevel::kInfo ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR, "live", "%s", message.c_str());
+}
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
+} // namespace scraps::log
 
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+#endif // SCRAPS_ANDROID

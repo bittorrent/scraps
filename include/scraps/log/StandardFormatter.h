@@ -17,19 +17,21 @@
 
 #include <scraps/config.h>
 
-#include <scraps/log/log.h>
+#include <scraps/log/FormatterInterface.h>
 
-namespace scraps {
+#include <string>
 
-// Don't break the old API just yet
-// TODO: break the old API
+namespace scraps::log {
 
-using LogLevel = log::Level;
-using Logger = log::LoggerInterface;
+/**
+* Base class for formatting a log message.
+*/
+class StandardFormatter : public FormatterInterface {
+public:
+    /**
+    * Returns a formatted string ready for logging.
+    */
+    virtual std::string format(const Message& message) const override;
+};
 
-using log::CurrentLogger;
-using log::SetLogger;
-using log::CurrentLogLevel;
-using log::SetLogLevel;
-
-} // namespace scraps
+} // namespace scraps::log
