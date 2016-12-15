@@ -84,6 +84,9 @@ rule pkgconfig ( targets * : sources * : properties * ) {
     if <target-os>linux in $(properties) {
         PRIVATE_LIBS on $(targets) = -lm -lpthread ;
     }
+    if <target-os>android in $(properties) {
+        PRIVATE_LIBS on $(targets) = -llog ;
+    }
 }
 actions pkgconfig {
 cat > $(<) <<- EOM
