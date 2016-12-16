@@ -15,30 +15,30 @@
 */
 #include "gtest.h"
 
-#include <scraps/FutureSynchronizer.h>
-
-#include <future>
-#include <set>
+#include <scraps/Continuator.h>
 
 using namespace scraps;
 
-TEST(FutureSynchronizer, async) {
-    FutureSynchronizer fs;
+TEST(Continuator, basic) {
+    Continuator c;
 
-    std::set<int> results;
+    int tasksFinished = 0;
 
-    auto mainThreadId = std::this_thread::get_id();
+    for (int i = 1; i <= 10; ++i) {
+        auto f = std::async(std::launch::async, [=]{
+            std::this_thread::sleep_for(1100ms - 100ms * i);
+            return i;
+        });
 
-    auto insert = [&](auto i){
-        results.insert(i);
-        EXPECT_NE(std::this_thread::get_id(), mainThreadId);
-    };
-
-    for (auto i = 0; i < 10; ++i) {
-        fs.push(std::async([r = i]{ std::this_thread::sleep_for(100ms); return r; }), insert);
+        c.then(std::move(f), [&, i](auto f) {
+            EXPECT_EQ(f.wait_for(0s), std::future_status::ready);
+            EXPECT_EQ(f.get(), i);
+            ++tasksFinished;
+        });
     }
 
-    std::this_thread::sleep_for(2s); // wait for FutureSynchronizer to finish up.
-
-    EXPECT_EQ(results, (std::set<int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}));
+    while (tasksFinished < 10) {
+        c.update();
+        std::this_thread::sleep_for(10ms);
+    }
 }
