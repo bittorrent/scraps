@@ -38,12 +38,13 @@ class LoggerInterface;
 * Windows: FileLogger
 *
 * For file log locations, see FileLogger::DefaultLogPath.
-*
 */
-std::shared_ptr<FormattedLogger> CreateApplicationLogger(std::shared_ptr<FormatterInterface> formatter,
-                                                         const std::string& appName,
-                                                         size_t rotateSize,
-                                                         size_t maxFiles);
+std::shared_ptr<FormattedLogger> CreateFileLogger(
+    const std::string&                  appName,
+    std::shared_ptr<FormatterInterface> formatter = nullptr,
+    size_t                              rotateSize = 1024 * 1024,
+    size_t                              maxFiles = 5
+);
 
 /**
 * Returns the current logger.

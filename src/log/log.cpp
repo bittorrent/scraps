@@ -36,10 +36,12 @@ void LogImpl(Level level, const char* file, unsigned int line, std::string text)
 
 } // namespace detail
 
-std::shared_ptr<FormattedLogger> CreateApplicationLogger(std::shared_ptr<FormatterInterface> formatter,
-                                                         const std::string& appName,
-                                                         size_t rotateSize,
-                                                         size_t maxFiles) {
+std::shared_ptr<FormattedLogger> CreateFileLogger(
+    const std::string&                  appName,
+    std::shared_ptr<FormatterInterface> formatter,
+    size_t                              rotateSize,
+    size_t                              maxFiles
+) {
 #if SCRAPS_APPLE || SCRAPS_LINUX || SCRAPS_WINDOWS
     return FileLogger::CreateApplicationLogger(std::move(formatter), appName, rotateSize, maxFiles);
 #elif SCRAPS_ANDROID
