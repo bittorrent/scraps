@@ -38,7 +38,7 @@ private:
     std::unique_ptr<Foo> _foo;
 };
 
-TEST(Stack, building) {
+TEST(codeformation_Stack, building) {
     codeformation::Stack stack;
     stack.defineResourceType<FooResource>();
 
@@ -66,7 +66,7 @@ TEST(Stack, building) {
     EXPECT_EQ(*stack.output<String>("String"), "Test");
 }
 
-TEST(Stack, constructionWithoutRequiredProperties) {
+TEST(codeformation_Stack, constructionWithoutRequiredProperties) {
     codeformation::Stack stack;
     stack.defineResourceType<FooResource>();
 
@@ -82,7 +82,7 @@ TEST(Stack, constructionWithoutRequiredProperties) {
     EXPECT_TRUE(error);
 }
 
-TEST(Stack, cyclicDependency) {
+TEST(codeformation_Stack, cyclicDependency) {
     codeformation::Stack stack;
     stack.defineResourceType<FooResource>();
 
@@ -102,7 +102,7 @@ TEST(Stack, cyclicDependency) {
     EXPECT_TRUE(error);
 }
 
-TEST(Stack, defineFunction) {
+TEST(codeformation_Stack, defineFunction) {
     codeformation::Stack stack;
     stack.defineFunction("FooFunc", [](const Any& arg) -> Any {
         EXPECT_EQ(stdts::any_cast<String>(arg), "Foo");
