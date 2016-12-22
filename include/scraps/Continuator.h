@@ -70,7 +70,7 @@ void Continuator::then(Future f, Callback c) {
     });
 }
 
-void Continuator::update() {
+inline void Continuator::update() {
     _callbacks.remove_if([](const auto& i) { return i(); });
 }
 
