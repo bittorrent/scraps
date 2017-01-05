@@ -20,13 +20,26 @@
 
 namespace scraps::log {
 
+class AndroidFormatter : public FormatterInterface {
+public:
+    virtual std::string format(const Message& message) const override {
+        return Formatf("%s:%u %s", message.file, message.line, message.text);
+    }
+};
+
 AndroidLogger::AndroidLogger(std::shared_ptr<FormatterInterface> formatter)
-    : FormattedLogger{std::move(formatter)}
+    : FormattedLogger{formatter ? std::move(formatter) : std::make_shared<AndroidFormatter>()}
 {
 }
 
 void AndroidLogger::write(LogLevel level, const std::string& message) {
-    __android_log_print(level == LogLevel::kInfo ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR, "live", "%s", message.c_str());
+    auto androidLogLevel =
+        level == LogLevel::kError ? ANDROID_LOG_ERROR :
+        level == LogLevel::kWarning ? ANDROID_LOG_WARN :
+        level == LogLevel::kInfo ? ANDROID_LOG_INFO :
+        ANDROID_LOG_DEBUG;
+
+    __android_log_print(androidLogLevel, "live", "%s", message.c_str());
 }
 
 } // namespace scraps::log
