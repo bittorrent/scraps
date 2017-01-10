@@ -68,6 +68,18 @@ TEST(utility, UniformDistribution) {
         EXPECT_GE(result, 1.0);
         EXPECT_LE(result, 123.456);
     }
+
+    {
+        auto result = UniformDistribution<int>(gen);
+        EXPECT_GE(result, 0);
+        EXPECT_LE(result, std::numeric_limits<int>::max());
+    }
+
+    {
+        auto result = UniformDistribution<float>(gen);
+        EXPECT_GE(result, 0);
+        EXPECT_LE(result, 1);
+    }
 }
 
 TEST(utility, RandomBytes) {

@@ -181,7 +181,7 @@ TCPService::ConnectionId TCPService::connect(const std::string& host, uint16_t p
             SCRAPS_LOG_ERROR("unable to resolve host {}", host);
             return;
         }
-        Endpoint endpoint{addresses[UniformDistribution(0, addresses.size() - 1, _prng)], port};
+        Endpoint endpoint{addresses[UniformDistribution(0u, addresses.size() - 1, _prng)], port};
         sockaddr_storage addr;
         socklen_t addrLength;
         endpoint.getSockAddr(&addr, &addrLength);

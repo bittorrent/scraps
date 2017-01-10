@@ -26,79 +26,74 @@
 namespace scraps {
 
 /**
-* Produces an integer value evenly distributed across a range
+* Produces an arithmetic value evenly distributed across: 0-max (ints) or 0-1 (reals)
 */
-template <typename T, typename UniformRandomBitGenerator>
-std::enable_if_t<std::is_integral<T>::value, T>
-UniformDistribution(T min, T max, UniformRandomBitGenerator&& g) {
-    return std::uniform_int_distribution<T>(min, max)(g);
+template <class T, class RNG>
+std::enable_if_t<std::is_arithmetic<T>::value, T>
+UniformDistribution(RNG&& g) {
+    using DistributionType = std::conditional_t<
+        std::is_integral<T>::value,
+        std::uniform_int_distribution<T>,
+        std::uniform_real_distribution<T>
+    >;
+    return DistributionType{}(g);
 }
 
 /**
-* Produces a real value evenly distributed across a range
+* Produces an arithmetic value evenly distributed across a range
 */
-template <typename T, typename UniformRandomBitGenerator>
-std::enable_if_t<std::is_floating_point<T>::value, T>
-UniformDistribution(T min, T max, UniformRandomBitGenerator&& g) {
-    return std::uniform_real_distribution<T>(min, max)(g);
-}
-
-/**
-* Produces an arithmetic value evenly distributed across a range of mixed type arithmetic values
-*/
-template <typename T, typename U, typename UniformRandomBitGenerator>
+template <class T, class U, class RNG>
 std::enable_if_t<std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, std::common_type_t<T, U>>
-UniformDistribution(T min, U max, UniformRandomBitGenerator&& g) {
+UniformDistribution(T min, U max, RNG&& g) {
     using CommonType = std::common_type_t<T, U>;
-    return UniformDistribution<CommonType>(static_cast<CommonType>(min), static_cast<CommonType>(max),
-                                           std::forward<UniformRandomBitGenerator>(g));
-}
-
-/**
- * Produces a random value for T for integral types.
- */
-template <typename T, typename UniformRandomBitGenerator>
-std::enable_if_t<std::is_integral<T>::value, T>
-UniformDistribution(UniformRandomBitGenerator&& g) {
-    return std::uniform_int_distribution<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(g);
+    using DistributionType = std::conditional_t<
+        std::is_integral<CommonType>::value,
+        std::uniform_int_distribution<CommonType>,
+        std::uniform_real_distribution<CommonType>
+    >;
+    return DistributionType(min, max)(g);
 }
 
 /**
 * Produces a chrono::durartion value evenly distributed across a range
 */
-template <typename Rep1, typename Period1, typename Rep2, typename Period2, typename UniformRandomBitGenerator>
+template <class Rep1, class Period1, class Rep2, class Period2, class RNG>
 auto UniformDistribution(const std::chrono::duration<Rep1, Period1>& min,
                          const std::chrono::duration<Rep2, Period2>& max,
-                         UniformRandomBitGenerator&& g)
+                         RNG&& g)
 {
-    using CommonType = std::common_type_t<std::chrono::duration<Rep1, Period1>,
-                                          std::chrono::duration<Rep2, Period2>>;
-    return CommonType{UniformDistribution(CommonType{min}.count(), CommonType{max}.count(),
-                                          std::forward<UniformRandomBitGenerator>(g))};
+    using CommonType = std::common_type_t<
+        std::chrono::duration<Rep1, Period1>,
+        std::chrono::duration<Rep2, Period2>
+    >;
+    return CommonType{UniformDistribution(CommonType{min}.count(), CommonType{max}.count(), g)};
 }
 
 /**
 * Produces a chrono::time_point value evenly distributed across a range
 */
-template <typename Clock, typename Duration1, typename Duration2, typename UniformRandomBitGenerator>
+template <class Clock, class Duration1, class Duration2, class RNG>
 auto UniformDistribution(const std::chrono::time_point<Clock, Duration1>& min,
                          const std::chrono::time_point<Clock, Duration2>& max,
-                         UniformRandomBitGenerator&& g)
+                         RNG&& g)
 {
-    using CommonType = std::common_type_t<std::chrono::time_point<Clock, Duration1>,
-                                          std::chrono::time_point<Clock, Duration2>>;
-    return CommonType{UniformDistribution(min.time_since_epoch(), max.time_since_epoch(),
-                                          std::forward<UniformRandomBitGenerator>(g))};
+    using CommonType = std::common_type_t<
+        std::chrono::time_point<Clock, Duration1>,
+        std::chrono::time_point<Clock, Duration2>
+    >;
+    return CommonType{UniformDistribution(min.time_since_epoch(), max.time_since_epoch(), g)};
 }
 
 /**
  * Generate a sequence of random bytes.
  */
-template <class UniformRandomBitGenerator>
-std::vector<uint8_t> RandomBytes(size_t n, UniformRandomBitGenerator&& g) {
+template <class RNG>
+std::vector<uint8_t> RandomBytes(size_t n, RNG&& g) {
     std::vector<uint8_t> result(n);
-    for (size_t i = 0; i < n; ++i) {
-        result[i] = static_cast<uint8_t>(UniformDistribution(0, 255, g));
+    std::uniform_int_distribution<uint8_t> dist;
+
+    for (auto& i : result) {
+        i = dist(g);
     }
 
     return result;
