@@ -55,6 +55,15 @@ UniformDistribution(T min, U max, UniformRandomBitGenerator&& g) {
 }
 
 /**
+ * Produces a random value for T for integral types.
+ */
+template <typename T, typename UniformRandomBitGenerator>
+std::enable_if_t<std::is_integral<T>::value, T>
+UniformDistribution(UniformRandomBitGenerator&& g) {
+    return std::uniform_int_distribution<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(g);
+}
+
+/**
 * Produces a chrono::durartion value evenly distributed across a range
 */
 template <typename Rep1, typename Period1, typename Rep2, typename Period2, typename UniformRandomBitGenerator>

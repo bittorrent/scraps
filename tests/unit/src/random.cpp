@@ -32,6 +32,12 @@ TEST(utility, UniformDistribution) {
     }
 
     {
+        auto result = UniformDistribution<int>(gen);
+        EXPECT_LE(std::numeric_limits<int>::min(), result);
+        EXPECT_LE(result, std::numeric_limits<int>::max());
+    }
+
+    {
         auto result = UniformDistribution(-7ms, 12ms, gen);
         EXPECT_GE(result, -7ms);
         EXPECT_LE(result, 12ms);
