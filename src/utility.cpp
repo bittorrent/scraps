@@ -143,7 +143,7 @@ stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path) {
 }
 
 bool SetBlocking(int fd, bool blocking) {
-#ifdef _WIN32
+#ifdef SCRAPS_WINDOWS
     unsigned long arg = blocking ? 1 : 0;
     return !ioctlsocket(fd, FIONBIO, &arg);
 #else
@@ -156,7 +156,7 @@ bool SetBlocking(int fd, bool blocking) {
 }
 
 std::string Demangle(const char* mangled) {
-#if __clang__ || __GNUC__
+#if !SCRAPS_ANDROID && (__clang__ || __GNUC__)
     struct FreeDeleter { void operator()(char* p) const { std::free(p); } };
     int status = 0;
     auto demangled = std::unique_ptr<char, FreeDeleter>{abi::__cxa_demangle(mangled, nullptr, nullptr, &status)};
