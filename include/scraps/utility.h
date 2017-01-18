@@ -141,4 +141,30 @@ inline bool CaseInsensitiveEquals(stdts::string_view l, stdts::string_view r) {
     return l.size() == r.size() && std::equal(l.begin(), l.end(), r.begin(), [](char a, char b){ return tolower(a) == tolower(b); });
 }
 
+/**
+* Split a sequence on a delimiter. The SequenceType template argument should be
+* specified to the type of container OutputIt should accept. By default, it is
+* set OutputIt::container_type::value_type.
+*
+* @param begin beginning of input sequence
+* @param end end of input sequence
+* @param out output iterator to a container of Sequence types
+* @param delimiter a single element element in the sequence
+*/
+template <typename InputIt, typename OutputIt, typename Delimiter, typename SequenceType = typename OutputIt::container_type::value_type>
+void Split(InputIt&& begin, InputIt&& end, OutputIt&& out, Delimiter&& delimiter) {
+    SequenceType current;
+    auto inserter = std::back_inserter(current);
+    for (auto it = begin; it != end; ++it) {
+        if (*it == delimiter) {
+            *(out++) = std::move(current);
+            current = {};
+            inserter = std::back_inserter(current);
+        } else {
+            inserter = *it;
+        }
+    }
+    *out = std::move(current);
+}
+
 } // namespace scraps

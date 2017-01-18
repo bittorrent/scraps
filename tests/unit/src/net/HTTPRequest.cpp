@@ -20,6 +20,8 @@
 
 #include <json11.hpp>
 
+#include <unordered_map>
+
 using namespace scraps;
 using namespace scraps::net;
 using json = json11::Json;
@@ -84,4 +86,53 @@ TEST(HTTPRequest, abruptDestruction) {
     HTTPRequest request("http://httpbin.org:9876");
     // destroy the request without waiting
     // this is just a test to make sure we don't leave any threads running or anything like that
+}
+
+TEST(HTTPRequest, HeaderValuesFromHTTPResponse) {
+    EXPECT_EQ(net::detail::HeaderValuesFromHTTPResponse({
+            "Set-Cookie: PHPSESSID=foobar; path=/",
+        }, "Set-Cookie"),
+        (std::vector<std::string>{
+            "PHPSESSID=foobar; path=/",
+        })
+    );
+}
+
+TEST(HTTPRequest, CookiesFromHTTPResponseHeaders) {
+    EXPECT_EQ(net::detail::CookiesFromHTTPResponseHeaders({
+            "Set-Cookie: PHPSESSID=foobar; path=/",
+            "Set-Cookie: PHPSESSID2=foobar",
+            "Set-Cookie: empty=",
+            "Set-Cookie: quoted=\"asdf\"",
+            "Set-Cookie: quoted2=\"asdf\"; asdf=1; zxcv=2",
+        }),
+        (std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>{
+            {"PHPSESSID", {"foobar", {"path=/"}}},
+            {"PHPSESSID2", {"foobar", {}}},
+            {"empty", {"", {}}},
+            {"quoted", {"asdf", {}}},
+            {"quoted2", {"asdf", {"asdf=1", "zxcv=2"}}},
+        })
+    );
+    EXPECT_EQ(net::detail::CookiesFromHTTPResponseHeaders({
+            "Set-Cookie: inva>lid=asdf",
+        }),
+        (std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>{})
+    );
+    EXPECT_EQ(net::detail::CookiesFromHTTPResponseHeaders({
+            "Set-Cookie: invalid=,",
+        }),
+        (std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>{})
+    );
+    EXPECT_EQ(net::detail::CookiesFromHTTPResponseHeaders({
+            "Set-Cookie: empty=",
+            "Set-Cookie: inva>lid=asdf",
+        }),
+        (std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>{})
+    );
+    EXPECT_EQ(net::detail::CookiesFromHTTPResponseHeaders({
+            "Set-Cookie: invalid=\"asdf; path=foo\"; test",
+        }),
+        (std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>{})
+    );
 }

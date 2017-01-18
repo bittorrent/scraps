@@ -206,3 +206,36 @@ TEST(utility, CaseInsensitiveEquals) {
     EXPECT_FALSE(CaseInsensitiveEquals("test", ""));
     EXPECT_FALSE(CaseInsensitiveEquals("tes", "test"));
 }
+
+TEST(utility, Split) {
+    {
+        std::vector<std::string> v;
+        auto in = "foo bar"s;
+        Split(in.begin(), in.end(), std::back_inserter(v), ' ');
+        EXPECT_EQ(v, (std::vector<std::string>{"foo", "bar"}));
+    }
+    {
+        std::vector<std::string> v;
+        auto in = " foo bar"s;
+        Split(in.begin(), in.end(), std::back_inserter(v), ' ');
+        EXPECT_EQ(v, (std::vector<std::string>{"", "foo", "bar"}));
+    }
+    {
+        std::vector<std::string> v;
+        auto in = "foo bar "s;
+        Split(in.begin(), in.end(), std::back_inserter(v), ' ');
+        EXPECT_EQ(v, (std::vector<std::string>{"foo", "bar", ""}));
+    }
+    {
+        std::vector<std::string> v;
+        auto in = "foo bar  "s;
+        Split(in.begin(), in.end(), std::back_inserter(v), ' ');
+        EXPECT_EQ(v, (std::vector<std::string>{"foo", "bar", "", ""}));
+    }
+    {
+        std::vector<std::string> v;
+        auto in = " "s;
+        Split(in.begin(), in.end(), std::back_inserter(v), ' ');
+        EXPECT_EQ(v, (std::vector<std::string>{"", ""}));
+    }
+}

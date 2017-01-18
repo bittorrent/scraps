@@ -17,11 +17,12 @@
 
 #include <scraps/config.h>
 
-#include <mutex>
-#include <condition_variable>
-#include <thread>
-
 #include <curl/curl.h>
+
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+#include <unordered_map>
 
 namespace scraps::net {
 
@@ -117,6 +118,13 @@ public:
     */
     std::vector<std::string> responseHeaders(const std::string& name) const;
 
+    /**
+    * @return mapping of cookies provided with the response via Set-Cookie
+    * including optional cookie directives such as Max-Age=0.
+    */
+    std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>
+    responseCookies() const;
+
 private:
     // no copying
     HTTPRequest(const HTTPRequest&) = delete;
@@ -146,5 +154,13 @@ private:
     static size_t CURLWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata);
     static size_t CURLHeaderWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata);
 };
+
+namespace detail {
+    std::vector<std::string> HeaderValuesFromHTTPResponse(const std::vector<std::string>& headers, const std::string& name);
+
+    // cookie key to value, directives
+    std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>
+    CookiesFromHTTPResponseHeaders(const std::vector<std::string>& headers);
+} // namespace detail
 
 } // namespace scraps::net

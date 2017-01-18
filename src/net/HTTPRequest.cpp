@@ -24,6 +24,139 @@
 
 namespace scraps::net {
 
+namespace detail {
+
+std::vector<std::string> HeaderValuesFromHTTPResponse(const std::vector<std::string>& headers, const std::string& name) {
+    std::vector<std::string> ret;
+    for (auto& header : headers) {
+        auto it = std::search(header.begin(), header.end(), name.begin(), name.end(), [](char a, char b) { return std::toupper(a) == std::toupper(b); });
+        if (it == header.begin()) {
+            std::advance(it, name.size());
+            if (it == header.end() || *(it++) != ':') { continue; }
+            auto raw = std::string{it, header.end()};
+            auto value = gsl::to_string(Trim(gsl::string_span<>{raw}));
+            ret.emplace_back(std::move(value));
+        }
+    }
+    return ret;
+}
+
+std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>
+CookiesFromHTTPResponseHeaders(const std::vector<std::string>& headers) {
+    // from https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+    // Set-Cookie: <cookie-name>=<cookie-value>
+    // Set-Cookie: <cookie-name>=<cookie-value>; Expires=<date>
+    // Set-Cookie: <cookie-name>=<cookie-value>; Max-Age=<non-zero-digit>
+    // Set-Cookie: <cookie-name>=<cookie-value>; Domain=<domain-value>
+    // Set-Cookie: <cookie-name>=<cookie-value>; Path=<path-value>
+    // Set-Cookie: <cookie-name>=<cookie-value>; Secure
+    // Set-Cookie: <cookie-name>=<cookie-value>; HttpOnly
+    //
+    // Set-Cookie: <cookie-name>=<cookie-value>; SameSite=Strict
+    // Set-Cookie: <cookie-name>=<cookie-value>; SameSite=Lax
+    //
+    // // Multiple directives are also possible, for example:
+    // Set-Cookie: <cookie-name>=<cookie-value>; Domain=<domain-value>; Secure; HttpOnly
+
+    auto isRFC2616TokenCharacter = [](auto c) {
+        //
+        // alphanumeric and any of !#$%&'*+-.^_`|~
+        return ('a' <= c && c <= 'z')
+            || ('A' <= c && c <= 'Z')
+            || ('0' <= c && c <= '9')
+            || c == '!'
+            || c == '#'
+            || c == '$'
+            || c == '%'
+            || c == '&'
+            || c == '\''
+            || c == '*'
+            || c == '+'
+            || c == '-'
+            || c == '.'
+            || c == '^'
+            || c == '_'
+            || c == '`'
+            || c == '|'
+            || c == '~'
+        ;
+    };
+
+    auto keyIsRFC2616Token = [&](const auto& key) {
+        return !key.empty() && std::find_if(key.begin(), key.end(), [&](auto& c) {
+                return !isRFC2616TokenCharacter(c);
+            }) == key.end();
+    };
+
+    auto isRFC6265CookieOctet = [](auto c) {
+        // cookie-octet   = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E
+        //                ; US-ASCII characters excluding CTLs,
+        //                ; whitespace DQUOTE, comma, semicolon,
+        //                ; and backslash
+        return c == 0x21
+            || (0x23 <= c && c <= 0x2B)
+            || (0x2D <= c && c <= 0x3A)
+            || (0x3C <= c && c <= 0x5B)
+            || (0x5D <= c && c <= 0x7E)
+        ;
+    };
+
+    auto valueIsRFC6265CookieValue = [&](const auto& value) {
+        return std::find_if(value.begin(), value.end(), [&](auto c) {
+            return !isRFC6265CookieOctet(c);
+        }) == value.end();
+    };
+
+    // " asdf; qwer; 1234" to {"asdf", "qwer", "1234"}
+    auto splitDirectives = [](auto&& str) -> std::vector<std::string> {
+        std::vector<std::string> directives;
+        scraps::Split(str.begin(), str.end(), std::back_inserter(directives), ';');
+        for (auto& d : directives) {
+            if (d.empty() || d[0] != ' ') {
+                return {};
+            }
+            d.erase(d.begin()); // trim leading whitespace
+        }
+        return directives;
+    };
+
+    std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>> cookies;
+    for (auto& h : HeaderValuesFromHTTPResponse(headers, "Set-Cookie")) {
+        auto equals = h.find('=');
+        if (equals == std::string::npos) {
+            return {};
+        }
+        auto key = h.substr(0, equals);
+
+        if (!keyIsRFC2616Token(key)) {
+            return {};
+        }
+
+
+        auto value = h.substr(equals + 1);
+        std::vector<std::string> directives;
+
+
+        auto semicolon = value.find(';');
+        if (semicolon != std::string::npos) {
+            directives = splitDirectives(value.substr(semicolon + 1));
+            value = value.substr(0, semicolon);
+        }
+
+        if (!value.empty() && value.front() == '"' && value.back() == '"') {
+            value = value.substr(1, value.size() - 2);
+        }
+
+        if (!valueIsRFC6265CookieValue(value)) {
+            return {};
+        }
+
+        cookies[key] = std::make_pair(value, directives);
+    }
+    return cookies;
+}
+} // namespace detail
+
 HTTPRequest::~HTTPRequest() {
     abort();
 
@@ -188,18 +321,12 @@ std::vector<std::string> HTTPRequest::responseHeaders() const {
 }
 
 std::vector<std::string> HTTPRequest::responseHeaders(const std::string& name) const {
-    std::vector<std::string> ret;
-    for (auto& header : responseHeaders()) {
-        auto it = std::search(header.begin(), header.end(), name.begin(), name.end(), [](char a, char b) { return std::toupper(a) == std::toupper(b); });
-        if (it == header.begin()) {
-            std::advance(it, name.size());
-            if (it == header.end() || *(it++) != ':') { continue; }
-            auto raw = std::string{it, header.end()};
-            auto value = gsl::to_string(Trim(gsl::string_span<>{raw}));
-            ret.emplace_back(std::move(value));
-        }
-    }
-    return ret;
+    return detail::HeaderValuesFromHTTPResponse(responseHeaders(), name);
+}
+
+std::unordered_map<std::string, std::pair<std::string, std::vector<std::string>>>
+HTTPRequest::responseCookies() const {
+    return detail::CookiesFromHTTPResponseHeaders(responseHeaders());
 }
 
 size_t HTTPRequest::CURLWriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata) {
