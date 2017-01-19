@@ -118,7 +118,7 @@ libraries:
     {% if platform == 'android' %}
     jshackle:
         repository: https://github.com/bittorrent/jshackle.git
-        commit: f471c01b7c7dfaf7fadacf2790a35bb15ee54155
+        commit: 29986aee0acb4c56c48208b2baddf3fec07278e9
     {% endif %}
     json11:
         repository: https://github.com/dropbox/json11.git
