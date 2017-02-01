@@ -44,6 +44,12 @@ You can override any of our dependencies by placing them in your `PKG_CONFIG_PAT
 
 Currently, only 'nix platforms are supported and only with clang and libc++. We have Travis builds for some of these but welcome pull requests for additional platform support. For help in building Scraps on your platform of choice, it may be helpful to explore the `scripts/ci` directory to determine how we do it.
 
+### Building on virtualized macOS
+
+Due to Apple's licensing restrictions, we can't just provide a public macOS box, so you'll have to create your own. See [live-build-environments](https://github.com/bittorrent/live-build-environments) for how to do that. When you do, take a look at the Vagrantfile and remove the line that sets `config.vm.box_url` and make sure you have your macOS box added under `macos1012`.
+
+For those with access, first you'll need the vagrant-s3auth plugin (`vagrant plugin install vagrant-s3auth`). Next, just use `vagrant up` to run the build.
+
 ## Issues & Requests
 
 If you discover an issue with security implications, we ask that you first disclose it privately by emailing any of the active BitTorrent contributors.
