@@ -153,10 +153,17 @@ def build(args):
         if args.clean:
             common_args.append('-a')
         if args.enable_coverage:
-            common_args.extend([
-                'cxxflags=-coverage',
-                'linkflags={}'.format(coverage_lib(platform.system().lower()))
-            ])
+            lib = coverage_lib(platform.system().lower())
+            if not lib:
+                print_diagnostic('code coverage requested but no coverage library found')
+                print_diagnostic(textwrap.dedent('''\
+                    If this is an Xcode build, be sure to install Xcode and not just the
+                    command line tools.'''))
+            else:
+                common_args.extend([
+                    'cxxflags=-coverage',
+                    'linkflags={}'.format(lib)
+                ])
         return shell_quote([c.format(**variables) for c in common_args])
 
     def b2():
@@ -176,14 +183,17 @@ def build(args):
 
 
 def coverage_lib(uname):
-    if uname == 'darwin':
-        toolchain_root = '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain'
-        return subprocess.check_output(
-            'find {}/usr/lib -name "libclang_rt.profile_osx.a"'.format(toolchain_root), shell=True).decode().strip()
-    else:
-        # XXX: currently only supported for clang 3.8
-        return subprocess.check_output(
-            'find /usr/lib*/llvm-3.8/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
+    try:
+        if uname == 'darwin':
+            toolchain_root = '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain'
+            return subprocess.check_output(
+                'find {}/usr/lib -name "libclang_rt.profile_osx.a"'.format(toolchain_root), shell=True).decode().strip()
+        else:
+            # XXX: currently only supported for clang 3.8
+            return subprocess.check_output(
+                'find /usr/lib*/llvm-3.8/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
+    except subprocess.CalledProcessError:
+        pass
 
 
 def install(args):

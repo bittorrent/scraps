@@ -10,3 +10,4 @@ bin
 configure.json
 dist
 project-config.jam
+.vagrant
