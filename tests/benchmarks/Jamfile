@@ -1,4 +1,4 @@
-exe scraps-benchmark :
+exe scraps-benchmarks :
     [ glob-tree-ex src : *.cpp ]
     ../..//scraps/<variant>release
     ../..//benchmark
@@ -7,5 +7,5 @@ exe scraps-benchmark :
 ;
 
 path-constant PREFIX : [ option.get prefix : "/usr/local" ] ;
-install install : scraps-benchmark : <location>$(PREFIX)/bin ;
+install install : scraps-benchmarks : <location>$(PREFIX)/bin ;
 explicit install ;
