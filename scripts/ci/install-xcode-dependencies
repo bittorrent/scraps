@@ -3,10 +3,10 @@
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 $script_dir/install-common-dependencies
 
-brew install pkg-config
-brew install python
-brew install python3
-brew install cmake
+type pkg-config 2>/dev/null || brew install pkg-config
+type python     2>/dev/null || brew install python
+type python3    2>/dev/null || brew install python3
+type cmake      2>/dev/null || brew install cmake
 
 pip install --user jinja2 pyyaml colorama
 

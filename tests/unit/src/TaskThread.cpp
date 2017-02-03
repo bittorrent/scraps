@@ -58,9 +58,11 @@ TEST(TaskThread, timingFunctionality) {
 
     auto now = std::chrono::steady_clock::now();
 
-    const auto threshold = 30ms;
+    const auto threshold = 50ms;
 
-    auto speedCheck = [=] { EXPECT_LT(std::chrono::steady_clock::now().time_since_epoch().count(), (now + threshold).time_since_epoch().count()); };
+    auto speedCheck = [=] {
+        EXPECT_LT(std::chrono::steady_clock::now().time_since_epoch(), (now + threshold).time_since_epoch());
+    };
 
     for (int i = 0; i < 50; ++i) {
         scheduler.async(speedCheck);
@@ -98,7 +100,7 @@ TEST(TaskThread, futuresFunctionality) {
     EXPECT_EQ(f.valid(), true);
     EXPECT_EQ(f.get(), 17);
 
-    const auto threshold = 20ms;
+    const auto threshold = 100ms;
 
     EXPECT_LT(std::chrono::steady_clock::now(), now + threshold);
 }

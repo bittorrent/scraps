@@ -55,7 +55,7 @@ TEST(RateLimitedLogger, basicUsage){
         std::this_thread::sleep_for(800ms); // <2 per second
     }
 
-    EXPECT_NEAR(dest->messages.size(), 10, 2); // no rate limiting
+    EXPECT_NEAR(dest->messages.size(), 10, 3); // no rate limiting
 }
 
 TEST(RateLimitedLogger, limitsLogMessagesByFileAndLine){

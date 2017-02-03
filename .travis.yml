@@ -24,24 +24,6 @@ addons:
 matrix:
     include:
 
-        # Android
-        - os: linux
-          services: docker
-          language: generic
-          env: TARGET=android
-          install: docker-compose pull android-env
-          script:
-              - |
-                docker-compose run \
-                  -e AWS_ACCESS_KEY_ID \
-                  -e AWS_SECRET_ACCESS_KEY \
-                  -e CACHE_BUCKET \
-                  -e TRAVIS -e CI \
-                  --rm android-env \
-                bash -c \
-                  "./scripts/ci/install-android-dependencies && \
-                  ./scripts/ci/build-android"
-
         # Linux
         - os: linux
           language: generic
@@ -66,36 +48,7 @@ matrix:
                   --rm linux-env \
                 bash -c 'bash <(curl -s https://codecov.io/bash) -x "llvm-cov-3.8 gcov"'
 
-        ######### Xcode #########
-
-        # MacOS
-        - os: osx
-          language: cpp
-          osx_image: xcode8
-          env:     TARGET=macos
-          install: ./scripts/ci/install-xcode-dependencies
-          script:  ./scripts/ci/build-macos
-          after_success: bash <(curl -s https://codecov.io/bash)
-
-        # iPhone
-        - os: osx
-          language: cpp
-          osx_image: xcode8
-          env:     TARGET=iphoneos
-          install: ./scripts/ci/install-xcode-dependencies
-          script:  ./scripts/ci/build-iphoneos
-
-        # AppleTV
-        - os: osx
-          language: cpp
-          osx_image: xcode8
-          env:     TARGET=appletvos
-          install: ./scripts/ci/install-xcode-dependencies
-          script:  ./scripts/ci/build-appletvos
-
-        ############ Analysis ############
-
-        # Linux
+        # Analysis
         - os: linux
           language: generic
           env:
@@ -115,13 +68,3 @@ matrix:
                 bash -c \
                   "./scripts/ci/install-linux-dependencies && \
                   ./scripts/ci/build-linux"
-
-        # MacOS
-        - os: osx
-          language: cpp
-          osx_image: xcode8
-          env:
-            - TARGET=macos
-            - ANALYSIS=1
-          install: ./scripts/ci/install-xcode-dependencies
-          script:  ./scripts/ci/build-macos
