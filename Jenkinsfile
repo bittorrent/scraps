@@ -49,8 +49,8 @@ def archive_results(targets) {
         sh 'sudo rm -rf dist'
         catchError {
             unstash name: target
+            sh "mv ${target}.tar.gz deploy/${target}.tar.gz"
         }
-        sh "mv ${target}.tar.gz deploy/${target}.tar.gz"
     }
     step([
         $class: 'S3BucketPublisher',
