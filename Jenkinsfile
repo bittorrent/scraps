@@ -23,7 +23,7 @@ def with_docker(environment, command) {
        '-e CACHE_BUCKET=$CACHE_BUCKET ' +
        '-e ANALYSIS=$ANALYSIS ' +
        "${environment} " +
-       "bash -c ${command}"
+       "bash -c \"${command}\""
 }
 
 def build_docker(target) {
