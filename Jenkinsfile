@@ -120,7 +120,7 @@ stage('Build') {
             }
         }
     }
-    node('ubuntu') {
+    node {
         archive_results([
             'android',
             'linux',
