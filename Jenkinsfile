@@ -33,8 +33,7 @@ def build_docker(target) {
         credentialsId: 'd88a020a-6354-4387-9635-7b6ca25e4172',
         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
     ]]) {
-        with_docker("${target}-env", "./scripts/ci/install-${target}-dependencies")
-        with_docker("${target}-env", "./scripts/ci/build-${target}")
+        with_docker("${target}-env", "./scripts/ci/install-${target}-dependencies && ./scripts/ci/build-${target}")
     }
 }
 
