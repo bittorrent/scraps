@@ -18,10 +18,10 @@ def build_xcode(target) {
 
 def with_docker(environment, command) {
     sh 'docker-compose run --rm ' +
-       '-e AWS_ACCESS_KEY_ID ' +
-       '-e AWS_SECRET_ACCESS_KEY ' +
-       '-e CACHE_BUCKET ' +
-       '-e ANALYZE ' +
+       '-e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID ' +
+       '-e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ' +
+       '-e CACHE_BUCKET=$CACHE_BUCKET ' +
+       '-e ANALYSIS=$ANALYSIS ' +
        "${environment} " +
        "bash -c ${command}"
 }
@@ -128,6 +128,14 @@ stage('Build') {
             'macos',
             'iphoneos',
             'appletvos'
+        ])
+        step([
+            $class: 'Mailer',
+            notifyEveryUnstableBuild: true,
+            recipients: emailextrecipients([
+                [$class: 'CulpritsRecipientProvider'],
+                [$class: 'RequesterRecipientProvider']
+            ])
         ])
     }
 }
