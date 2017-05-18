@@ -8,7 +8,7 @@ services:
     linux-env:
         extends:
             service: base
-        image: bittorrent/live-build-environments:linux-7512f1a
+        image: bittorrent/live-build-environments:linux-c65d648
     android-env:
         extends:
             service: base
