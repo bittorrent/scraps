@@ -57,6 +57,7 @@ public:
     std::unordered_map<Key, std::unordered_set<Value>> get() const {
         std::lock_guard<std::mutex> lock(_mutex);
         std::unordered_map<Key, std::unordered_set<Value>> ret;
+        _removeExpired();
         for (auto& kv : _entries) {
             ret[kv.first] = _get(kv.first);
         }
@@ -68,6 +69,7 @@ public:
     */
     std::unordered_set<Value> get(Key key) const {
         std::lock_guard<std::mutex> lock(_mutex);
+        _removeExpired();
         return _get(key);
     }
 
@@ -93,10 +95,9 @@ private:
         }
     }
 
+    // Be sure to call _removeExpired before this method if necessary
     std::unordered_set<Value> _get(Key key) const {
-        _removeExpired();
-
-        std::unordered_set<std::string> ret;
+        std::unordered_set<Value> ret;
         if (!_entries.count(key)) {
             return ret;
         }

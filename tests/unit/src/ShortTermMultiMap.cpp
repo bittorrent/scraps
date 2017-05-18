@@ -17,6 +17,9 @@
 
 #include <scraps/ShortTermMultiMap.h>
 
+#include <thread>
+#include <chrono>
+
 using namespace scraps;
 
 TEST(ShortTermMultiMap, basicOperation) {
@@ -42,4 +45,26 @@ TEST(ShortTermMultiMap, basicOperation) {
 
     EXPECT_TRUE(map.get(2).empty());
     EXPECT_TRUE(map.get().empty());
+}
+
+TEST(ShortTermMultiMap, types) {
+    ShortTermMultiMap<int, int> map;
+    (void)map.get();
+}
+
+TEST(ShortTermMultiMap, threadSafety) {
+    ShortTermMultiMap<int, int> map;
+    std::thread writer{[&]{
+        for (int i = 0; i < 100000; ++i) {
+            map.add(i, i, 10ms);
+        }
+    }};
+    std::thread reader{[&]{
+        for (int i = 0; i < 1000; ++i) {
+            map.get();
+        }
+    }};
+
+    writer.join();
+    reader.join();
 }
