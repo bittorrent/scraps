@@ -122,7 +122,7 @@ size_t PhysicalMemory() {
 #endif
 }
 
-stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path) {
+stdts::optional<std::vector<stdts::byte>> BytesFromFile(const std::string& path) {
     std::ifstream dataFile{path, std::ifstream::ate | std::ios::binary};
     const auto fileSize = dataFile.tellg();
 
@@ -130,7 +130,7 @@ stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path) {
         return {};
     }
 
-    std::vector<Byte> buf;
+    std::vector<stdts::byte> buf;
     buf.resize(fileSize);
     dataFile.seekg(0, std::ios::beg);
     dataFile.read(reinterpret_cast<char*>(buf.data()), fileSize);

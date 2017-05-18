@@ -21,6 +21,8 @@
 #import <Foundation/NSProcessInfo.h>
 #endif
 
+#include <stdts/cstddef.h>
+
 #include <array>
 
 using namespace scraps;
@@ -61,8 +63,8 @@ TEST(utility, DecToHex) {
 TEST(utility, ToBytes) {
     {
         std::string str{"AB"};
-        std::array<scraps::Byte, 1> expected = {scraps::Byte{0xAB}};
-        std::array<scraps::Byte, 1> actual{};
+        std::array<stdts::byte, 1> expected = {stdts::byte{0xAB}};
+        std::array<stdts::byte, 1> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
         EXPECT_EQ(expected, actual);
@@ -70,8 +72,8 @@ TEST(utility, ToBytes) {
 
     {
         std::string str{"0xAB"};
-        std::array<scraps::Byte, 1> expected = {scraps::Byte{0xAB}};
-        std::array<scraps::Byte, 1> actual{};
+        std::array<stdts::byte, 1> expected = {stdts::byte{0xAB}};
+        std::array<stdts::byte, 1> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
         EXPECT_EQ(expected, actual);
@@ -80,7 +82,7 @@ TEST(utility, ToBytes) {
     {
         // differing sizes
         std::string str{"ABCDEF"};
-        std::array<scraps::Byte, 2> actual{};
+        std::array<stdts::byte, 2> actual{};
 
         EXPECT_FALSE(ToBytes(str, actual));
     }
@@ -88,7 +90,7 @@ TEST(utility, ToBytes) {
     {
         // invalid characters
         std::string str{"hello world!"};
-        std::array<scraps::Byte, 6> actual{};
+        std::array<stdts::byte, 6> actual{};
 
         EXPECT_FALSE(ToBytes(str, actual));
     }
@@ -96,8 +98,8 @@ TEST(utility, ToBytes) {
     {
         // zero length
         std::string str{};
-        std::array<scraps::Byte, 0> expected{};
-        std::array<scraps::Byte, 0> actual{};
+        std::array<stdts::byte, 0> expected{};
+        std::array<stdts::byte, 0> actual{};
 
         EXPECT_TRUE(ToBytes(str, actual));
         EXPECT_EQ(expected, actual);
@@ -105,9 +107,9 @@ TEST(utility, ToBytes) {
 }
 
 TEST(utility, ToHex) {
-    std::array<scraps::Byte, 8> bytes = {
-        scraps::Byte{0x01}, scraps::Byte{0x23}, scraps::Byte{0x45}, scraps::Byte{0x67},
-        scraps::Byte{0x89}, scraps::Byte{0xAB}, scraps::Byte{0xCD}, scraps::Byte{0xEF},
+    std::array<stdts::byte, 8> bytes = {
+        stdts::byte{0x01}, stdts::byte{0x23}, stdts::byte{0x45}, stdts::byte{0x67},
+        stdts::byte{0x89}, stdts::byte{0xAB}, stdts::byte{0xCD}, stdts::byte{0xEF},
     };
 
     EXPECT_EQ(ToHex(bytes), "0123456789abcdef");
@@ -179,8 +181,10 @@ TEST(utility, ParseAddressAndPort) {
     }
 };
 
+struct DemangleTestType {};
+
 TEST(utility, Demangle) {
-    EXPECT_EQ(Demangle(typeid(scraps::GenericByte).name()), "scraps::GenericByte");
+    EXPECT_EQ(Demangle(typeid(DemangleTestType).name()), "DemangleTestType");
 }
 
 TEST(utility, ByteFromFile) {

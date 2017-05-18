@@ -18,12 +18,13 @@
 #include <scraps/config.h>
 
 #include <scraps/base64.h>
-#include <scraps/Byte.h>
 #include <scraps/hex.h>
 #include <scraps/Temp.h>
 #include <scraps/random.h>
 #include <scraps/hash.h>
+
 #include <stdts/optional.h>
+#include <stdts/cstddef.h>
 
 #include <gsl.h>
 
@@ -118,7 +119,7 @@ auto Trim(gsl::basic_string_span<T, N> str) {
     return TrimLeft(TrimRight(str));
 }
 
-stdts::optional<std::vector<Byte>> BytesFromFile(const std::string& path);
+stdts::optional<std::vector<stdts::byte>> BytesFromFile(const std::string& path);
 
 /**
 * Sets the given file descriptor to blocking or non-blocking.

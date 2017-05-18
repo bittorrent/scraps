@@ -24,7 +24,7 @@ TEST(SHA256, basic) {
     SHA256 sha256;
     std::string data = "0123456789";
     sha256.update(data.data(), data.size());
-    std::array<unsigned char, SHA256::kHashSize> result;
+    std::array<stdts::byte, SHA256::kHashSize> result;
     sha256.finish(result.data());
 
     EXPECT_EQ("84d89877f0d4041efb6bf91a16f0248f2fd573e6af05c19f96bedb9f882f7882", ToHex(result));

@@ -25,20 +25,16 @@
     namespace scraps { using HMACSHA256 = sodium::HMACSHA256; }
 #endif
 
+#include <stdts/cstddef.h>
+
 #include <gsl.h>
 
 namespace scraps {
 
-template <typename BaseByteType>
-struct HMACSHA256ByteTag {};
-
-template <typename BaseByteType>
-using HMACSHA256Byte = StrongByte<HMACSHA256ByteTag<BaseByteType>>;
-
-template <typename KeyByteType, std::ptrdiff_t KeySize, typename ByteT, std::ptrdiff_t DataSize>
-std::array<HMACSHA256Byte<std::remove_const_t<ByteT>>, HMACSHA256::kResultSize>
-GetHMACSHA256(gsl::span<KeyByteType, KeySize> key, gsl::span<ByteT, DataSize> data) {
-    std::array<HMACSHA256Byte<std::remove_const_t<ByteT>>, HMACSHA256::kResultSize> ret;
+template <std::ptrdiff_t KeySize, std::ptrdiff_t DataSize>
+std::array<stdts::byte, HMACSHA256::kResultSize>
+GetHMACSHA256(gsl::span<stdts::byte, KeySize> key, gsl::span<stdts::byte, DataSize> data) {
+    std::array<stdts::byte, HMACSHA256::kResultSize> ret;
 
     HMACSHA256 hmac(key.data(), key.size());
     hmac.update(data.data(), data.size());

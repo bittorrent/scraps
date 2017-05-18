@@ -15,9 +15,9 @@
 */
 #pragma once
 
-#include <scraps/config.h>
+#include <stdts/cstddef.h>
 
-#include <scraps/Byte.h>
+#include <scraps/config.h>
 
 #if SCRAPS_APPLE
     #include <scraps/apple/SHA256.h>
@@ -31,16 +31,10 @@
 
 namespace scraps {
 
-template <typename BaseByteType>
-struct SHA256ByteTag {};
-
-template <typename BaseByteType>
-using SHA256Byte = StrongByte<SHA256ByteTag<BaseByteType>>;
-
 template <typename ByteT, std::ptrdiff_t N>
-std::array<SHA256Byte<std::remove_const_t<ByteT>>, SHA256::kHashSize>
+std::array<stdts::byte, SHA256::kHashSize>
 GetSHA256(gsl::span<ByteT, N> data) {
-    std::array<SHA256Byte<std::remove_const_t<ByteT>>, SHA256::kHashSize> ret;
+    std::array<stdts::byte, SHA256::kHashSize> ret;
 
     SHA256 sha256;
     sha256.update(data.data(), data.size());

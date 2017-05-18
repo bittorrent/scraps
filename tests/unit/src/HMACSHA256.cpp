@@ -25,7 +25,7 @@ TEST(HMACSHA256, basic) {
     HMACSHA256 digest(key.data(), key.size());
     std::string data = "0123456789";
     digest.update(data.data(), data.size());
-    std::array<unsigned char, HMACSHA256::kResultSize> result;
+    std::array<stdts::byte, HMACSHA256::kResultSize> result;
     digest.finish(result.data());
 
     EXPECT_EQ("1418bde51967febed1356d35d916222a78b616b4d3d090ec34e3531f41325ed3", ToHex(result));

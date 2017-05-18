@@ -17,8 +17,9 @@
 
 #include <scraps/config.h>
 
-#include <scraps/Byte.h>
 #include <scraps/Temp.h>
+
+#include <stdts/cstddef.h>
 
 #include <gsl.h>
 
@@ -33,8 +34,8 @@ constexpr signed char DecToHex(int c) {
     return -1;
 }
 
-constexpr signed char DecToHex(const Byte& c) {
-    return DecToHex(c.value());
+constexpr signed char DecToHex(stdts::byte c) {
+    return DecToHex(static_cast<int>(c));
 }
 
 template <typename CharT>
@@ -55,13 +56,11 @@ template <typename T, std::ptrdiff_t... BytesDimension>
 std::string ToHex(const gsl::span<T, BytesDimension...> range) {
     std::string ret;
 
-    static_assert(sizeof(T) == 1, "Input span type too large");
-
     ret.reserve(range.size() * 2 + 2);
 
     for (auto& b : range) {
-        ret += DecToHex(b >> 4);
-        ret += DecToHex(b & 0x0F);
+        ret += DecToHex(stdts::byte{b} >> 4);
+        ret += DecToHex(stdts::byte{b} & stdts::byte{0x0F});
     }
 
     return ret;
@@ -77,8 +76,8 @@ std::string ToHex(const std::array<T, N>& in) {
  * range is successfully converted to the output range. A prefix of "0x" or "0X"
  * is optional.
  */
-template <typename HexCharT, std::ptrdiff_t HexExtent, typename ByteType, std::ptrdiff_t... BytesDimension>
-constexpr bool ToBytes(const gsl::basic_string_span<const HexCharT, HexExtent> hex, const gsl::span<ByteType, BytesDimension...> bytes) {
+template <typename HexCharT, std::ptrdiff_t HexExtent, std::ptrdiff_t... BytesDimension>
+constexpr bool ToBytes(const gsl::basic_string_span<const HexCharT, HexExtent> hex, const gsl::span<stdts::byte, BytesDimension...> bytes) {
     auto prefixSize = 0;
     if (hex.size() > 2 && hex[0] == '0' && (hex[1] == 'x' || hex[1] == 'X')) {
         prefixSize += 2;
@@ -92,14 +91,14 @@ constexpr bool ToBytes(const gsl::basic_string_span<const HexCharT, HexExtent> h
         if (hi < 0 || lo < 0) {
             return false;
         }
-        bytes[i] = ByteType{static_cast<uint8_t>((hi << 4) | lo)};
+        bytes[i] = (stdts::byte{static_cast<unsigned char>(hi)} << 4) | stdts::byte{static_cast<unsigned char>(lo)};
     }
     return true;
 }
 
-template <typename CharT, typename T, size_t N>
-constexpr bool ToBytes(const std::basic_string<CharT>& in, std::array<T, N>& out) {
-    return ToBytes(gsl::basic_string_span<const CharT>{in}, gsl::span<T, N>{out});
+template <typename CharT, size_t N>
+constexpr bool ToBytes(const std::basic_string<CharT>& in, std::array<stdts::byte, N>& out) {
+    return ToBytes(gsl::basic_string_span<const CharT>{in}, gsl::span<stdts::byte, N>{out});
 }
 
 } // namespace scraps
