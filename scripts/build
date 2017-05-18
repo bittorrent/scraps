@@ -189,9 +189,9 @@ def coverage_lib(uname):
             return subprocess.check_output(
                 'find {}/usr/lib -name "libclang_rt.profile_osx.a"'.format(toolchain_root), shell=True).decode().strip()
         else:
-            # XXX: currently only supported for clang 3.8
+            # XXX: currently only supported for clang 3.9
             return subprocess.check_output(
-                'find /usr/lib*/llvm-3.8/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
+                'find /usr/lib*/llvm-3.9/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
     except subprocess.CalledProcessError:
         pass
 
