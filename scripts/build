@@ -191,7 +191,7 @@ def coverage_lib(uname):
         else:
             # XXX: currently only supported for clang 3.9
             return subprocess.check_output(
-                'find /usr/lib*/llvm-3.9/lib -name "libclang_rt.profile*.a"', shell=True).decode().strip()
+                'find /usr/lib*/llvm-3.9/lib -name "libclang_rt.profile-x86_64.a"', shell=True).decode().strip()
     except subprocess.CalledProcessError:
         pass
 
