@@ -31,9 +31,9 @@
 
 namespace scraps {
 
-template <std::ptrdiff_t KeySize, std::ptrdiff_t DataSize>
+template <typename ByteType1, typename ByteType2, std::ptrdiff_t KeySize, std::ptrdiff_t DataSize>
 std::array<stdts::byte, HMACSHA256::kResultSize>
-GetHMACSHA256(gsl::span<stdts::byte, KeySize> key, gsl::span<stdts::byte, DataSize> data) {
+GetHMACSHA256(const gsl::span<ByteType1, KeySize> key, const gsl::span<ByteType2, DataSize> data) {
     std::array<stdts::byte, HMACSHA256::kResultSize> ret;
 
     HMACSHA256 hmac(key.data(), key.size());
