@@ -19,6 +19,7 @@
 
 #include <scraps/Observer.h>
 
+#include <functional>
 #include <unordered_map>
 
 namespace scraps {

@@ -20,6 +20,7 @@
 #include <scraps/log/FormattedLogger.h>
 
 #include <cstdio>
+#include <mutex>
 #include <string>
 
 namespace scraps::log {

@@ -18,6 +18,7 @@
 #include <scraps/config.h>
 #include <stdts/optional.h>
 
+#include <functional>
 #include <string>
 
 // TODO: when we see wide enough C++17 support, these will be replaced by <filesystem>

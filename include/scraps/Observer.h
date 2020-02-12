@@ -19,6 +19,7 @@
 
 #include <scraps/Notification.h>
 
+#include <functional>
 #include <mutex>
 #include <type_traits>
 #include <cassert>

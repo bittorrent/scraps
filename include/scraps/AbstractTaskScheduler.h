@@ -18,6 +18,7 @@
 #include <scraps/config.h>
 
 #include <atomic>
+#include <functional>
 #include <future>
 #include <memory>
 #include <mutex>

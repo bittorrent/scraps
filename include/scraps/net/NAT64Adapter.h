@@ -23,6 +23,8 @@
 
 #include <stdts/optional.h>
 
+#include <mutex>
+
 namespace scraps {
 namespace net {
 

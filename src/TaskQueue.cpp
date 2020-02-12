@@ -15,6 +15,8 @@
 */
 #include <scraps/TaskQueue.h>
 
+#include <algorithm>
+
 namespace scraps {
 
 void TaskQueue::clear() {
