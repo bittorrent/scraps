@@ -126,7 +126,7 @@ libraries:
         project:
             build-steps:
                 - cp json11.hpp {build_directory}/include
-                - $CXX -std=c++11 {{ '-stdlib=libc++' if platform != 'android' }} -c json11.cpp -I . -o json11.o
+                - $CXX -std=c++11 {{ '-stdlib=libc++' if platform != 'android' and platform != 'generic' }} -c json11.cpp -I . -o json11.o
                 - ar -rv {build_directory}/lib/libjson11.a json11.o
             post-build:
                 - mkdir -p {build_directory}/include/json11
