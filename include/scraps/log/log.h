@@ -93,8 +93,8 @@ void Logf(Level level, const char* file, unsigned int line, const char* format, 
 #define SCRAPS_LOG_RATE_LIMITED(LEVEL, INTERVAL, ...)                                  \
     {                                                                                  \
         if ((LEVEL) >= ::scraps::log::detail::gLevel) {                                \
-            static ::std::atomic<::std::chrono::steady_clock::time_point> prev;        \
-            auto now = ::std::chrono::steady_clock::now();                             \
+            static ::std::atomic<::std::chrono::steady_clock::duration> prev;          \
+            auto now = ::std::chrono::steady_clock::now().time_since_epoch();          \
             auto last = prev.load(::std::memory_order_acquire);                        \
             if (now - last >= (INTERVAL) && prev.compare_exchange_strong(last, now)) { \
                 SCRAPS_LOG(LEVEL, __VA_ARGS__);                                        \
