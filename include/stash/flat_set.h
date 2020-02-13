@@ -160,7 +160,7 @@ public:
     /**
      * Constant
      */
-    void swap(flat_set<Key, Compare>& other) noexcept(noexcept(std::swap(other._set, _set)));
+    void swap(flat_set<Key, Compare>& other) noexcept(noexcept(_set.swap(other._set)));
 
     // Lookup
 
@@ -370,7 +370,7 @@ auto flat_set<Key, Compare>::erase_if(InputIt begin, InputIt end, Predicate pred
 }
 
 template <typename Key, typename Compare>
-void flat_set<Key, Compare>::swap(flat_set<Key, Compare>& other) noexcept(noexcept(other.swap(other))) {
+void flat_set<Key, Compare>::swap(flat_set<Key, Compare>& other) noexcept(noexcept(_set.swap(other._set))) {
     _set.swap(other._set);
 }
 
