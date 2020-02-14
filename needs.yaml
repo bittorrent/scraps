@@ -32,6 +32,9 @@ libraries:
             {% if platform == 'android' and architecture == 'armv7' %}
             environment:
                 CFLAGS: "{current} -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm"
+            {% elif platform == 'generic' %}
+            environment:
+                CFLAGS: "{current} -fPIC"
             {% endif %}
             post-build: xxd -i LICENSE {build_directory}/include/sodium/license.c
     mbedtls:
