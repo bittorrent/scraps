@@ -206,10 +206,18 @@ bool UDPSocket::_bind(const char* interface, uint16_t port) {
         freeaddrinfo(result);
     });
 
-    if (::bind(_socket, result->ai_addr, result->ai_addrlen)) {
-        SCRAPS_LOG_ERROR("error binding udp socket (errno = {})", static_cast<int>(errno));
-        return false;
+    auto rp = result;
+
+    for (; rp != nullptr; rp = rp->ai_next) {
+        if (::bind(_socket, rp->ai_addr, rp->ai_addrlen)) {
+            SCRAPS_LOG_ERROR("error binding udp socket (errno = {})", static_cast<int>(errno));
+        }
+        else {
+            break;
+        }
     }
+
+    if (!rp) return false;
 
     return true;
 }
