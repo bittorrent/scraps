@@ -186,6 +186,27 @@ void UDPSocket::close() {
     _totalSentBytes = 0;
 }
 
+static char* get_ip_str(const struct sockaddr* sa, char* s, size_t maxlen)
+{
+    switch (sa->sa_family) {
+    case AF_INET:
+        inet_ntop(AF_INET, &(((struct sockaddr_in*)sa)->sin_addr),
+            s, maxlen);
+        break;
+
+    case AF_INET6:
+        inet_ntop(AF_INET6, &(((struct sockaddr_in6*)sa)->sin6_addr),
+            s, maxlen);
+        break;
+
+    default:
+        strncpy(s, "Unknown AF", maxlen);
+        return NULL;
+    }
+
+    return s;
+}
+
 bool UDPSocket::_bind(const char* interface, uint16_t port) {
     addrinfo hints;
     memset(&hints, 0, sizeof(hints));
@@ -210,7 +231,9 @@ bool UDPSocket::_bind(const char* interface, uint16_t port) {
 
     for (; rp != nullptr; rp = rp->ai_next) {
         if (::bind(_socket, rp->ai_addr, rp->ai_addrlen)) {
-            SCRAPS_LOG_ERROR("error binding udp socket (errno = {})", static_cast<int>(errno));
+            char addr[1024];
+            get_ip_str(rp->ai_addr, addr, sizeof(addr));
+            SCRAPS_LOG_ERROR("error binding udp socket to {} (errno = {})", addr, static_cast<int>(errno));
         }
         else {
             break;
